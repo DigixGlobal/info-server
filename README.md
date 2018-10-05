@@ -13,23 +13,55 @@
 * Get proposal details: `/proposals/details/:id`
 ```
 {
+    "proposalId": "0xwef23fwef",
     "proposer": "0x1234we..",
-    "ipfsdoc": "Qmwefwef",
-    "moreDocs": [],
     "endorser": "0x231423..",
-    "proposalStage": "idea", // idea/draft/draftVoting/VotingCommit/VotingReveal/AwaitingClaim/OnGoing/closed
+    "isDigix": false,
+    "timeCreated": <timestamp>,
+    "finalVersionIpfsDoc": "Qm23f..",
+    "proposalVersions": [
+      {
+        "docIpfsHash": "Qm..",
+        "created": <timestamp>,
+        "milestoneFundings": [1e18, 2e18],
+        finalReward: [1e18],
+        moreDocs: ["Qm..", "Qm..",..],
+        totalFunding: 4e18
+      },
+      ...
+    ]
+    "draftVoting": {
+      "startTime": <timestamp>,
+      "votingDeadline": <timestamp>,
+      "totalVoterStake": 123e9, // 123 DGD,
+      "totalVoterCount": 12
+      "currentResult": 0.61, // 61%
+      "quorum": 140e9, // 140 DGD
+      "quota": 0.60, // 60%
+      "claimed": false,
+      "passed": false,
+      "funded": false,
+    },
+    "votingRounds": [
+      { // voting round 0
+        "startTime": <timestamp>,
+        "commitDeadline": <timestamp>,
+        "revealDeadline": <timestamp>,
+        "totalVoterStake": 123e9, // 123 DGD,
+        "totalVoterCount": 12
+        "currentResult": 0.61, // 61%
+        "quorum": 140e9, // 140 DGD
+        "quota": 0.60, // 60%
+        "claimed": false,
+        "passed": false,
+        "funded": false,
+      },
+      ....
+    ]
     "currentMilestone": 1,
-    "milestoneCount": 2,
-    "totalFunding": 5e18, // 5 ETH
-    "fundings": [1e18, 4e18], // fundings for different milestones
     "currentMilestoneStart": <timestamp>,
-    "currentVotingStart": <timestamp>,
-    "currentVotingDeadline": <timestamp>,
-    "currentApproval": 0.60,
-    "currentDgdTurnout": 123e9, // 123 DGD
-    "currentVoterTurnout": 12, // 12 voters so far
-    "quorum": 200e9, // 200 DGD
-    "quota": 0.6, // 60%
+    "currentVotingRound": -1, // -1 = draftVoting, 0 = first Voting
+    "votingStage": "draftVoting", // draftVoting/commit/reveal/none
     "claimableFunding": 1e18, // 1 ETH
     "prl": "ok", // ok/paused/stopped
 }
@@ -37,5 +69,17 @@
 
 * List proposals: `/proposals/:stage`  :stage = idea/draft/...
 ```
-[<proposal_id_1>, <proposal_id_2>, ...]
+[
+  {
+    "proposalId": "0xwef23fwef",
+    "proposer": "0x1234we..",
+    ....
+  },
+  {
+    "proposalId": "0xwef23fwef",
+    "proposer": "0x1234we..",
+    ....
+  },
+  ...
+]
 ```
