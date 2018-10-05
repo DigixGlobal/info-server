@@ -3,11 +3,27 @@
 * `/dao_details`
 ```
 {
-    "currentQuarter": 1
-    "timeInQuarter": 1234213 // in seconds
-    "totalDgdsLocked": 123e9 // = 123 DGD
+    "currentQuarter": 1,
+    "startOfQuarter": <timestamp>, // in seconds
+    "startOfMainphase": <timestamp>,
+    "startOfNextQuarter": <timestamp>,
+    "totalDgdsLocked": 1234e9 // = 1234 DGD
 }
 ```
+##### Address details
+* `/address/:address`
+```
+{
+    "isUser": true, // whether this address is a user. In ther words, whether this address has locked DGDs at least once
+    "lockedDgdStake": 123e9, // 123 DGDStake
+    "lockedDgd": 200e9, // locked 200 DGD
+    "reputationPoint": 12e9, // 12 Reputation Points
+    "quarterPoint": 8e9, // 8 Quarter Points
+    "isParticipant": true,
+    "isModerator": true,
+}
+```
+
 
 ##### Proposals
 * Get proposal details: `/proposals/details/:id`
@@ -70,16 +86,16 @@
 * List proposals: `/proposals/:stage`  :stage = idea/draft/...
 ```
 [
-  {
-    "proposalId": "0xwef23fwef",
-    "proposer": "0x1234we..",
-    ....
-  },
-  {
-    "proposalId": "0xwef23fwef",
-    "proposer": "0x1234we..",
-    ....
-  },
-  ...
+    {
+      "proposalId": "0xwef23fwef",
+      "proposer": "0x1234we..",
+      ....
+    },
+    {
+      "proposalId": "0xwef23fwef",
+      "proposer": "0x1234we..",
+      ....
+    },
+    ...
 ]
 ```
