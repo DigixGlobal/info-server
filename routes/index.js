@@ -6,10 +6,14 @@ const proposalRoutes = require('./proposals');
 
 router.use('/proposals', proposalRoutes);
 
-
-router.get('/test', async (req, res) => {
-  return res.status(500).json({ success: true });
+router.get('/daoInfo', async (req, res) => {
+  const result = await req.db.get('daoInfo').findOne({})
+  return res.status(500).json({ result });
 });
 
+router.get('/address/:address', async (req, res) => {
+  const result = await req.db.get('addresses').findOne({ address: req.params.address })
+  return res.status(500).json({ "result": result ? result : "notFound" });
+});
 
 module.exports = router;

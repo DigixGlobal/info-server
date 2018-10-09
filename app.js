@@ -9,6 +9,10 @@ const cron = require("node-cron");
 const app = express();
 const Web3 = require('web3');
 const ERC20abi = require('./ERC20abi.json');
+const scripts = require('./scripts');
+
+const db = require('monk')('localhost:12702/digixdao')
+
 
 const w3 = new Web3(new Web3.providers.HttpProvider("https://mainnet.infura.io"));
 
@@ -18,17 +22,21 @@ app.use(morgan('combined'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// middleware to inject db object // not sure if is a good practice
+app.use((req, res, next) => {
+  req.db = db;
+  next();
+})
+
 app.use('/', routes);
 
 const test = async () => {
-
   const DGD = w3.eth.contract(ERC20abi);
   const dgd = DGD.at('0xe0b7927c4af23765cb51314a0e0521a9645f0e2a');
   console.log('Total supply = ', await dgd.totalSupply.call());
 }
 
-console.log('\ttest running test()');
-test();
+scripts.setDummyData(db);
 
 cron.schedule("1 * * * *", async () => {
   // schedule a script to run every min
