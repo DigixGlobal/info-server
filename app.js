@@ -12,6 +12,8 @@ const routes = require('./routes');
 const app = express();
 const scripts = require('./scripts');
 
+const contracts = {};
+
 const {
   getContracts,
 } = require('./helpers/contracts');
@@ -38,14 +40,20 @@ app.use((req, res, next) => {
 
 app.use('/', routes);
 
-const testDao = async () => {
-  const contracts = getContracts(w3, process.env.NETWORK_ID);
-  console.log('current quarter         = ', await contracts.dao.currentQuarterIndex.call());
-  console.log('current time in quarter = ', await contracts.dao.currentTimeInQuarter.call());
-  console.log('eth funds in dao        = ', await contracts.daoFundingStorage.ethInDao.call());
-};
+// const testDao = async () => {
+//   await getContracts(contracts, w3, process.env.NETWORK_ID);
+//   console.log('current quarter         = ', await contracts.dao.currentQuarterIndex.call());
+//   console.log('current time in quarter = ', await contracts.dao.currentTimeInQuarter.call());
+//   console.log('eth funds in dao        = ', await contracts.daoFundingStorage.ethInDao.call());
+// };
 
 scripts.setDummyData(db);
+
+const startContractWatchers = async () => {
+  await getContracts(contracts, w3, process.env.NETWORK_ID);
+  scripts.watchProposalEvents(db, contracts);
+};
+startContractWatchers();
 
 cron.schedule('* * * * *', async () => {
   // schedule a script to run every min
@@ -53,7 +61,7 @@ cron.schedule('* * * * *', async () => {
   console.log('\tIn cron.schedule');
   console.log('Running a task every 1 min');
 
-  await testDao();
+  scripts.refreshDao(db, contracts); // check if daoInfo object has changed
 });
 
 const server = app.listen(3002, function () {

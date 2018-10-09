@@ -46,8 +46,7 @@ const contracts = {
   daoWhitelistingStorage: DaoWhitelistingStorage,
 };
 
-const getContracts = function (w3, networkId) {
-  const contractObjs = {};
+const getContracts = async (contractObjs, w3, networkId) => {
   for (const k in contracts) {
     const contract = contracts[k];
     contractObjs[k] = w3.eth.contract(contract.abi).at(contract.networks[networkId].address);
