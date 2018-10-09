@@ -10,8 +10,11 @@ const monk = require('monk');
 const routes = require('./routes');
 
 const app = express();
-const ERC20abi = require('./ERC20abi.json');
 const scripts = require('./scripts');
+
+const {
+  getContract,
+} = require('./helpers/contracts');
 
 const db = monk(process.env.DATABASE_URL, function (err) {
   if (err) {
@@ -35,21 +38,21 @@ app.use((req, res, next) => {
 
 app.use('/', routes);
 
-const test = async () => {
-  const DGD = w3.eth.contract(ERC20abi);
-  const dgd = DGD.at('0xe0b7927c4af23765cb51314a0e0521a9645f0e2a');
-  console.log('Total supply = ', await dgd.totalSupply.call());
+const testDao = async () => {
+  const { abi, address } = getContract('Dao', '42');
+  console.log('current quarter         = ', await w3.eth.contract(abi).at(address).currentQuarterIndex.call());
+  console.log('current time in quarter = ', await w3.eth.contract(abi).at(address).currentTimeInQuarter.call());
 };
 
 scripts.setDummyData(db);
 
-cron.schedule('1 * * * *', async () => {
+cron.schedule('* * * * *', async () => {
   // schedule a script to run every min
 
   console.log('\tIn cron.schedule');
   console.log('Running a task every 1 min');
 
-  await test();
+  await testDao();
 });
 
 const server = app.listen(3002, function () {

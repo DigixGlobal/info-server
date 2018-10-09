@@ -85,4 +85,5 @@ const setDummyData = (db) => {
 
 module.exports = {
   setDummyData,
+  watchSomeEvent,
 };
