@@ -4,17 +4,22 @@ const express = require('express');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const routes = require('./routes');
-const cron = require("node-cron");
-const app = express();
+const cron = require('node-cron');
 const Web3 = require('web3');
+const monk = require('monk');
+const routes = require('./routes');
+
+const app = express();
 const ERC20abi = require('./ERC20abi.json');
 const scripts = require('./scripts');
 
-const db = require('monk')('localhost:12702/digixdao')
+const db = monk(process.env.DATABASE_URL, function (err) {
+  if (err) {
+    console.error('Db is not connected: ', err.message);
+  }
+});
 
-
-const w3 = new Web3(new Web3.providers.HttpProvider("https://mainnet.infura.io"));
+const w3 = new Web3(new Web3.providers.HttpProvider(process.env.WEB3_HTTP_PROVIDER));
 
 app.use(cors());
 
@@ -26,7 +31,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use((req, res, next) => {
   req.db = db;
   next();
-})
+});
 
 app.use('/', routes);
 
@@ -34,11 +39,11 @@ const test = async () => {
   const DGD = w3.eth.contract(ERC20abi);
   const dgd = DGD.at('0xe0b7927c4af23765cb51314a0e0521a9645f0e2a');
   console.log('Total supply = ', await dgd.totalSupply.call());
-}
+};
 
 scripts.setDummyData(db);
 
-cron.schedule("1 * * * *", async () => {
+cron.schedule('1 * * * *', async () => {
   // schedule a script to run every min
 
   console.log('\tIn cron.schedule');
