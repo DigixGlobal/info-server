@@ -13,7 +13,7 @@ const app = express();
 const scripts = require('./scripts');
 
 const {
-  getContract,
+  getContracts,
 } = require('./helpers/contracts');
 
 const db = monk(process.env.DATABASE_URL, function (err) {
@@ -39,9 +39,10 @@ app.use((req, res, next) => {
 app.use('/', routes);
 
 const testDao = async () => {
-  const { abi, address } = getContract('Dao', '42');
-  console.log('current quarter         = ', await w3.eth.contract(abi).at(address).currentQuarterIndex.call());
-  console.log('current time in quarter = ', await w3.eth.contract(abi).at(address).currentTimeInQuarter.call());
+  const contracts = getContracts(w3, process.env.NETWORK_ID);
+  console.log('current quarter         = ', await contracts.dao.currentQuarterIndex.call());
+  console.log('current time in quarter = ', await contracts.dao.currentTimeInQuarter.call());
+  console.log('eth funds in dao        = ', await contracts.daoFundingStorage.ethInDao.call());
 };
 
 scripts.setDummyData(db);

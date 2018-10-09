@@ -22,44 +22,40 @@ const DaoWhitelisting = require('@digix/dao-contracts-kovan/build/contracts/DaoW
 const DaoWhitelistingStorage = require('@digix/dao-contracts-kovan/build/contracts/DaoWhitelistingStorage.json');
 
 const contracts = {
-  ContractResolver,
-  Dao,
-  DaoFundingManager,
-  DaoFundingStorage,
-  DaoIdentity,
-  DaoIdentityStorage,
-  DaoListingService,
-  DaoPointsStorage,
-  DaoRewardsManager,
-  DaoRewardsManagerExtras,
-  DaoRewardsStorage,
-  DaoSpecialProposal,
-  DaoSpecialStorage,
-  DaoSpecialVotingClaims,
-  DaoStakeLocking,
-  DaoStakeStorage,
-  DaoStorage,
-  DaoUpgradeStorage,
-  DaoVoting,
-  DaoVotingClaims,
-  DaoWhitelisting,
-  DaoWhitelistingStorage,
+  contractResolver: ContractResolver,
+  dao: Dao,
+  daoFundingManager: DaoFundingManager,
+  daoFundingStorage: DaoFundingStorage,
+  daoIdentity: DaoIdentity,
+  daoIdentityStorage: DaoIdentityStorage,
+  daoListingService: DaoListingService,
+  daoPointsStorage: DaoPointsStorage,
+  daoRewardsManager: DaoRewardsManager,
+  daoRewardsManagerExtras: DaoRewardsManagerExtras,
+  daoRewardsStorage: DaoRewardsStorage,
+  daoSpecialProposal: DaoSpecialProposal,
+  daoSpecialStorage: DaoSpecialStorage,
+  daoSpecialVotingClaims: DaoSpecialVotingClaims,
+  daoStakeLocking: DaoStakeLocking,
+  daoStakeStorage: DaoStakeStorage,
+  daoStorage: DaoStorage,
+  daoUpgradeStorage: DaoUpgradeStorage,
+  daoVoting: DaoVoting,
+  daoVotingClaims: DaoVotingClaims,
+  daoWhitelisting: DaoWhitelisting,
+  daoWhitelistingStorage: DaoWhitelistingStorage,
 };
 
-const getContract = function (name, networkId) {
-  const contract = contracts[name];
-  // let latestNetwork = Math.max(...Object.keys(contract.networks));
-  // const selectedNetwork = DEFAULT_NETWORKS.find(n => n.id === network);
-  // if (selectedNetwork.id.toLowerCase() !== 'testrpc') {
-  //   latestNetwork = selectedNetwork.chainId;
-  // }
+const getContracts = function (w3, networkId) {
+  const contractObjs = {};
+  for (const k in contracts) {
+    const contract = contracts[k];
+    contractObjs[k] = w3.eth.contract(contract.abi).at(contract.networks[networkId].address);
+  }
 
-  return {
-    abi: contract.abi,
-    address: contract.networks[networkId].address,
-  };
+  return contractObjs;
 };
 
 module.exports = {
-  getContract,
+  getContracts,
 };
