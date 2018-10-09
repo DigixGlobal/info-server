@@ -50,8 +50,12 @@ app.use('/', routes);
 scripts.setDummyData(db);
 
 const startContractWatchers = async () => {
-  await getContracts(contracts, w3, process.env.NETWORK_ID);
+  const networkId = await w3.version.network;
+  await getContracts(contracts, w3, networkId);
   scripts.watchProposalEvents(db, contracts);
+  console.log(contracts.dao.address);
+  scripts.refreshProposal(db, contracts, '0xe2086410ef9c878f21514fbdb56190a1dca43ee90173d70cbd261ea9fef8fd64');
+  console.log();
 };
 startContractWatchers();
 

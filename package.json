@@ -27,7 +27,7 @@
     "nodemon": "^1.18.4",
     "postmark": "^1.6.1",
     "web3": "0.20.7",
-    "@digix/dao-contracts-kovan": "0.0.1"
+    "@digix/dao-contracts": "file:../dao-contracts"
   },
   "devDependencies": {
     "eslint": "^5.6.1",
