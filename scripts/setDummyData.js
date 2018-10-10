@@ -72,6 +72,24 @@ module.exports = (db) => {
     quarterPoint: 8e9, // 8 Quarter Points
     isParticipant: true,
     isModerator: true,
+    votes: {
+      proposalId: {
+        draftVoting: {
+          commit: true,
+          reveal: true,
+        },
+        votingRound: {
+          0: {
+            commit: true,
+            reveal: true,
+          },
+          1: {
+            commit: true,
+            reveal: false,
+          },
+        },
+      },
+    },
   }, { upsert: true });
   // db.close()
 };

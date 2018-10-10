@@ -1,5 +1,6 @@
 const ContractResolver = require('@digix/dao-contracts/build/contracts/ContractResolver.json');
 const Dao = require('@digix/dao-contracts/build/contracts/Dao.json');
+const MockDaoConfigsStorage = require('@digix/dao-contracts/build/contracts/MockDaoConfigsStorage.json');
 const DaoFundingManager = require('@digix/dao-contracts/build/contracts/DaoFundingManager.json');
 const DaoFundingStorage = require('@digix/dao-contracts/build/contracts/DaoFundingStorage.json');
 const DaoIdentity = require('@digix/dao-contracts/build/contracts/DaoIdentity.json');
@@ -24,6 +25,7 @@ const DaoWhitelistingStorage = require('@digix/dao-contracts/build/contracts/Dao
 const contracts = {
   contractResolver: ContractResolver,
   dao: Dao,
+  daoConfigsStorage: MockDaoConfigsStorage,
   daoFundingManager: DaoFundingManager,
   daoFundingStorage: DaoFundingStorage,
   daoIdentity: DaoIdentity,
