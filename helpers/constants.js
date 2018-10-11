@@ -38,8 +38,8 @@ const watchedFunctionNames = {
   DRAFT_VOTE: 'voteOnDraft',
   COMMIT_VOTE: 'commitVoteOnProposal',
   REVEAL_VOTE: 'revealVoteOnProposal',
-  COMMIT_VOTE_SPECIAL: 'commitVoteOnSpecialProposal',
-  REVEAL_VOTE_SPECIAL: 'revealVoteOnSpecialProposal',
+  // COMMIT_VOTE_SPECIAL: 'commitVoteOnSpecialProposal',
+  // REVEAL_VOTE_SPECIAL: 'revealVoteOnSpecialProposal',
   ENDORSE_PROPOSAL: 'endorseProposal',
 };
 
@@ -47,8 +47,8 @@ const watchedFunctionsList = [
   watchedFunctionNames.DRAFT_VOTE,
   watchedFunctionNames.COMMIT_VOTE,
   watchedFunctionNames.REVEAL_VOTE,
-  watchedFunctionNames.COMMIT_VOTE_SPECIAL,
-  watchedFunctionNames.REVEAL_VOTE_SPECIAL,
+  // watchedFunctionNames.COMMIT_VOTE_SPECIAL,
+  // watchedFunctionNames.REVEAL_VOTE_SPECIAL,
   watchedFunctionNames.ENDORSE_PROPOSAL,
 ];
 
