@@ -1,5 +1,6 @@
 const ContractResolver = require('@digix/dao-contracts/build/contracts/ContractResolver.json');
 const Dao = require('@digix/dao-contracts/build/contracts/Dao.json');
+const DaoCalculatorService = require('@digix/dao-contracts/build/contracts/DaoCalculatorService.json');
 const MockDaoConfigsStorage = require('@digix/dao-contracts/build/contracts/MockDaoConfigsStorage.json');
 const DaoFundingManager = require('@digix/dao-contracts/build/contracts/DaoFundingManager.json');
 const DaoFundingStorage = require('@digix/dao-contracts/build/contracts/DaoFundingStorage.json');
@@ -26,6 +27,7 @@ const abiDecoder = require('abi-decoder');
 const contracts = {
   contractResolver: ContractResolver,
   dao: Dao,
+  daoCalculatorService: DaoCalculatorService,
   daoConfigsStorage: MockDaoConfigsStorage,
   daoFundingManager: DaoFundingManager,
   daoFundingStorage: DaoFundingStorage,

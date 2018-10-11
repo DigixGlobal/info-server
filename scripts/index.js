@@ -1,6 +1,7 @@
 const a = require('awaiting');
 
 const {
+  refreshProposalNew,
   refreshProposalDetails,
   refreshProposalFinalizeProposal,
   refreshProposalFinishMilestone,
@@ -51,6 +52,19 @@ const _getProposalId = (params) => {
   return proposalId;
 };
 
+const _getIndex = (params) => {
+  let index = null;
+  params.forEach((param) => {
+    if (
+      (param.name === '_index')
+      && (param.type === 'uint256')
+    ) {
+      index = param.value;
+    }
+  });
+  return index;
+};
+
 const watchAndProcessNewBlocks = (w3, db, contracts) => {
   const filter = w3.eth.filter('latest');
   filter.watch(async () => {
@@ -70,6 +84,7 @@ const watchAndProcessNewBlocks = (w3, db, contracts) => {
         const res = {
           _from: tx.from,
           _proposalId: _getProposalId(decoded.params),
+          _index: _getIndex(decoded.params),
         };
         watchedFunctionsMap[decoded.name](db, contracts, res);
       }
@@ -83,7 +98,7 @@ const watchProposalEvents = async (db, contracts) => {
   //    - update MongoDB database
   //    - notify the Dao Server if need to
   watchProposalEvent(contracts.dao.NewProposal, (res) => {
-    refreshProposalDetails(db, contracts, res);
+    refreshProposalNew(db, contracts, res);
     // TODO: and maybe notify Dao server
   });
 

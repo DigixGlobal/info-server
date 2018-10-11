@@ -16,13 +16,50 @@ const {
   proposalVotingStages,
 } = require('../helpers/constants');
 
+const {
+  getAllAddresses,
+} = require('./addresses');
+
+const refreshProposalNew = async (db, contracts, res) => {
+  // read current proposal from DB
+  const proposals = db.get('proposals');
+  const proposal = {};
+  const proposalDetails = await contracts.daoStorage.readProposal.call(res._proposalId);
+  proposal.proposalId = proposalDetails[readProposalIndices.proposalId];
+  proposal.proposer = proposalDetails[readProposalIndices.proposer];
+  proposal.endorser = proposalDetails[readProposalIndices.endorser];
+  proposal.stage = proposalStages.IDEA;
+  proposal.timeCreated = proposalDetails[readProposalIndices.timeCreated];
+  proposal.finalVersionIpfsDoc = proposalDetails[readProposalIndices.finalVersionIpfsDoc];
+  proposal.prl = proposalDetails[readProposalIndices.prl];
+  proposal.isDigix = proposalDetails[readProposalIndices.isDigix];
+
+  const nVersions = proposalDetails[readProposalIndices.nVersions];
+  proposal.proposalVersions = [];
+  let currentVersion = res._proposalId;
+  for (const v in indexRange(0, nVersions)) {
+    console.log('version id : ', v);
+    const proposalVersion = await contracts.daoStorage.readProposalVersion.call(res._proposalId, currentVersion);
+    proposal.proposalVersions.push({
+      docIpfsHash: proposalVersion[readProposalVersionIndices.docIpfsHash],
+      created: proposalVersion[readProposalVersionIndices.created],
+      milestoneFundings: proposalVersion[readProposalVersionIndices.milestoneFundings],
+      finalReward: proposalVersion[readProposalVersionIndices.finalReward],
+      moreDocs: [],
+      totalFunding: proposalVersion[readProposalVersionIndices.finalReward].plus(sumArrayBN(proposalVersion[readProposalVersionIndices.milestoneFundings])),
+    });
+    currentVersion = await contracts.daoStorage.getNextProposalVersion.call(res._proposalId, currentVersion);
+  }
+
+  console.log('[refreshProposalNew] = ', proposal);
+  // update the database
+  proposals.update({ proposalId: res._proposalId }, proposal, { upsert: true });
+};
+
 const refreshProposalDetails = async (db, contracts, res) => {
   // read current proposal from DB
   const proposals = db.get('proposals');
   proposals.findOne({ proposalId: res._proposalId }, async function (err, proposal) {
-    if (proposal === null) {
-      proposal = {};
-    }
     const proposalDetails = await contracts.daoStorage.readProposal.call(res._proposalId);
     proposal.proposalId = proposalDetails[readProposalIndices.proposalId];
     proposal.proposer = proposalDetails[readProposalIndices.proposer];
@@ -231,33 +268,126 @@ const refreshProposalPRLAction = async (db, contracts, res) => {
 };
 
 const refreshProposalDraftVote = async (db, contracts, res) => {
-  // TODO:
-  console.log('[refreshProposalDraftVote]');
-  console.log('res = ', res);
+  // update proposals
+  const proposals = db.get('proposals');
+  proposals.findOne({ proposalId: res._proposalId }, async function (err, proposal) {
+    getAllAddresses(db, async (allAddresses) => {
+      const draftVotingCount = await contracts.daoStorage.readDraftVotingCount.call(res._proposalId, allAddresses);
+      const yesVoters = await contracts.daoStorage.readDraftVotingVotes.call(res._proposalId, allAddresses, true);
+      const noVoters = await contracts.daoStorage.readDraftVotingVotes.call(res._proposalId, allAddresses, false);
+      const quotaNumerator = await contracts.daoConfigsStorage.uintConfigs.call(daoConfigsKeys.CONFIG_DRAFT_QUOTA_NUMERATOR);
+      const quotaDenominator = await contracts.daoConfigsStorage.uintConfigs.call(daoConfigsKeys.CONFIG_DRAFT_QUOTA_DENOMINATOR);
+      proposal.draftVoting.totalVoterStake = draftVotingCount[0].plus(draftVotingCount[1]);
+      proposal.draftVoting.totalVoterCount = yesVoters[1].plus(noVoters[1]);
+      proposal.draftVoting.currentResult = draftVotingCount[0].idiv(draftVotingCount[0].plus(draftVotingCount[1]));
+      proposal.quorum = await contracts.daoCalculatorService.minimumDraftQuorum.call(res._proposalId);
+      proposal.quota = quotaNumerator.idiv(quotaDenominator);
+
+      proposals.update({ proposalId: res._proposalId }, proposal, { upsert: true });
+    });
+  });
+
+  // update addresses
+  const addresses = db.get('addresses');
+  addresses.findOne({ address: res._from }, function (err, participant) {
+    participant.votes[res._proposalId].draftVoting = {};
+    participant.votes[res._proposalId].votingRound = {};
+    participant.votes[res._proposalId].draftVoting.commit = true;
+    participant.votes[res._proposalId].draftVoting.reveal = true;
+
+    addresses.update({ address: res._from }, participant, { upsert: true });
+  });
 };
 
 const refreshProposalCommitVote = async (db, contracts, res) => {
-  // TODO:
-  console.log('[refreshProposalCommitVote]');
-  console.log('res = ', res);
+  // update proposals
+  const proposals = db.get('proposals');
+  proposals.findOne({ proposalId: res._proposalId }, function (err, proposal) {
+    // update addresses
+    const addresses = db.get('addresses');
+    addresses.findOne({ address: res._from }, async function (err, participant) {
+      const quotaNumerator = await contracts.daoConfigsStorage.uintConfigs.call(daoConfigsKeys.CONFIG_VOTING_QUOTA_NUMERATOR);
+      const quotaDenominator = await contracts.daoConfigsStorage.uintConfigs.call(daoConfigsKeys.CONFIG_VOTING_QUOTA_DENOMINATOR);
+      const voterStake = await contracts.daoStakeStorage.lockedDGDStake.call(res._from);
+      proposal.votingRounds[res._index].quorum = await contracts.daoCalculatorService.minimumVotingQuorum.call(res._proposalId, res._index);
+      proposal.votingRounds[res._index].quota = quotaNumerator.idiv(quotaDenominator);
+      if (participant.votes[res._proposalId].votingRounds[res._index].commit === false) {
+        proposal.votingRounds[res._index].totalVoterStake = proposal.votingRounds[res._index].totalVoterStake.plus(voterStake);
+        proposal.votingRounds[res._index].totalVoterCount = proposal.votingRounds[res._index].totalVoterCount.plus(new BigNumber(1));
+      }
+      proposals.update({ proposalId: res._proposalId }, proposal, { upsert: true });
+
+      participant.votes[res._proposalId].votingRound[res._index].commit = true;
+      addresses.update({ address: res._from }, participant, { upsert: true });
+    });
+  });
 };
 
 const refreshProposalRevealVote = async (db, contracts, res) => {
-  // TODO:
-  console.log('[refreshProposalRevealVote]');
-  console.log('res = ', res);
+  // update proposals
+  const proposals = db.get('proposals');
+  proposals.findOne({ proposalId: res._proposalId }, function (err, proposal) {
+    getAllAddresses(db, async (allAddresses) => {
+      const votingCount = await contracts.daoStorage.readVotingCount.call(res._proposalId, res._index, allAddresses);
+      const yesVoters = await contracts.daoStorage.readVotingRoundVotes.call(res._proposalId, res._index, allAddresses, true);
+      const noVoters = await contracts.daoStorage.readVotingRoundVotes.call(res._proposalId, res._index, allAddresses, false);
+      const quotaNumerator = await contracts.daoConfigsStorage.uintConfigs.call(daoConfigsKeys.CONFIG_VOTING_QUOTA_NUMERATOR);
+      const quotaDenominator = await contracts.daoConfigsStorage.uintConfigs.call(daoConfigsKeys.CONFIG_VOTING_QUOTA_DENOMINATOR);
+      proposal.votingRounds[res._index].totalVoterStake = votingCount[0].plus(votingCount[1]);
+      proposal.votingRounds[res._index].totalVoterCount = yesVoters[1].plus(noVoters[1]);
+      proposal.votingRounds[res._index].currentResult = votingCount[0].idiv(votingCount[0].plus(votingCount[1]));
+      proposal.votingRounds[res._index].quorum = await contracts.daoCalculatorService.minimumVotingQuorum.call(res._proposalId, res._index);
+      proposal.votingRounds[res._index].quota = quotaNumerator.idiv(quotaDenominator);
+
+      proposals.update({ proposalId: res._proposalId }, proposal, { upsert: true });
+    });
+  });
+
+  // update addresses
+  const addresses = db.get('addresses');
+  addresses.findOne({ address: res._from }, function (err, participant) {
+    participant.votes[res._proposalId].votingRound[res._index].reveal = true;
+    addresses.update({ address: res._from }, participant, { upsert: true });
+  });
 };
 
 const refreshProposalCommitVoteOnSpecial = async (db, contracts, res) => {
   // TODO:
   console.log('[refreshProposalCommitVoteOnSpecial]');
   console.log('res = ', res);
+
+  // update addresses
+  const addresses = db.get('addresses');
+  addresses.findOne({ address: res._from }, function (err, participant) {
+    participant.votes[res._proposalId].votingRound = {};
+    participant.votes[res._proposalId].votingRound[0].commit = true;
+    addresses.update({ address: res._from }, participant, { upsert: true });
+  });
+
+  // update proposals
+  const proposals = db.get('proposals');
+  proposals.findOne({ proposalId: res._proposalId }, function (err, proposal) {
+
+  });
 };
 
 const refreshProposalRevealVoteOnSpecial = async (db, contracts, res) => {
   // TODO:
   console.log('[refreshProposalRevealVoteOnSpecial]');
   console.log('res = ', res);
+
+  // update addresses
+  const addresses = db.get('addresses');
+  addresses.findOne({ address: res._from }, function (err, participant) {
+    participant.votes[res._proposalId].votingRound[0].reveal = true;
+    addresses.update({ address: res._from }, participant, { upsert: true });
+  });
+
+  // update proposals
+  const proposals = db.get('proposals');
+  proposals.findOne({ proposalId: res._proposalId }, function (err, proposal) {
+
+  });
 };
 
 const watchedFunctionsMap = {
@@ -270,6 +400,7 @@ const watchedFunctionsMap = {
 };
 
 module.exports = {
+  refreshProposalNew,
   refreshProposalDetails,
   refreshProposalFinalizeProposal,
   refreshProposalDraftVotingClaim,
