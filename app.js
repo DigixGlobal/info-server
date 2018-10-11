@@ -44,32 +44,18 @@ app.use((req, res, next) => {
 
 app.use('/', routes);
 
-// const testDao = async () => {
-//   await getContracts(contracts, w3, process.env.NETWORK_ID);
-//   console.log('current quarter         = ', await contracts.dao.currentQuarterIndex.call());
-//   console.log('current time in quarter = ', await contracts.dao.currentTimeInQuarter.call());
-//   console.log('eth funds in dao        = ', await contracts.daoFundingStorage.ethInDao.call());
-// };
-
-scripts.setDummyData(db);
-
 const startContractWatchers = async () => {
   const networkId = await w3.version.network;
   await getContracts(contracts, w3, networkId);
   scripts.watchProposalEvents(db, contracts);
-
   scripts.watchAndProcessNewBlocks(w3, db, contracts);
-  console.log(contracts.dao.address);
-  console.log();
 };
+
 startContractWatchers();
 
 cron.schedule('* * * * *', async () => {
   // schedule a script to run every min
-
   console.log('\tIn cron.schedule');
-  console.log('Running a task every 1 min');
-
   scripts.refreshDao(db, contracts); // check if daoInfo object has changed
 });
 

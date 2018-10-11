@@ -18,6 +18,40 @@ const readProposalVersionIndices = {
   finalReward: 3,
 };
 
+const proposalStages = {
+  IDEA: 'idea',
+  DRAFT: 'draft',
+  PROPOSAL: 'proposal',
+  ONGOING: 'ongoing',
+  REVIEW: 'review',
+  ARCHIVED: 'archived',
+};
+
+const proposalVotingStages = {
+  DRAFT: 'draftVoting',
+  COMMIT: 'commit',
+  REVEAL: 'reveal',
+  NONE: 'none',
+};
+
+const watchedFunctionNames = {
+  DRAFT_VOTE: 'voteOnDraft',
+  COMMIT_VOTE: 'commitVoteOnProposal',
+  REVEAL_VOTE: 'revealVoteOnProposal',
+  COMMIT_VOTE_SPECIAL: 'commitVoteOnSpecialProposal',
+  REVEAL_VOTE_SPECIAL: 'revealVoteOnSpecialProposal',
+  ENDORSE_PROPOSAL: 'endorseProposal',
+};
+
+const watchedFunctionsList = [
+  watchedFunctionNames.DRAFT_VOTE,
+  watchedFunctionNames.COMMIT_VOTE,
+  watchedFunctionNames.REVEAL_VOTE,
+  watchedFunctionNames.COMMIT_VOTE_SPECIAL,
+  watchedFunctionNames.REVEAL_VOTE_SPECIAL,
+  watchedFunctionNames.ENDORSE_PROPOSAL,
+];
+
 const daoConfigsKeys = {
   CONFIG_LOCKING_PHASE_DURATION: 'locking_phase_duration',
   CONFIG_QUARTER_DURATION: 'quarter_duration',
@@ -84,4 +118,8 @@ module.exports = {
   readProposalIndices,
   readProposalVersionIndices,
   daoConfigsKeys,
+  proposalStages,
+  proposalVotingStages,
+  watchedFunctionNames,
+  watchedFunctionsList,
 };

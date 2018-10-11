@@ -6,9 +6,15 @@ const {
   refreshProposalFinishMilestone,
   refreshProposalDraftVotingClaim,
   refreshProposalVotingClaim,
+  refreshProposalClaimFunding,
   refreshProposalCloseProposal,
   refreshProposalPRLAction,
+  watchedFunctionsMap,
 } = require('./refreshProposal');
+
+const {
+  watchedFunctionsList,
+} = require('../helpers/constants');
 
 const refreshDao = require('./refreshDao');
 const setDummyData = require('./setDummyData');
@@ -26,11 +32,23 @@ const setDummyData = require('./setDummyData');
  */
 const watchProposalEvent = (event, callback) => {
   // watch the event that changes a proposal, and call callback(proposalId);
-  // TODO
   event().watch(function (err, result) {
     const { args } = result;
     callback(args);
   });
+};
+
+const _getProposalId = (params) => {
+  let proposalId;
+  params.forEach((param) => {
+    if (
+      (param.name === '_proposalId')
+      && (param.type === 'bytes32')
+    ) {
+      proposalId = param.value;
+    }
+  });
+  return proposalId;
 };
 
 const watchAndProcessNewBlocks = (w3, db, contracts) => {
@@ -38,20 +56,28 @@ const watchAndProcessNewBlocks = (w3, db, contracts) => {
   filter.watch(async () => {
     const currentBlockNumber = w3.eth.blockNumber;
     const blockNumberToProcess = currentBlockNumber - parseInt(process.env.BLOCK_CONFIRMATIONS, 10);
-    console.log('currentBlockNumber = ', currentBlockNumber);
-    console.log('blockNumberToProcess = ', blockNumberToProcess);
     const block = w3.eth.getBlock(blockNumberToProcess);
     await a.map(block.transactions, 20, async (tnxId) => {
       const tx = await w3.eth.getTransaction(tnxId);
       const txReceipt = await w3.eth.getTransactionReceipt(tnxId);
-      if (!contracts.fromAddress[tx.to] || txReceipt.status !== '0x01') return; // if not sending to our contracts, or reverted: no need to process
-      console.log('decoded = ', contracts.decoder.decodeMethod(tx.input));
+
+      // if not sending to our contracts, or reverted: no need to process
+      if (!contracts.fromAddress[tx.to] || txReceipt.status !== '0x01') return;
+
+      const decoded = contracts.decoder.decodeMethod(tx.input);
+
+      if (watchedFunctionsList.includes(decoded.name)) {
+        const res = {
+          _from: tx.from,
+          _proposalId: _getProposalId(decoded.params),
+        };
+        watchedFunctionsMap[decoded.name](db, contracts, res);
+      }
     });
   });
 };
 
 const watchProposalEvents = async (db, contracts) => {
-  console.log('entered here');
   // watch any event that would change a proposal's details
   // when it happens:
   //    - update MongoDB database
@@ -103,6 +129,11 @@ const watchProposalEvents = async (db, contracts) => {
 
   watchProposalEvent(contracts.daoVotingClaims.VotingClaim, (res) => {
     refreshProposalVotingClaim(db, contracts, res);
+    // TODO: and maybe notify Dao server
+  });
+
+  watchProposalEvent(contracts.daoFundingManager.ClaimFunding, (res) => {
+    refreshProposalClaimFunding(db, contracts, res);
     // TODO: and maybe notify Dao server
   });
 };
