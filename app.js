@@ -21,6 +21,10 @@ const {
 const db = monk(process.env.DATABASE_URL, function (err) {
   if (err) {
     console.error('Db is not connected: ', err.message);
+  } else {
+    db.get('daoInfo').createIndex('index');
+    db.get('proposals').createIndex('proposalId', { unique: true });
+    db.get('addresses').createIndex('address', { unique: true });
   }
 });
 
@@ -53,6 +57,8 @@ const startContractWatchers = async () => {
   const networkId = await w3.version.network;
   await getContracts(contracts, w3, networkId);
   scripts.watchProposalEvents(db, contracts);
+
+  scripts.watchAndProcessNewBlocks(w3, db, contracts);
   console.log(contracts.dao.address);
   console.log();
 };

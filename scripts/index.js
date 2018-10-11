@@ -1,3 +1,5 @@
+const a = require('awaiting');
+
 const {
   refreshProposalDetails,
   refreshProposalFinalizeProposal,
@@ -28,6 +30,23 @@ const watchProposalEvent = (event, callback) => {
   event().watch(function (err, result) {
     const { args } = result;
     callback(args);
+  });
+};
+
+const watchAndProcessNewBlocks = (w3, db, contracts) => {
+  const filter = w3.eth.filter('latest');
+  filter.watch(async () => {
+    const currentBlockNumber = w3.eth.blockNumber;
+    const blockNumberToProcess = currentBlockNumber - parseInt(process.env.BLOCK_CONFIRMATIONS, 10);
+    console.log('currentBlockNumber = ', currentBlockNumber);
+    console.log('blockNumberToProcess = ', blockNumberToProcess);
+    const block = w3.eth.getBlock(blockNumberToProcess);
+    await a.map(block.transactions, 20, async (tnxId) => {
+      const tx = await w3.eth.getTransaction(tnxId);
+      const txReceipt = await w3.eth.getTransactionReceipt(tnxId);
+      if (!contracts.fromAddress[tx.to] || txReceipt.status !== '0x01') return; // if not sending to our contracts, or reverted: no need to process
+      console.log('decoded = ', contracts.decoder.decodeMethod(tx.input));
+    });
   });
 };
 
@@ -91,5 +110,6 @@ const watchProposalEvents = async (db, contracts) => {
 module.exports = {
   setDummyData,
   watchProposalEvents,
+  watchAndProcessNewBlocks,
   refreshDao,
 };

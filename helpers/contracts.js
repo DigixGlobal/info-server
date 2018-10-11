@@ -21,6 +21,7 @@ const DaoVoting = require('@digix/dao-contracts/build/contracts/DaoVoting.json')
 const DaoVotingClaims = require('@digix/dao-contracts/build/contracts/DaoVotingClaims.json');
 const DaoWhitelisting = require('@digix/dao-contracts/build/contracts/DaoWhitelisting.json');
 const DaoWhitelistingStorage = require('@digix/dao-contracts/build/contracts/DaoWhitelistingStorage.json');
+const abiDecoder = require('abi-decoder');
 
 const contracts = {
   contractResolver: ContractResolver,
@@ -49,11 +50,15 @@ const contracts = {
 };
 
 const getContracts = async (contractObjs, w3, networkId) => {
+  contractObjs.fromAddress = {};
+  contractObjs.decoder = abiDecoder;
   for (const k in contracts) {
     const contract = contracts[k];
-    contractObjs[k] = w3.eth.contract(contract.abi).at(contract.networks[networkId].address);
+    const contractAddress = contract.networks[networkId].address;
+    contractObjs[k] = w3.eth.contract(contract.abi).at(contractAddress);
+    contractObjs.fromAddress[contractAddress] = contractObjs[k];
+    contractObjs.decoder.addABI(contract.abi);
   }
-
   return contractObjs;
 };
 

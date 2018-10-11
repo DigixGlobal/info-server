@@ -55,6 +55,7 @@ module.exports = (db) => {
 
   const daoInfo = db.get('daoInfo');
   daoInfo.update({}, {
+    index: 'index',
     currentQuarter: 1,
     startOfQuarter: 1539052987, // in seconds
     startOfMainphase: 1540512000, // 25 Oct 2018
