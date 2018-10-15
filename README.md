@@ -115,7 +115,26 @@ npm run staging
 }
 ```
 
-* List proposals: `/proposals/:stage`  :stage = idea/draft/...
+* List proposals in a certain stage: `/proposals/:stage`  :stage = idea/draft/...
+```
+{
+    result: [
+      {
+        "proposalId": "0xwef23fwef",
+        "proposer": "0x1234we..",
+        ....
+      },
+      {
+        "proposalId": "0xwef23fwef",
+        "proposer": "0x1234we..",
+        ....
+      },
+      ...
+    ]
+}
+```
+
+* List all proposals: `/proposals/all`
 ```
 {
     result: [

@@ -14,7 +14,8 @@ router.get('/details/:id', async (req, res) => {
 
 router.get('/:stage', async (req, res) => {
   // read straight from mongoDb database and return
-  const proposals = await req.db.get('proposals').find({ stage: req.params.stage })
+  const filter = req.params.stage === 'all' ? {} : { stage: req.params.stage }
+  const proposals = await req.db.get('proposals').find(filter);
 
   return res.status(500).json({ result: proposals });
 });
