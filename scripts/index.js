@@ -19,6 +19,8 @@ const setDummyData = (db) => {
     "proposalVersions": [
       {
         "docIpfsHash": "QmZyLQ9zhEDSBf9rCfwXx2GRq3xJ84NtAWb1rKxGDWGUkb",
+        "title": "DGD holders offline meetup in Seattle",
+        "description": "Lorem ipsum doler sot and then he said ok",
         "created": 1539597600,
         "milestoneFundings": [1e18, 2e18],
         finalReward: [1e18],
@@ -51,6 +53,8 @@ const setDummyData = (db) => {
     "proposalVersions": [
       {
         "docIpfsHash": "QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG",
+        "title": "Emma Watson Brand Ambassador",
+        "description": "Make emma great again. Lorem ipsum and then he was ok",
         "created": 1538902800,
         "milestoneFundings": [1e18, 2e18],
         finalReward: [1e18],
@@ -59,6 +63,8 @@ const setDummyData = (db) => {
       },
       {
         "docIpfsHash": "QmSoLju6m7xTh3DuokvT3886QRYqxAzb1kShaanJgW36yx",
+        "title": "Emma Watson Brand Ambassador for DGX",
+        "description": "Just made emma great again. Lorem ipsum and then she was not ok",
         "created": 1538996400,
         "milestoneFundings": [2e18, 2e18],
         finalReward: [2e18],
@@ -101,6 +107,8 @@ const setDummyData = (db) => {
     "proposalVersions": [
       {
         "docIpfsHash": "QmAtMju6m7xTh3DuokvT3886QRYqxAzb1kShaanJgW36yx",
+        "title": "Music video for DGX",
+        "description": "Lorem ipsum doler simat this is a music video for DGX gold-backed token",
         "created": 1538474400,
         "milestoneFundings": [1e18, 2e18],
         finalReward: [1e18],
@@ -154,6 +162,8 @@ const setDummyData = (db) => {
     "proposalVersions": [
       {
         "docIpfsHash": "QmQNFEgpLMXhhHB5amrwjdA33fR8EsFLJw85Z7K6dxUZnV",
+        "title": "Smart contract audit for DigixDAO contracts",
+        "description": "DigixDAO contracts to be audited by Lorem Ipsum. Please release some ethers",
         "created": 1538042400,
         "milestoneFundings": [1e18, 2e18],
         finalReward: [1e18],
@@ -207,6 +217,8 @@ const setDummyData = (db) => {
     "proposalVersions": [
       {
         "docIpfsHash": "QmAtMju6m7xTh3DuokvT3886QRYqxAzb1kShaanJgW33xz",
+        "title": "DGX on exchanges",
+        "description": "DGX on a few other exchanges like Lorem and Ipsum",
         "created": 1537437600,
         "milestoneFundings": [3e18, 4e18],
         finalReward: [2e18],
@@ -260,6 +272,8 @@ const setDummyData = (db) => {
     "proposalVersions": [
       {
         "docIpfsHash": "QmAtMju6m7xTh3DuokvT3886QRYqxAzb1kShaanJgW0000",
+        "title": "Make gold great again",
+        "description": "Add more gold to Digix vaults, increase supply of DGX gold-backed tokens. Then loreum ipsum doler simat",
         "created": 1533895200,
         "milestoneFundings": [3e18, 4e18],
         finalReward: [2e18],
@@ -268,6 +282,8 @@ const setDummyData = (db) => {
       },
       {
         "docIpfsHash": "QmAtMju6m7xTh3DuokvT3886QRYqxAzb1kShaanJgW123z",
+        "title": "Make gold great again",
+        "description": "Add even more gold to Digix vaults, increase supply of DGX gold-backed tokens to 100mio. Then loreum ipsum doler simat",
         "created": 1533899200,
         "milestoneFundings": [4e18, 4e18],
         finalReward: [3e18],
@@ -334,6 +350,8 @@ const setDummyData = (db) => {
     "proposalVersions": [
       {
         "docIpfsHash": "QmTNbkhMpk5gwwSHosV4SQrChvfCg2bucP5pELH6EL9STs",
+        "title": "Some silly proposal",
+        "description": "This proposal is so silly, voting failed and its now archived",
         "created": 1539531100,
         "milestoneFundings": [5e18, 5e18],
         finalReward: [5e18],
