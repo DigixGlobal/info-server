@@ -281,6 +281,7 @@ const refreshProposalDraftVote = async (db, contracts, res) => {
       proposal.draftVoting.totalVoterCount = yesVoters[1].plus(noVoters[1]);
       proposal.draftVoting.currentResult = draftVotingCount[0].idiv(draftVotingCount[0].plus(draftVotingCount[1]));
       proposal.quorum = await contracts.daoCalculatorService.minimumDraftQuorum.call(res._proposalId);
+      console.log('quorum = ', proposal.quorum);
       proposal.quota = quotaNumerator.idiv(quotaDenominator);
 
       proposals.update({ proposalId: res._proposalId }, proposal, { upsert: true });

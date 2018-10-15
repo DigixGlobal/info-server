@@ -79,7 +79,8 @@ const watchAndProcessNewBlocks = (w3, db, contracts) => {
       if (!contracts.fromAddress[tx.to] || txReceipt.status !== '0x01') return;
 
       const decoded = contracts.decoder.decodeMethod(tx.input);
-
+      console.log(decoded);
+      console.log(contracts.decoder.decodeLogs(txReceipt.logs));
       if (watchedFunctionsList.includes(decoded.name)) {
         const res = {
           _from: tx.from,

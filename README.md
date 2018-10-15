@@ -1,3 +1,5 @@
+### Outline of server structure: [link](OUTLINE.md)
+
 ### Setup:
 * Install MongoDB: https://docs.mongodb.com/manual/administration/install-on-linux/
 * `npm i`
