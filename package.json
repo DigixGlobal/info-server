@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "./node_modules/.bin/nodemon node app.js",
+    "dev": "rm out.log && pm2 start development.config.js && tail -f out.log",
+    "staging": "pm2 start staging.config.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "db": "mongod --dbpath db --port 12702"
   },

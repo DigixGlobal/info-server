@@ -11,10 +11,8 @@ const Web3 = require('web3');
 const ERC20abi = require('./ERC20abi.json');
 const scripts = require('./scripts');
 
-const db = require('monk')('localhost:12702/digixdao')
-
-
-const w3 = new Web3(new Web3.providers.HttpProvider("https://mainnet.infura.io"));
+const db = require('monk')(process.env.DB_URL);
+const w3 = new Web3(new Web3.providers.HttpProvider(process.env.WEB3_HTTP_PROVIDER));
 
 app.use(cors());
 
@@ -47,6 +45,6 @@ cron.schedule("1 * * * *", async () => {
   await test();
 });
 
-const server = app.listen(3002, function () {
-  console.log('Notification app running on port.', server.address().port);
+const server = app.listen(process.env.PORT, function () {
+  console.log('Info server running on port.', server.address().port);
 });
