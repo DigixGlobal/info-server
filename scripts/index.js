@@ -253,7 +253,7 @@ const setDummyData = (db) => {
     "proposalId": "QmAtMju6m7xTh3DuokvT3886QRYqxAzb1kShaanJgW0000",
     "stage": "review",
     "proposer": "0x84a0d77c693adabe0ebc48f88b3ffff010577051",
-    "endorser": "0x2db0e64fa2102a4753e5ca2edeaa6f6a8d1939a5",
+    "endorser": "0xfbf77d8e2afd1532433dc809fe3108db68313770",
     "isDigix": false,
     "timeCreated": 1533895200,
     "finalVersionIpfsDoc": "QmAtMju6m7xTh3DuokvT3886QRYqxAzb1kShaanJgW123z",
@@ -375,17 +375,93 @@ const setDummyData = (db) => {
   }, { "upsert": true })
 
   const addresses = db.get('addresses')
-  addresses.update({"address": "0x6ed6e4bc5341d8d53bca4ee5df6f0e1970f49918"}, {
-    "address": "0x6ed6e4bc5341d8d53bca4ee5df6f0e1970f49918", // Badge holder 0
+  addresses.update({"address": "0xd7b99f68d740fa500aae37cc273b7cf7b4b49309"}, {
+    "address": "0xd7b99f68d740fa500aae37cc273b7cf7b4b49309", // Badge holder 0
     "isUser": true, // whether this address is a user. In ther words, whether this address has locked DGDs at least once
-    "lockedDgdStake": 123e9, // 123 DGDStake
+    "lockedDgdStake": 120e9, // 123 DGDStake
     "lockedDgd": 200e9, // locked 200 DGD
-    "reputationPoint": 1200e9, // 12 Reputation Points
+    "reputationPoint": 200, // 12 Reputation Points
     "quarterPoint": 8e9, // 8 Quarter Points
     "isParticipant": true,
     "isModerator": true,
   }, { "upsert": true })
-  // db.close()
+
+  addresses.update({"address": "0x84a0d77c693adabe0ebc48f88b3ffff010577051"}, {
+    "address": "0x84a0d77c693adabe0ebc48f88b3ffff010577051", // Badge holder 0
+    "isUser": true, // whether this address is a user. In ther words, whether this address has locked DGDs at least once
+    "lockedDgdStake": 3e9, // 123 DGDStake
+    "lockedDgd": 3e9, // locked 200 DGD
+    "reputationPoint": 0, // 12 Reputation Points
+    "quarterPoint": 2e9, // 8 Quarter Points
+    "isParticipant": true,
+    "isModerator": false,
+  }, { "upsert": true })
+
+  addresses.update({"address": "0xea674fdde714fd979de3edf0f56aa9716b898ec8"}, {
+    "address": "0xea674fdde714fd979de3edf0f56aa9716b898ec8", // Badge holder 0
+    "isUser": true, // whether this address is a user. In ther words, whether this address has locked DGDs at least once
+    "lockedDgdStake": 5e9, // 123 DGDStake
+    "lockedDgd": 5e9, // locked 200 DGD
+    "reputationPoint": 10, // 12 Reputation Points
+    "quarterPoint": 1e9, // 8 Quarter Points
+    "isParticipant": true,
+    "isModerator": false,
+  }, { "upsert": true })
+
+  addresses.update({"address": "0x295ba3a07d3e8e72e2c032359449f6d2ba658bfb"}, {
+    "address": "0x295ba3a07d3e8e72e2c032359449f6d2ba658bfb", // Badge holder 0
+    "isUser": true, // whether this address is a user. In ther words, whether this address has locked DGDs at least once
+    "lockedDgdStake": 110e9, // 123 DGDStake
+    "lockedDgd": 140e9, // locked 200 DGD
+    "reputationPoint": 240, // 12 Reputation Points
+    "quarterPoint": 5e9, // 8 Quarter Points
+    "isParticipant": true,
+    "isModerator": true,
+  }, { "upsert": true })
+
+  addresses.update({"address": "0xd3f093ca4be548a0cfd0610b3f12ae7a958ccb18"}, {
+    "address": "0xd3f093ca4be548a0cfd0610b3f12ae7a958ccb18", // Badge holder 0
+    "isUser": true, // whether this address is a user. In ther words, whether this address has locked DGDs at least once
+    "lockedDgdStake": 104e9, // 123 DGDStake
+    "lockedDgd": 104e9, // locked 200 DGD
+    "reputationPoint": 235, // 12 Reputation Points
+    "quarterPoint": 3e9, // 8 Quarter Points
+    "isParticipant": true,
+    "isModerator": true,
+  }, { "upsert": true })
+
+  addresses.update({"address": "0x74395fe3ce092320ff5d0cc1d79e054f15b1b3b8"}, {
+    "address": "0x74395fe3ce092320ff5d0cc1d79e054f15b1b3b8", // Badge holder 0
+    "isUser": true, // whether this address is a user. In ther words, whether this address has locked DGDs at least once
+    "lockedDgdStake": 2e9, // 123 DGDStake
+    "lockedDgd": 2e9, // locked 200 DGD
+    "reputationPoint": 0, // 12 Reputation Points
+    "quarterPoint": 0e9, // 8 Quarter Points
+    "isParticipant": true,
+    "isModerator": false,
+  }, { "upsert": true })
+
+  addresses.update({"address": "0xfbf77d8e2afd1532433dc809fe3108db68313770"}, {
+    "address": "0xfbf77d8e2afd1532433dc809fe3108db68313770", // Badge holder 0
+    "isUser": true, // whether this address is a user. In ther words, whether this address has locked DGDs at least once
+    "lockedDgdStake": 100e9, // 123 DGDStake
+    "lockedDgd": 100e9, // locked 200 DGD
+    "reputationPoint": 300, // 12 Reputation Points
+    "quarterPoint": 2e9, // 8 Quarter Points
+    "isParticipant": true,
+    "isModerator": true,
+  }, { "upsert": true })
+
+  addresses.update({"address": "0x5a0b54d5dc17e0aadc383d2db43b0a0d3e029c4c"}, {
+    "address": "0x5a0b54d5dc17e0aadc383d2db43b0a0d3e029c4c", // Badge holder 0
+    "isUser": true, // whether this address is a user. In ther words, whether this address has locked DGDs at least once
+    "lockedDgdStake": 14e9, // 123 DGDStake
+    "lockedDgd": 14e9, // locked 200 DGD
+    "reputationPoint": 15, // 12 Reputation Points
+    "quarterPoint": 2e9, // 8 Quarter Points
+    "isParticipant": true,
+    "isModerator": false,
+  }, { "upsert": true })
 }
 
 module.exports = {
