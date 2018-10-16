@@ -19,7 +19,7 @@ app.use(cors());
 app.use(morgan('combined'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-console.log(app.get('json spaces'));
+
 app.set('json spaces', 4);
 
 // middleware to inject db object // not sure if is a good practice
