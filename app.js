@@ -18,13 +18,18 @@ const {
   getContracts,
 } = require('./helpers/contracts');
 
+const {
+  collections,
+} = require('./helpers/constants');
+
 const db = monk(process.env.DATABASE_URL, function (err) {
   if (err) {
     console.error('Db is not connected: ', err.message);
   } else {
-    db.get('daoInfo').createIndex('index');
-    db.get('proposals').createIndex('proposalId', { unique: true });
-    db.get('addresses').createIndex('address', { unique: true });
+    db.get(collections.DAO).createIndex('index');
+    db.get(collections.PROPOSALS).createIndex('proposalId', { unique: true });
+    db.get(collections.ADDRESSES).createIndex('address', { unique: true });
+    db.get(collections.TRANSACTIONS).createIndex('index', { unique: true });
   }
 });
 
@@ -47,8 +52,9 @@ app.use('/', routes);
 const startContractWatchers = async () => {
   const networkId = await w3.version.network;
   await getContracts(contracts, w3, networkId);
-  scripts.watchProposalEvents(db, contracts);
-  scripts.watchAndProcessNewBlocks(w3, db, contracts);
+
+  // start watching new blocks
+  scripts.watchNewBlocks(w3, db, contracts);
 };
 
 startContractWatchers();
@@ -56,7 +62,6 @@ startContractWatchers();
 cron.schedule('* * * * *', async () => {
   // schedule a script to run every min
   console.log('\tIn cron.schedule');
-  scripts.refreshDao(db, contracts); // check if daoInfo object has changed
 });
 
 const server = app.listen(3002, function () {

@@ -34,22 +34,40 @@ const proposalVotingStages = {
   NONE: 'none',
 };
 
+const collections = {
+  COUNTERS: 'counters',
+  TRANSACTIONS: 'allTransactions',
+  PROPOSALS: 'proposals',
+  ADDRESSES: 'addresses',
+  DAO: 'daoInfo',
+};
+
+const counters = {
+  TRANSACTIONS: 'allTransactions',
+};
+
 const watchedFunctionNames = {
   DRAFT_VOTE: 'voteOnDraft',
   COMMIT_VOTE: 'commitVoteOnProposal',
   REVEAL_VOTE: 'revealVoteOnProposal',
-  // COMMIT_VOTE_SPECIAL: 'commitVoteOnSpecialProposal',
-  // REVEAL_VOTE_SPECIAL: 'revealVoteOnSpecialProposal',
+  COMMIT_VOTE_SPECIAL: 'commitVoteOnSpecialProposal',
+  REVEAL_VOTE_SPECIAL: 'revealVoteOnSpecialProposal',
+  NEW_PROPOSAL: 'submitPreproposal',
   ENDORSE_PROPOSAL: 'endorseProposal',
+  MODIFY_PROPOSAL: 'modifyProposal',
+  FINALIZE_PROPOSAL: 'finalizeProposal',
 };
 
 const watchedFunctionsList = [
   watchedFunctionNames.DRAFT_VOTE,
   watchedFunctionNames.COMMIT_VOTE,
   watchedFunctionNames.REVEAL_VOTE,
-  // watchedFunctionNames.COMMIT_VOTE_SPECIAL,
-  // watchedFunctionNames.REVEAL_VOTE_SPECIAL,
+  watchedFunctionNames.COMMIT_VOTE_SPECIAL,
+  watchedFunctionNames.REVEAL_VOTE_SPECIAL,
+  watchedFunctionNames.NEW_PROPOSAL,
   watchedFunctionNames.ENDORSE_PROPOSAL,
+  watchedFunctionNames.MODIFY_PROPOSAL,
+  watchedFunctionNames.FINALIZE_PROPOSAL,
 ];
 
 const daoConfigsKeys = {
@@ -119,6 +137,8 @@ module.exports = {
   readProposalVersionIndices,
   daoConfigsKeys,
   proposalStages,
+  collections,
+  counters,
   proposalVotingStages,
   watchedFunctionNames,
   watchedFunctionsList,
