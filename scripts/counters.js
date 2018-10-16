@@ -6,7 +6,7 @@ const {
 
 const getCurrentIndex = (db, name, callback) => {
   db.get(collections.COUNTERS).findOne({
-    _id: name,
+    name,
   }, function (err, r) {
     assert.equal(null, err);
     callback(r);
