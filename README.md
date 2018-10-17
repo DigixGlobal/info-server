@@ -55,6 +55,19 @@ npm run staging
 
 
 ##### Proposals
+* Get count of proposals in different stages: `/proposals/count`
+```
+{
+  "result": {
+    "idea": 2,
+    "draft": 1,
+    "proposal": 2,
+    "ongoing": 1,
+    "review": 1,
+    "archived": 1
+  }
+}
+```
 * Get proposal details: `/proposals/details/:id`
 ```
 {
