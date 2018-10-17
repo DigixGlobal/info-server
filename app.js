@@ -1,5 +1,3 @@
-require('dotenv').config();
-
 const express = require('express');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
@@ -36,6 +34,7 @@ let db;
 const initDB = async () => {
   const client = await mongodb.MongoClient.connect(process.env.DB_URL);
   const clientdb = client.db(process.env.DIGIXDAO_DB_NAME);
+  await clientdb.collection(collections.COUNTERS).createIndex('name', { unique: true });
   await clientdb.collection(collections.DAO).createIndex('index');
   await clientdb.collection(collections.PROPOSALS).createIndex('proposalId', { unique: true });
   await clientdb.collection(collections.ADDRESSES).createIndex('address', { unique: true });
