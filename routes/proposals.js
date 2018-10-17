@@ -7,7 +7,7 @@ router.get('/test', async (req, res) => {
 
 router.get('/count', async (req, res) => {
   const allProposals = await req.db.get('proposals').find();
-  const result = {}
+  const result = { all: allProposals.length };
   for (proposal of allProposals) {
     const stage = proposal.stage;
     if (!result[stage]) result[stage] = 0;
