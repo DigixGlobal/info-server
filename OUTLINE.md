@@ -11,9 +11,11 @@
 }
 ```
 
-* There is a function `updateTransactionDatabase` that will update `allTransactions` to the latest block
+* There is a function `updateTransactionDatabase` that will update `allTransactions` to the latest block. This is what it should do:
+  * get the last transaction from `allTransactions`, find out which block it is (lets say its `lastBlock`)
+  * go through all the blocks from `lastBlock+1` to `currentBlock`, and add all the DAO transactions to `allTransactions`
 
-* There is a `watchNewBlocks` that watches new blocks and update `allTransactions`
+* There is a `watchNewBlocks` that watches new blocks and call `updateTransactionDatabase`
 
 * There is a variable `lastProcessedTransaction` that is initialized to be -1 (not processed anything yet)
 

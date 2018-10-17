@@ -1,34 +1,23 @@
-const assert = require('assert');
-
 const {
   collections,
 } = require('../helpers/constants');
 
-const getCurrentIndex = (db, name, callback) => {
-  db.get(collections.COUNTERS).findOne({
-    name,
-  }, function (err, r) {
-    assert.equal(null, err);
-    callback(r);
-  });
+const getCounter = async (db, name) => {
+  const counter = await db.collection(collections.COUNTERS).findOne({ name });
+  return counter;
 };
 
-const incrementAndGetNextIndex = (db, name, callback) => {
-  db.get(collections.COUNTERS).findOneAndUpdate({
+const incrementCounter = async (db, name, incrementBy) => {
+  await db.collection(collections.COUNTERS).findOneAndUpdate({
     name,
   }, {
     $inc: {
-      max_value: 1,
+      max_value: incrementBy,
     },
-  }, {
-    returnOriginal: false,
-  }, function (err, r) {
-    assert.equal(null, err);
-    callback(r);
   });
 };
 
 module.exports = {
-  getCurrentIndex,
-  incrementAndGetNextIndex,
+  getCounter,
+  incrementCounter,
 };

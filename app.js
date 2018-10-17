@@ -6,13 +6,10 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const cron = require('node-cron');
 const Web3 = require('web3');
-const monk = require('monk');
+const mongodb = require('mongodb');
+
 const routes = require('./routes');
-
-const app = express();
 const scripts = require('./scripts');
-
-const contracts = {};
 
 const {
   getContracts,
@@ -22,48 +19,61 @@ const {
   collections,
 } = require('./helpers/constants');
 
-const db = monk(process.env.DATABASE_URL, function (err) {
-  if (err) {
-    console.error('Db is not connected: ', err.message);
-  } else {
-    db.get(collections.DAO).createIndex('index');
-    db.get(collections.PROPOSALS).createIndex('proposalId', { unique: true });
-    db.get(collections.ADDRESSES).createIndex('address', { unique: true });
-    db.get(collections.TRANSACTIONS).createIndex('index', { unique: true });
-  }
-});
+const app = express();
+const contracts = {};
 
 const w3 = new Web3(new Web3.providers.HttpProvider(process.env.WEB3_HTTP_PROVIDER));
 
 app.use(cors());
-
 app.use(morgan('combined'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
-// middleware to inject db object // not sure if is a good practice
-app.use((req, res, next) => {
-  req.db = db;
-  next();
-});
-
 app.use('/', routes);
+app.set('json spaces', 4);
 
-const startContractWatchers = async () => {
+let db;
+
+const initDB = async () => {
+  const client = await mongodb.MongoClient.connect(process.env.DB_URL);
+  const clientdb = client.db(process.env.DIGIXDAO_DB_NAME);
+  await clientdb.collection(collections.DAO).createIndex('index');
+  await clientdb.collection(collections.PROPOSALS).createIndex('proposalId', { unique: true });
+  await clientdb.collection(collections.ADDRESSES).createIndex('address', { unique: true });
+  await clientdb.collection(collections.TRANSACTIONS).createIndex('index', { unique: true });
+  return clientdb;
+};
+
+const initCron = async () => {
+  cron.schedule('* * * * *', async () => {
+    // schedule a script to run every min
+    console.log('\tIn cron.schedule');
+
+    // process the pending transactions
+    scripts.processTransactions(w3, db, contracts);
+  });
+};
+
+const init = async () => {
+  db = await initDB();
+
+  // middleware to inject db object // not sure if is a good practice
+  app.use((req, res, next) => {
+    req.db = db;
+    next();
+  });
+
   const networkId = await w3.version.network;
   await getContracts(contracts, w3, networkId);
 
-  // start watching new blocks
+  await scripts.syncToLatestBlock(w3, db, contracts);
+
   scripts.watchNewBlocks(w3, db, contracts);
+
+  initCron();
 };
 
-startContractWatchers();
+init();
 
-cron.schedule('* * * * *', async () => {
-  // schedule a script to run every min
-  console.log('\tIn cron.schedule');
-});
-
-const server = app.listen(3002, function () {
-  console.log('Notification app running on port.', server.address().port);
+const server = app.listen(process.env.PORT, function () {
+  console.log('Info server running on port.', server.address().port);
 });

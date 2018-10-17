@@ -2,17 +2,27 @@
 
 ### Setup:
 * Install MongoDB: https://docs.mongodb.com/manual/administration/install-on-linux/
-* `npm i`
-* In a terminal, run:
+* Make sure `mongod` is running:
 ```
-npm run db
+sudo service mongod start
 ```
-* In a separate terminal, run:
+* Install pm2:
 ```
-npm start
+npm install pm2@latest -g
 ```
-* The local server is at `localhost:3002`. Test going to http://localhost:3002/daoInfo
-
+* Install node dependencies:
+```
+npm i
+```
+* [Development] start the server in development:
+```
+npm run dev
+```
+  * The local server is at `localhost:3001`. Test going to http://localhost:3001/daoInfo
+* [Staging] start the staging server (on port 3002)
+```
+npm run staging
+```
 
 ### Endpoints
 ##### Dao details
@@ -47,6 +57,19 @@ npm start
 
 
 ##### Proposals
+* Get count of proposals in different stages: `/proposals/count`
+```
+{
+  "result": {
+    "idea": 2,
+    "draft": 1,
+    "proposal": 2,
+    "ongoing": 1,
+    "review": 1,
+    "archived": 1
+  }
+}
+```
 * Get proposal details: `/proposals/details/:id`
 ```
 {
@@ -107,7 +130,26 @@ npm start
 }
 ```
 
-* List proposals: `/proposals/:stage`  :stage = idea/draft/...
+* List proposals in a certain stage: `/proposals/:stage`  :stage = idea/draft/...
+```
+{
+    result: [
+      {
+        "proposalId": "0xwef23fwef",
+        "proposer": "0x1234we..",
+        ....
+      },
+      {
+        "proposalId": "0xwef23fwef",
+        "proposer": "0x1234we..",
+        ....
+      },
+      ...
+    ]
+}
+```
+
+* List all proposals: `/proposals/all`
 ```
 {
     result: [
