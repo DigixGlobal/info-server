@@ -1,34 +1,37 @@
 const express = require('express');
 
+const {
+  collections,
+} = require('../helpers/constants');
+
 const router = express.Router();
 
 router.get('/test', async (req, res) => {
-  return res.status(500).json({ message: 'proposals/test' });
+  return res.json({ message: 'proposals/test' });
 });
 
 router.get('/count', async (req, res) => {
-  const allProposals = await req.db.get('proposals').find();
-  const result = { all: allProposals.length };
-  for (const proposal of allProposals) {
-    const stage = { proposal };
-    if (!result[stage]) result[stage] = 0;
-    result[stage] += 1;
+  const cursor = req.db.collection(collections.PROPOSALS).find();
+  const result = { all: await cursor.count() };
+  for (let proposal = await cursor.next(); proposal != null; proposal = await cursor.next()) {
+    if (!result[proposal.stage]) result[proposal.stage] = 0;
+    result[proposal.stage] += 1;
   }
   return res.json({ result });
 });
 
 router.get('/details/:id', async (req, res) => {
-  // read straight from mongoDb database and return
-  const details = await req.db.get('proposals').findOne({ proposalId: req.params.id });
-
+  const details = await req.db.collection(collections.PROPOSALS).findOne({ proposalId: req.params.id });
   return res.json({ result: details || 'notFound' });
 });
 
 router.get('/:stage', async (req, res) => {
-  // read straight from mongoDb database and return
-  const filter = req.params.stage === 'all' ? {} : { stage: req.params.stage };
-  const proposals = await req.db.get('proposals').find(filter);
-
+  const filter = (req.params.stage === 'all') ? {} : { stage: req.params.stage };
+  const cursor = req.db.collection(collections.PROPOSALS).find(filter);
+  const proposals = [];
+  for (let proposal = await cursor.next(); proposal != null; proposal = await cursor.next()) {
+    proposals.push(proposal);
+  }
   return res.json({ result: proposals });
 });
 

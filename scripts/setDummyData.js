@@ -1,5 +1,5 @@
 module.exports = (db) => {
-  const proposals = db.get('proposals');
+  const proposals = db.collection('proposals');
   proposals.update({ proposalId: '0xwef23fwef' }, {
     proposalId: '0xwef23fwef', // is not finalized yet
     stage: 'idea',
@@ -53,7 +53,7 @@ module.exports = (db) => {
     prl: 'ok', // ok/paused/stopped
   }, { upsert: true });
 
-  const daoInfo = db.get('daoInfo');
+  const daoInfo = db.collection('daoInfo');
   daoInfo.update({}, {
     index: 'index',
     currentQuarter: 1,
@@ -63,7 +63,7 @@ module.exports = (db) => {
     totalDgdsLocked: 1234e9, // = 1234 DGD
   }, { upsert: true });
 
-  const addresses = db.get('addresses');
+  const addresses = db.collection('addresses');
   addresses.update({ address: '0x6ed6e4bc5341d8d53bca4ee5df6f0e1970f49918' }, {
     address: '0x6ed6e4bc5341d8d53bca4ee5df6f0e1970f49918', // Badge holder 0
     isUser: true, // whether this address is a user. In ther words, whether this address has locked DGDs at least once

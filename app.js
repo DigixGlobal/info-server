@@ -26,7 +26,6 @@ app.use(cors());
 app.use(morgan('combined'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use('/', routes);
 app.set('json spaces', 4);
 
 let db;
@@ -60,6 +59,7 @@ const init = async () => {
     req.db = db;
     next();
   });
+  app.use('/', routes);
 
   const networkId = await w3.version.network;
   await getContracts(contracts, w3, networkId);
