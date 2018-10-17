@@ -11,8 +11,8 @@ const setDummyData = (db) => {
   proposals.update({ proposalId: "QmZyLQ9zhEDSBf9rCfwXx2GRq3xJ84NtAWb1rKxGDWGUkb" }, {
     "proposalId": "QmZyLQ9zhEDSBf9rCfwXx2GRq3xJ84NtAWb1rKxGDWGUkb", // is not finalized yet
     "stage": "idea",
-    "proposer": "0x84a0d77c693adabe0ebc48f88b3ffff010577051",
-    "endorser": "0xd7b99f68d740fa500aae37cc273b7cf7b4b49309",
+    "proposer": "0x300ac2c15a6778cfdd7eaa6189a4401123ff9dda",
+    "endorser": "0x68911e512a4ecbd12d5dbae3250ff2c8e5850b60",
     "isDigix": false,
     "timeCreated": 1539597600,
     "finalVersionIpfsDoc": "",
@@ -45,8 +45,8 @@ const setDummyData = (db) => {
   proposals.update({ proposalId: "QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG" }, {
     "proposalId": "QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG",
     "stage": "draft",
-    "proposer": "0xea674fdde714fd979de3edf0f56aa9716b898ec8",
-    "endorser": "0x295ba3a07d3e8e72e2c032359449f6d2ba658bfb",
+    "proposer": "0x602651daaea32f5a13d9bd4df67d0922662e8928",
+    "endorser": "0x9210ddf37582861fbc5ec3a9aff716d3cf9be5e1",
     "isDigix": false,
     "timeCreated": 1538902800,
     "finalVersionIpfsDoc": "QmSoLju6m7xTh3DuokvT3886QRYqxAzb1kShaanJgW36yx",
@@ -99,8 +99,8 @@ const setDummyData = (db) => {
   proposals.update({ proposalId: "QmAtMju6m7xTh3DuokvT3886QRYqxAzb1kShaanJgW36yx" }, {
     "proposalId": "QmAtMju6m7xTh3DuokvT3886QRYqxAzb1kShaanJgW36yx",
     "stage": "proposal",
-    "proposer": "0x74395fe3ce092320ff5d0cc1d79e054f15b1b3b8",
-    "endorser": "0xd3f093ca4be548a0cfd0610b3f12ae7a958ccb18",
+    "proposer": "0xcbe85e69eec80f29e9030233a757d49c68e75c8d",
+    "endorser": "0xe02a693f038933d7b28301e6fb654a035385652d",
     "isDigix": false,
     "timeCreated": 1538474400,
     "finalVersionIpfsDoc": "QmAtMju6m7xTh3DuokvT3886QRYqxAzb1kShaanJgW36yx",
@@ -154,8 +154,8 @@ const setDummyData = (db) => {
   proposals.update({ proposalId: "QmQNFEgpLMXhhHB5amrwjdA33fR8EsFLJw85Z7K6dxUZnV" }, {
     "proposalId": "QmQNFEgpLMXhhHB5amrwjdA33fR8EsFLJw85Z7K6dxUZnV",
     "stage": "proposal",
-    "proposer": "0x74395fe3ce092320ff5d0cc1d79e054f15b1b3b8",
-    "endorser": "0xd3f093ca4be548a0cfd0610b3f12ae7a958ccb18",
+    "proposer": "0xcbe85e69eec80f29e9030233a757d49c68e75c8d",
+    "endorser": "0xe02a693f038933d7b28301e6fb654a035385652d",
     "isDigix": false,
     "timeCreated": 1538042400,
     "finalVersionIpfsDoc": "QmQNFEgpLMXhhHB5amrwjdA33fR8EsFLJw85Z7K6dxUZnV",
@@ -209,8 +209,8 @@ const setDummyData = (db) => {
   proposals.update({ proposalId: "QmAtMju6m7xTh3DuokvT3886QRYqxAzb1kShaanJgW33xz" }, {
     "proposalId": "QmAtMju6m7xTh3DuokvT3886QRYqxAzb1kShaanJgW33xz",
     "stage": "ongoing",
-    "proposer": "0x5a0b54d5dc17e0aadc383d2db43b0a0d3e029c4c",
-    "endorser": "0xfbf77d8e2afd1532433dc809fe3108db68313770",
+    "proposer": "0x355fbd38b3219fa3b7d0739eae142acd9ea832a1",
+    "endorser": "0x68911e512a4ecbd12d5dbae3250ff2c8e5850b60",
     "isDigix": false,
     "timeCreated": 1537437600,
     "finalVersionIpfsDoc": "QmAtMju6m7xTh3DuokvT3886QRYqxAzb1kShaanJgW33xz",
@@ -264,8 +264,8 @@ const setDummyData = (db) => {
   proposals.update({ proposalId: "QmAtMju6m7xTh3DuokvT3886QRYqxAzb1kShaanJgW0000" }, {
     "proposalId": "QmAtMju6m7xTh3DuokvT3886QRYqxAzb1kShaanJgW0000",
     "stage": "review",
-    "proposer": "0x84a0d77c693adabe0ebc48f88b3ffff010577051",
-    "endorser": "0xfbf77d8e2afd1532433dc809fe3108db68313770",
+    "proposer": "0x300ac2c15a6778cfdd7eaa6189a4401123ff9dda",
+    "endorser": "0x68911e512a4ecbd12d5dbae3250ff2c8e5850b60",
     "isDigix": false,
     "timeCreated": 1533895200,
     "finalVersionIpfsDoc": "QmAtMju6m7xTh3DuokvT3886QRYqxAzb1kShaanJgW123z",
@@ -342,8 +342,8 @@ const setDummyData = (db) => {
   proposals.update({ proposalId: "QmTNbkhMpk5gwwSHosV4SQrChvfCg2bucP5pELH6EL9STs" }, {
     "proposalId": "QmTNbkhMpk5gwwSHosV4SQrChvfCg2bucP5pELH6EL9STs",
     "stage": "archived",
-    "proposer": "0x84a0d77c693adabe0ebc48f88b3ffff010577123",
-    "endorser": "0x2db0e64fa2102a4753e5ca2edeaa6f6a8d193123",
+    "proposer": "0x300ac2c15a6778cfdd7eaa6189a4401123ff9dda",
+    "endorser": "0x68911e512a4ecbd12d5dbae3250ff2c8e5850b60",
     "isDigix": false,
     "timeCreated": 1539531100,
     "finalVersionIpfsDoc": "QmTNbkhMpk5gwwSHosV4SQrChvfCg2bucP5pELH6EL9STs",
@@ -393,8 +393,8 @@ const setDummyData = (db) => {
   }, { "upsert": true })
 
   const addresses = db.get('addresses')
-  addresses.update({"address": "0xd7b99f68d740fa500aae37cc273b7cf7b4b49309"}, {
-    "address": "0xd7b99f68d740fa500aae37cc273b7cf7b4b49309", // Badge holder 0
+  addresses.update({"address": "0x68911e512a4ecbd12d5dbae3250ff2c8e5850b60"}, {
+    "address": "0x68911e512a4ecbd12d5dbae3250ff2c8e5850b60", // Badge holder 0
     "isUser": true, // whether this address is a user. In ther words, whether this address has locked DGDs at least once
     "lockedDgdStake": 120e9, // 123 DGDStake
     "lockedDgd": 200e9, // locked 200 DGD
@@ -404,8 +404,8 @@ const setDummyData = (db) => {
     "isModerator": true,
   }, { "upsert": true })
 
-  addresses.update({"address": "0x84a0d77c693adabe0ebc48f88b3ffff010577051"}, {
-    "address": "0x84a0d77c693adabe0ebc48f88b3ffff010577051", // Badge holder 0
+  addresses.update({"address": "0x300ac2c15a6778cfdd7eaa6189a4401123ff9dda"}, {
+    "address": "0x300ac2c15a6778cfdd7eaa6189a4401123ff9dda", // Badge holder 0
     "isUser": true, // whether this address is a user. In ther words, whether this address has locked DGDs at least once
     "lockedDgdStake": 3e9, // 123 DGDStake
     "lockedDgd": 3e9, // locked 200 DGD
@@ -415,8 +415,8 @@ const setDummyData = (db) => {
     "isModerator": false,
   }, { "upsert": true })
 
-  addresses.update({"address": "0xea674fdde714fd979de3edf0f56aa9716b898ec8"}, {
-    "address": "0xea674fdde714fd979de3edf0f56aa9716b898ec8", // Badge holder 0
+  addresses.update({"address": "0x602651daaea32f5a13d9bd4df67d0922662e8928"}, {
+    "address": "0x602651daaea32f5a13d9bd4df67d0922662e8928", // Badge holder 0
     "isUser": true, // whether this address is a user. In ther words, whether this address has locked DGDs at least once
     "lockedDgdStake": 5e9, // 123 DGDStake
     "lockedDgd": 5e9, // locked 200 DGD
@@ -426,8 +426,8 @@ const setDummyData = (db) => {
     "isModerator": false,
   }, { "upsert": true })
 
-  addresses.update({"address": "0x295ba3a07d3e8e72e2c032359449f6d2ba658bfb"}, {
-    "address": "0x295ba3a07d3e8e72e2c032359449f6d2ba658bfb", // Badge holder 0
+  addresses.update({"address": "0x9210ddf37582861fbc5ec3a9aff716d3cf9be5e1"}, {
+    "address": "0x9210ddf37582861fbc5ec3a9aff716d3cf9be5e1", // Badge holder 0
     "isUser": true, // whether this address is a user. In ther words, whether this address has locked DGDs at least once
     "lockedDgdStake": 110e9, // 123 DGDStake
     "lockedDgd": 140e9, // locked 200 DGD
@@ -437,8 +437,8 @@ const setDummyData = (db) => {
     "isModerator": true,
   }, { "upsert": true })
 
-  addresses.update({"address": "0xd3f093ca4be548a0cfd0610b3f12ae7a958ccb18"}, {
-    "address": "0xd3f093ca4be548a0cfd0610b3f12ae7a958ccb18", // Badge holder 0
+  addresses.update({"address": "0xe02a693f038933d7b28301e6fb654a035385652d"}, {
+    "address": "0xe02a693f038933d7b28301e6fb654a035385652d", // Badge holder 0
     "isUser": true, // whether this address is a user. In ther words, whether this address has locked DGDs at least once
     "lockedDgdStake": 104e9, // 123 DGDStake
     "lockedDgd": 104e9, // locked 200 DGD
@@ -448,8 +448,8 @@ const setDummyData = (db) => {
     "isModerator": true,
   }, { "upsert": true })
 
-  addresses.update({"address": "0x74395fe3ce092320ff5d0cc1d79e054f15b1b3b8"}, {
-    "address": "0x74395fe3ce092320ff5d0cc1d79e054f15b1b3b8", // Badge holder 0
+  addresses.update({"address": "0xcbe85e69eec80f29e9030233a757d49c68e75c8d"}, {
+    "address": "0xcbe85e69eec80f29e9030233a757d49c68e75c8d", // Badge holder 0
     "isUser": true, // whether this address is a user. In ther words, whether this address has locked DGDs at least once
     "lockedDgdStake": 2e9, // 123 DGDStake
     "lockedDgd": 2e9, // locked 200 DGD
@@ -459,19 +459,8 @@ const setDummyData = (db) => {
     "isModerator": false,
   }, { "upsert": true })
 
-  addresses.update({"address": "0xfbf77d8e2afd1532433dc809fe3108db68313770"}, {
-    "address": "0xfbf77d8e2afd1532433dc809fe3108db68313770", // Badge holder 0
-    "isUser": true, // whether this address is a user. In ther words, whether this address has locked DGDs at least once
-    "lockedDgdStake": 100e9, // 123 DGDStake
-    "lockedDgd": 100e9, // locked 200 DGD
-    "reputationPoint": 300, // 12 Reputation Points
-    "quarterPoint": 2e9, // 8 Quarter Points
-    "isParticipant": true,
-    "isModerator": true,
-  }, { "upsert": true })
-
-  addresses.update({"address": "0x5a0b54d5dc17e0aadc383d2db43b0a0d3e029c4c"}, {
-    "address": "0x5a0b54d5dc17e0aadc383d2db43b0a0d3e029c4c", // Badge holder 0
+  addresses.update({"address": "0x355fbd38b3219fa3b7d0739eae142acd9ea832a1"}, {
+    "address": "0x355fbd38b3219fa3b7d0739eae142acd9ea832a1", // Badge holder 0
     "isUser": true, // whether this address is a user. In ther words, whether this address has locked DGDs at least once
     "lockedDgdStake": 14e9, // 123 DGDStake
     "lockedDgd": 14e9, // locked 200 DGD
