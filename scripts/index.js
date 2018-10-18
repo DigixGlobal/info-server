@@ -387,7 +387,7 @@ const setDummyData = (db) => {
   daoInfo.update({}, {
       "currentQuarter": 1,
       "startOfQuarter": 1533117600, // 1 august 2018
-      "startOfMainphase": 1533636000,
+      "startOfMainPhase": 1533636000,
       "startOfNextQuarter": 1540893600,
       "totalDgdsLocked": 2000e9 // = 2000 DGD
   }, { "upsert": true })

@@ -18,15 +18,20 @@ router.get('/count', async (req, res) => {
 
 router.get('/details/:id', async (req, res) => {
   // read straight from mongoDb database and return
-  const details = await req.db.get('proposals').findOne({ proposalId: req.params.id })
-
-  return res.json({ result: details ? details : 'notFound' });
+  const details = await req.db.get('proposals').findOne({ proposalId: req.params.id }, { _id: 0 })
+  if (details) {
+    delete details._id;
+  } else {
+    details = 'notFound';
+  }
+  return res.json({ result: details });
 });
 
 router.get('/:stage', async (req, res) => {
   // read straight from mongoDb database and return
   const filter = req.params.stage === 'all' ? {} : { stage: req.params.stage }
-  const proposals = await req.db.get('proposals').find(filter);
+
+  const proposals = await req.db.get('proposals').find(filter, { _id: 0 });
 
   return res.json({ result: proposals });
 });
