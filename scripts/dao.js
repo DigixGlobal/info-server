@@ -1,4 +1,4 @@
-const refreshDao = async (contracts) => {
+const refreshDao = async () => {
 
 };
 

@@ -47,7 +47,7 @@ const _formEventObj = (transaction) => {
   return res;
 };
 
-const formTxnDocument = async (web3, txnIds) => {
+const _formTxnDocument = async (web3, txnIds) => {
   const r = await getCounter(counters.TRANSACTIONS);
   const transactions = [];
   const contracts = getContracts();
@@ -78,7 +78,7 @@ const formTxnDocument = async (web3, txnIds) => {
 };
 
 const filterAndInsertTxns = async (web3, txnIds) => {
-  const transactions = await formTxnDocument(web3, txnIds);
+  const transactions = await _formTxnDocument(web3, txnIds);
   if (transactions.length > 0) {
     await insertTransactions(transactions);
     await incrementMaxValue(counters.TRANSACTIONS, transactions.length);
