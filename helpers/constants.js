@@ -47,27 +47,31 @@ const counters = {
 };
 
 const watchedFunctionNames = {
-  DRAFT_VOTE: 'voteOnDraft',
-  COMMIT_VOTE: 'commitVoteOnProposal',
-  REVEAL_VOTE: 'revealVoteOnProposal',
-  COMMIT_VOTE_SPECIAL: 'commitVoteOnSpecialProposal',
-  REVEAL_VOTE_SPECIAL: 'revealVoteOnSpecialProposal',
   NEW_PROPOSAL: 'submitPreproposal',
   ENDORSE_PROPOSAL: 'endorseProposal',
   MODIFY_PROPOSAL: 'modifyProposal',
   FINALIZE_PROPOSAL: 'finalizeProposal',
+  // DRAFT_VOTE: 'voteOnDraft',
+  // CLAIM_DRAFT_VOTING: 'claimDraftVotingResult',
+  // COMMIT_VOTE: 'commitVoteOnProposal',
+  // REVEAL_VOTE: 'revealVoteOnProposal',
+  // CLAIM_VOTING: 'claimProposalVotingResult',
+  // COMMIT_VOTE_SPECIAL: 'commitVoteOnSpecialProposal',
+  // REVEAL_VOTE_SPECIAL: 'revealVoteOnSpecialProposal',
 };
 
 const watchedFunctionsList = [
-  watchedFunctionNames.DRAFT_VOTE,
-  watchedFunctionNames.COMMIT_VOTE,
-  watchedFunctionNames.REVEAL_VOTE,
-  watchedFunctionNames.COMMIT_VOTE_SPECIAL,
-  watchedFunctionNames.REVEAL_VOTE_SPECIAL,
   watchedFunctionNames.NEW_PROPOSAL,
   watchedFunctionNames.ENDORSE_PROPOSAL,
   watchedFunctionNames.MODIFY_PROPOSAL,
   watchedFunctionNames.FINALIZE_PROPOSAL,
+  // watchedFunctionNames.DRAFT_VOTE,
+  // watchedFunctionNames.CLAIM_DRAFT_VOTING,
+  // watchedFunctionNames.COMMIT_VOTE,
+  // watchedFunctionNames.REVEAL_VOTE,
+  // watchedFunctionNames.CLAIM_VOTING,
+  // watchedFunctionNames.COMMIT_VOTE_SPECIAL,
+  // watchedFunctionNames.REVEAL_VOTE_SPECIAL,
 ];
 
 const daoConfigsKeys = {

@@ -4,7 +4,8 @@ const {
 
 const {
   getCounter,
-  incrementCounter,
+  incrementMaxValue,
+  incrementLastProcessed,
 } = require('./counters');
 
 const {
@@ -13,15 +14,28 @@ const {
   counters,
 } = require('../helpers/constants');
 
+const {
+  watchedFunctionsMap,
+} = require('./refreshProposal');
+
 const getLastTransaction = async (db) => {
-  const cursor = await db.collection(collections.TRANSACTIONS).find().sort({ _id: -1 }).limit(1);
+  const cursor = db.collection(collections.TRANSACTIONS).find().sort({ _id: -1 }).limit(1);
   const r = await cursor.next();
   return r;
 };
 
+const getTransactions = async (db, skip) => {
+  const cursor = db.collection(collections.TRANSACTIONS).find().skip(skip);
+  const transactions = [];
+  for (let transaction = await cursor.next(); transaction != null; transaction = await cursor.next()) {
+    transactions.push(transaction);
+  }
+  return transactions;
+};
+
 const insertTransactions = async (db, docs) => {
   await db.collection(collections.TRANSACTIONS).insertMany(docs);
-  await incrementCounter(db, counters.TRANSACTIONS, docs.length);
+  await incrementMaxValue(db, counters.TRANSACTIONS, docs.length);
 };
 
 const formTxnDocument = async (web3, db, contracts, txnIds) => {
@@ -74,8 +88,42 @@ const updateTransactionsDatabase = async (web3, db, contracts, lastTxn) => {
   }
 };
 
+const getProposalId = (transaction) => {
+  for (const param of transaction.decodedInputs.params) {
+    if (param.name === '_proposalId') {
+      return param.value;
+    }
+  }
+};
+
+const formEventObj = (transaction) => {
+  const res = {
+    _from: transaction.tx.from,
+    _proposalId: getProposalId(transaction),
+  };
+  for (const eventLog of transaction.decodedEvents) {
+    for (const arg of eventLog.events) {
+      res[arg.name] = arg.value;
+    }
+  }
+  return res;
+};
+
+const processTransactions = async (web3, db, contracts) => {
+  const counter = await getCounter(db, counters.TRANSACTIONS);
+  if (counter.last_processed === counter.max_value) return;
+  const transactions = await getTransactions(db, counter.last_processed);
+  if (transactions.length <= 0) return;
+  for (const transaction of transactions) {
+    const res = formEventObj(transaction);
+    await watchedFunctionsMap[transaction.decodedInputs.name](db, contracts, res);
+  }
+  await incrementLastProcessed(db, counters.TRANSACTIONS, transactions.length);
+};
+
 module.exports = {
   getLastTransaction,
   updateTransactionsDatabase,
   filterAndInsertTxns,
+  processTransactions,
 };

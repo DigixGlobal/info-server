@@ -7,7 +7,7 @@ const getCounter = async (db, name) => {
   return counter;
 };
 
-const incrementCounter = async (db, name, incrementBy) => {
+const incrementMaxValue = async (db, name, incrementBy) => {
   await db.collection(collections.COUNTERS).findOneAndUpdate({
     name,
   }, {
@@ -17,7 +17,18 @@ const incrementCounter = async (db, name, incrementBy) => {
   });
 };
 
+const incrementLastProcessed = async (db, name, incrementBy) => {
+  await db.collection(collections.COUNTERS).findOneAndUpdate({
+    name,
+  }, {
+    $inc: {
+      last_processed: incrementBy,
+    },
+  });
+};
+
 module.exports = {
   getCounter,
-  incrementCounter,
+  incrementMaxValue,
+  incrementLastProcessed,
 };

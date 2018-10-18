@@ -3,7 +3,9 @@ const {
   watchNewBlocks,
 } = require('./blocks');
 
-const processTransactions = require('./processTransactions');
+const {
+  processTransactions,
+} = require('./transactions');
 
 module.exports = {
   syncToLatestBlock,

@@ -31,7 +31,7 @@ app.set('json spaces', 4);
 let db;
 
 const initDB = async () => {
-  const client = await mongodb.MongoClient.connect(process.env.DB_URL);
+  const client = await mongodb.MongoClient.connect(process.env.DB_URL, { useNewUrlParser: true });
   const clientdb = client.db(process.env.DIGIXDAO_DB_NAME);
   await clientdb.collection(collections.COUNTERS).createIndex('name', { unique: true });
   await clientdb.collection(collections.DAO).createIndex('index');
