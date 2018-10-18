@@ -24,6 +24,8 @@ const DaoWhitelisting = require('@digix/dao-contracts/build/contracts/DaoWhiteli
 const DaoWhitelistingStorage = require('@digix/dao-contracts/build/contracts/DaoWhitelistingStorage.json');
 const abiDecoder = require('abi-decoder');
 
+const _contracts = {};
+
 const contracts = {
   contractResolver: ContractResolver,
   dao: Dao,
@@ -51,19 +53,23 @@ const contracts = {
   daoWhitelistingStorage: DaoWhitelistingStorage,
 };
 
-const getContracts = async (contractObjs, w3, networkId) => {
-  contractObjs.fromAddress = {};
-  contractObjs.decoder = abiDecoder;
+const initContracts = async (web3, networkId) => {
+  _contracts.fromAddress = {};
+  _contracts.decoder = abiDecoder;
   for (const k in contracts) {
     const contract = contracts[k];
     const contractAddress = contract.networks[networkId].address;
-    contractObjs[k] = w3.eth.contract(contract.abi).at(contractAddress);
-    contractObjs.fromAddress[contractAddress] = contractObjs[k];
-    contractObjs.decoder.addABI(contract.abi);
+    _contracts[k] = web3.eth.contract(contract.abi).at(contractAddress);
+    _contracts.fromAddress[contractAddress] = _contracts[k];
+    _contracts.decoder.addABI(contract.abi);
   }
-  return contractObjs;
+};
+
+const getContracts = () => {
+  return _contracts;
 };
 
 module.exports = {
+  initContracts,
   getContracts,
 };

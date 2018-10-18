@@ -4,21 +4,22 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const cron = require('node-cron');
 const Web3 = require('web3');
-const mongodb = require('mongodb');
 
-const routes = require('./routes');
-const scripts = require('./scripts');
+const mongoUtil = require('./dbWrapper/mongoUtil');
 
 const {
-  getContracts,
+  initContracts,
 } = require('./helpers/contracts');
 
+// TODO: this will go
 const {
   collections,
 } = require('./helpers/constants');
 
+const routes = require('./routes');
+const scripts = require('./scripts');
+
 const app = express();
-const contracts = {};
 
 const w3 = new Web3(new Web3.providers.HttpProvider(process.env.WEB3_HTTP_PROVIDER));
 
@@ -28,17 +29,16 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set('json spaces', 4);
 
-let db;
-
 const initDB = async () => {
-  const client = await mongodb.MongoClient.connect(process.env.DB_URL, { useNewUrlParser: true });
-  const clientdb = client.db(process.env.DIGIXDAO_DB_NAME);
-  await clientdb.collection(collections.COUNTERS).createIndex('name', { unique: true });
-  await clientdb.collection(collections.DAO).createIndex('index');
-  await clientdb.collection(collections.PROPOSALS).createIndex('proposalId', { unique: true });
-  await clientdb.collection(collections.ADDRESSES).createIndex('address', { unique: true });
-  await clientdb.collection(collections.TRANSACTIONS).createIndex('index', { unique: true });
-  return clientdb;
+  await mongoUtil.connectToServer(process.env.DB_URL, process.env.DIGIXDAO_DB_NAME);
+  const db = mongoUtil.getDB();
+
+  // TODO: this should be done at the time of deployment
+  await db.collection(collections.COUNTERS).createIndex('name', { unique: true });
+  await db.collection(collections.DAO).createIndex('index');
+  await db.collection(collections.PROPOSALS).createIndex('proposalId', { unique: true });
+  await db.collection(collections.ADDRESSES).createIndex('address', { unique: true });
+  await db.collection(collections.TRANSACTIONS).createIndex('index', { unique: true });
 };
 
 const initCron = async () => {
@@ -47,26 +47,27 @@ const initCron = async () => {
     console.log('\tIn cron.schedule');
 
     // process the pending transactions
-    scripts.processTransactions(w3, db, contracts);
+    scripts.processTransactions(w3);
   });
 };
 
 const init = async () => {
-  db = await initDB();
+  await initDB();
 
+  // TODO: no need to do this (ask @vu)
   // middleware to inject db object // not sure if is a good practice
   app.use((req, res, next) => {
-    req.db = db;
+    req.db = mongoUtil.getDB();
     next();
   });
   app.use('/', routes);
 
   const networkId = await w3.version.network;
-  await getContracts(contracts, w3, networkId);
+  await initContracts(w3, networkId);
 
-  await scripts.syncToLatestBlock(w3, db, contracts);
+  await scripts.syncToLatestBlock(w3);
 
-  scripts.watchNewBlocks(w3, db, contracts);
+  scripts.watchNewBlocks(w3);
 
   initCron();
 };

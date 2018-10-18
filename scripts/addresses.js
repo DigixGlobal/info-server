@@ -1,13 +1,22 @@
-const getAllAddresses = (db, callback) => {
-  const addresses = db.get('addresses');
-  addresses.find().toArray(function (err, docs) {
-    const allAddresses = docs.map((doc) => {
-      return doc.address;
-    });
-    callback(allAddresses);
-  });
+const refreshAddressLockDGD = async (res) => {
+
+};
+
+const refreshAddressWithdrawDGD = async (res) => {
+
+};
+
+const refreshAddressContinueParticipation = async (res) => {
+
+};
+
+const refreshAddressRedeemBadge = async (res) => {
+
 };
 
 module.exports = {
-  getAllAddresses,
+  refreshAddressLockDGD,
+  refreshAddressWithdrawDGD,
+  refreshAddressContinueParticipation,
+  refreshAddressRedeemBadge,
 };
