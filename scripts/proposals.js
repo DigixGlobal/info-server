@@ -26,10 +26,23 @@ const {
   updateProposal,
 } = require('../dbWrapper/proposals');
 
+const _getProposalId = (res) => {
+  let user;
+  for (const event of res._events) {
+    for (const argName in event) {
+      if (argName === '_proposalId') {
+        user = event[argName];
+      }
+    }
+  }
+  return user;
+};
+
 // DONE
 const refreshProposalNew = async (res) => {
   const proposal = {};
-  const proposalDetails = await getContracts().daoStorage.readProposal.call(res._proposalId);
+  const _proposalId = _getProposalId(res);
+  const proposalDetails = await getContracts().daoStorage.readProposal.call(_proposalId);
   proposal.proposalId = proposalDetails[readProposalIndices.proposalId];
   proposal.proposer = proposalDetails[readProposalIndices.proposer];
   proposal.endorser = proposalDetails[readProposalIndices.endorser];
@@ -41,10 +54,10 @@ const refreshProposalNew = async (res) => {
 
   const nVersions = proposalDetails[readProposalIndices.nVersions];
   proposal.proposalVersions = [];
-  let currentVersion = res._proposalId;
+  let currentVersion = _proposalId;
   for (const v in indexRange(0, nVersions)) {
     console.log('version id : ', v);
-    const proposalVersion = await getContracts().daoStorage.readProposalVersion.call(res._proposalId, currentVersion);
+    const proposalVersion = await getContracts().daoStorage.readProposalVersion.call(_proposalId, currentVersion);
     proposal.proposalVersions.push({
       docIpfsHash: proposalVersion[readProposalVersionIndices.docIpfsHash],
       created: proposalVersion[readProposalVersionIndices.created],
@@ -53,7 +66,7 @@ const refreshProposalNew = async (res) => {
       moreDocs: [],
       totalFunding: proposalVersion[readProposalVersionIndices.finalReward].plus(sumArrayBN(proposalVersion[readProposalVersionIndices.milestoneFundings])),
     });
-    currentVersion = await getContracts().daoStorage.getNextProposalVersion.call(res._proposalId, currentVersion);
+    currentVersion = await getContracts().daoStorage.getNextProposalVersion.call(_proposalId, currentVersion);
   }
 
   // update the database
@@ -69,7 +82,6 @@ const refreshProposalDetails = async (res) => {
   proposal.proposalId = proposalDetails[readProposalIndices.proposalId];
   proposal.proposer = proposalDetails[readProposalIndices.proposer];
   proposal.endorser = proposalDetails[readProposalIndices.endorser];
-  proposal.stage = proposalDetails[readProposalIndices.stage]; // TODO: map stage from the hex
   proposal.timeCreated = proposalDetails[readProposalIndices.timeCreated];
   proposal.finalVersionIpfsDoc = proposalDetails[readProposalIndices.finalVersionIpfsDoc];
   proposal.prl = proposalDetails[readProposalIndices.prl];

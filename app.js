@@ -11,7 +11,8 @@ const {
   initContracts,
 } = require('./helpers/contracts');
 
-// TODO: this will go
+// TODO: this will not be here
+// when the below "TODO" is taken care of
 const {
   collections,
 } = require('./helpers/constants');
@@ -48,6 +49,12 @@ const initCron = async () => {
 
     // process the pending transactions
     scripts.processTransactions(w3);
+
+    // TODO: remove this part
+    // don't need to refresh dao every minute
+    // the values stay the same in the same quarter
+    // So, only need to refreshDao when a new quarter begins
+    scripts.refreshDao();
   });
 };
 

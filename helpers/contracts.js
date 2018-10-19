@@ -21,6 +21,7 @@ const DaoUpgradeStorage = require('@digix/dao-contracts/build/contracts/DaoUpgra
 const DaoVoting = require('@digix/dao-contracts/build/contracts/DaoVoting.json');
 const DaoVotingClaims = require('@digix/dao-contracts/build/contracts/DaoVotingClaims.json');
 const DaoWhitelisting = require('@digix/dao-contracts/build/contracts/DaoWhitelisting.json');
+const DaoInformation = require('@digix/dao-contracts/build/contracts/DaoInformation.json');
 const DaoWhitelistingStorage = require('@digix/dao-contracts/build/contracts/DaoWhitelistingStorage.json');
 const abiDecoder = require('abi-decoder');
 
@@ -50,6 +51,7 @@ const contracts = {
   daoVoting: DaoVoting,
   daoVotingClaims: DaoVotingClaims,
   daoWhitelisting: DaoWhitelisting,
+  daoInformation: DaoInformation,
   daoWhitelistingStorage: DaoWhitelistingStorage,
 };
 

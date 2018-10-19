@@ -60,7 +60,8 @@ module.exports = (db) => {
     startOfQuarter: 1539052987, // in seconds
     startOfMainphase: 1540512000, // 25 Oct 2018
     startOfNextQuarter: 1543622400, // 1 dec 2018
-    totalDgdsLocked: 1234e9, // = 1234 DGD
+    totalLockedDgds: 1234e9, // = 1234 DGD
+    totalModeratorLockedDgds: 234e9, // 234 DGD
   }, { upsert: true });
 
   const addresses = db.collection('addresses');
@@ -73,6 +74,7 @@ module.exports = (db) => {
     quarterPoint: 8e9, // 8 Quarter Points
     isParticipant: true,
     isModerator: true,
+    lastParticipatedQuarter: 1,
     votes: {
       proposalId: {
         draftVoting: {

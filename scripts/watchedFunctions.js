@@ -6,17 +6,19 @@ const {
 } = require('./proposals');
 
 const {
-  refreshAddressLockDGD,
-  refreshAddressWithdrawDGD,
-  refreshAddressContinueParticipation,
-  refreshAddressRedeemBadge,
+  refreshAddress,
 } = require('./addresses');
 
+const {
+  initDao,
+} = require('./dao');
+
 const watchedFunctionsMap = {
-  // lockDGD: refreshAddressLockDGD,
-  // withdrawDGD: refreshAddressWithdrawDGD,
-  // confirmContinueParticipation: refreshAddressContinueParticipation,
-  // redeemBadge: refreshAddressRedeemBadge,
+  setStartOfFirstQuarter: initDao,
+  lockDGD: refreshAddress,
+  withdrawDGD: refreshAddress,
+  confirmContinueParticipation: refreshAddress,
+  redeemBadge: refreshAddress,
   submitPreproposal: refreshProposalNew,
   modifyProposal: refreshProposalDetails,
   endorseProposal: refreshProposalEndorseProposal,

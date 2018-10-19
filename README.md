@@ -34,7 +34,8 @@ npm run staging
       "startOfQuarter": <timestamp>, // in seconds
       "startOfMainphase": <timestamp>,
       "startOfNextQuarter": <timestamp>,
-      "totalDgdsLocked": 1234e9 // = 1234 DGD
+      "totalLockedDgds": 1234e9, // = 1234 DGD
+      "totalModeratorLockedDgds": 234e9 // 234 DGD
     }
 }
 ```
@@ -51,6 +52,7 @@ npm run staging
       "quarterPoint": 8e9, // 8 Quarter Points
       "isParticipant": true,
       "isModerator": true,
+      "lastParticipatedQuarter": 1
     }
 }
 ```

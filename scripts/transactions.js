@@ -38,10 +38,17 @@ const _formEventObj = (transaction) => {
   const res = {
     _from: transaction.tx.from,
     _proposalId: _getProposalId(transaction),
+    _events: [],
   };
   for (const eventLog of transaction.decodedEvents) {
-    for (const arg of eventLog.events) {
-      res[arg.name] = arg.value;
+    // only consider the event if it from the contract we were watching
+    if (eventLog && (eventLog.address === transaction.tx.to)) {
+      // populate the `res` object for every argument in this event's log
+      const _event = {};
+      for (const arg of eventLog.events) {
+        _event[arg.name] = arg.value;
+      }
+      res._events.push(_event);
     }
   }
   return res;

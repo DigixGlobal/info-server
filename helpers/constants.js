@@ -47,10 +47,11 @@ const counters = {
 };
 
 const watchedFunctionNames = {
-  // LOCK_DGD: 'lockDGD',
-  // WITHDRAW_DGD: 'withdrawDGD',
-  // REDEEM_BADGE: 'redeemBadge',
-  // CONFIRM_CONTINUE_PARTICIPATION: 'confirmContinueParticipation',
+  START_DAO: 'setStartOfFirstQuarter',
+  LOCK_DGD: 'lockDGD',
+  WITHDRAW_DGD: 'withdrawDGD',
+  REDEEM_BADGE: 'redeemBadge',
+  CONFIRM_CONTINUE_PARTICIPATION: 'confirmContinueParticipation',
   NEW_PROPOSAL: 'submitPreproposal',
   ENDORSE_PROPOSAL: 'endorseProposal',
   MODIFY_PROPOSAL: 'modifyProposal',
@@ -65,10 +66,11 @@ const watchedFunctionNames = {
 };
 
 const watchedFunctionsList = [
-  // watchedFunctionNames.LOCK_DGD,
-  // watchedFunctionNames.WITHDRAW_DGD,
-  // watchedFunctionNames.REDEEM_BADGE,
-  // watchedFunctionNames.CONFIRM_CONTINUE_PARTICIPATION,
+  watchedFunctionNames.START_DAO,
+  watchedFunctionNames.LOCK_DGD,
+  watchedFunctionNames.WITHDRAW_DGD,
+  watchedFunctionNames.REDEEM_BADGE,
+  watchedFunctionNames.CONFIRM_CONTINUE_PARTICIPATION,
   watchedFunctionNames.NEW_PROPOSAL,
   watchedFunctionNames.ENDORSE_PROPOSAL,
   watchedFunctionNames.MODIFY_PROPOSAL,
