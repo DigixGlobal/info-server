@@ -12,7 +12,7 @@ router.get('/daoInfo', async (req, res) => {
 });
 
 router.get('/address/:address', async (req, res) => {
-  const result = await req.db.get('addresses').findOne({ address: req.params.address }, { _id: 0 })
+  const result = await req.db.get('addresses').findOne({ address: req.params.address.toLowerCase() }, { _id: 0 })
   return res.json({ "result": result ? result : "notFound" });
 });
 
