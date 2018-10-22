@@ -398,7 +398,7 @@ const setDummyData = (db) => {
     "isUser": true, // whether this address is a user. In ther words, whether this address has locked DGDs at least once
     "lockedDgdStake": 120e9, // 123 DGDStake
     "lockedDgd": 200e9, // locked 200 DGD
-    "reputationPoint": 200, // 12 Reputation Points
+    "reputationPoint": 2001e8, // 12 Reputation Points
     "quarterPoint": 8e9, // 8 Quarter Points
     "isParticipant": true,
     "isModerator": true,
@@ -420,7 +420,7 @@ const setDummyData = (db) => {
     "isUser": true, // whether this address is a user. In ther words, whether this address has locked DGDs at least once
     "lockedDgdStake": 5e9, // 123 DGDStake
     "lockedDgd": 5e9, // locked 200 DGD
-    "reputationPoint": 10, // 12 Reputation Points
+    "reputationPoint": 10e9, // 12 Reputation Points
     "quarterPoint": 1e9, // 8 Quarter Points
     "isParticipant": true,
     "isModerator": false,
@@ -431,7 +431,7 @@ const setDummyData = (db) => {
     "isUser": true, // whether this address is a user. In ther words, whether this address has locked DGDs at least once
     "lockedDgdStake": 110e9, // 123 DGDStake
     "lockedDgd": 140e9, // locked 200 DGD
-    "reputationPoint": 240, // 12 Reputation Points
+    "reputationPoint": 240e9, // 12 Reputation Points
     "quarterPoint": 5e9, // 8 Quarter Points
     "isParticipant": true,
     "isModerator": true,
@@ -442,7 +442,7 @@ const setDummyData = (db) => {
     "isUser": true, // whether this address is a user. In ther words, whether this address has locked DGDs at least once
     "lockedDgdStake": 104e9, // 123 DGDStake
     "lockedDgd": 104e9, // locked 200 DGD
-    "reputationPoint": 235, // 12 Reputation Points
+    "reputationPoint": 235e9, // 12 Reputation Points
     "quarterPoint": 3e9, // 8 Quarter Points
     "isParticipant": true,
     "isModerator": true,
@@ -464,7 +464,7 @@ const setDummyData = (db) => {
     "isUser": true, // whether this address is a user. In ther words, whether this address has locked DGDs at least once
     "lockedDgdStake": 14e9, // 123 DGDStake
     "lockedDgd": 14e9, // locked 200 DGD
-    "reputationPoint": 15, // 12 Reputation Points
+    "reputationPoint": 15e9, // 12 Reputation Points
     "quarterPoint": 2e9, // 8 Quarter Points
     "isParticipant": true,
     "isModerator": false,
