@@ -23,8 +23,18 @@ const getAddressDetails = async (address) => {
   return addressDetails;
 };
 
+const getAllAddresses = async (filter) => {
+  const addresses = await mongoUtil.getDB()
+    .collection(collections.ADDRESSES)
+    .find(filter)
+    .toArray()
+    .map(doc => doc.address);
+  return addresses;
+};
+
 module.exports = {
   updateAddress,
   insertAddress,
   getAddressDetails,
+  getAllAddresses,
 };

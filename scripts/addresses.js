@@ -16,11 +16,11 @@ const _getAddressObject = (userInfo) => {
   return {
     isParticipant: userInfo[0],
     isModerator: userInfo[1],
-    lastParticipatedQuarter: userInfo[2],
-    lockedDgdStake: userInfo[3],
-    lockedDgd: userInfo[4],
-    reputationPoint: userInfo[5],
-    quarterPoint: userInfo[6],
+    lastParticipatedQuarter: userInfo[2].toNumber(),
+    lockedDgdStake: userInfo[3].toNumber(),
+    lockedDgd: userInfo[4].toNumber(),
+    reputationPoint: userInfo[5].toNumber(),
+    quarterPoint: userInfo[6].toNumber(),
   };
 };
 
@@ -31,6 +31,8 @@ const _getInsertAddressObj = (user) => {
   };
 };
 
+// TODO: move to generic function
+// get the value for a `key`
 const _getUser = (res) => {
   let user;
   for (const event of res._events) {
@@ -60,14 +62,14 @@ const refreshAddress = async (res) => {
   }
 
   // update lockedDGDs in daoInfo
-  const totalLockedDgds = await getContracts()
+  const totalLockedDgds = (await getContracts()
     .daoStakeStorage
     .totalLockedDGDStake
-    .call();
-  const totalModeratorLockedDgds = await getContracts()
+    .call()).toNumber();
+  const totalModeratorLockedDgds = (await getContracts()
     .daoStakeStorage
     .totalModeratorLockedDGDStake
-    .call();
+    .call()).toNumber();
   await updateDao({
     $set: {
       totalLockedDgds,

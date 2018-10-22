@@ -26,6 +26,13 @@ const {
   updateProposal,
 } = require('../dbWrapper/proposals');
 
+const {
+  getAddressDetails,
+  updateAddress,
+} = require('../dbWrapper/addresses');
+
+// TODO: move to a generic function
+// get the `value` of a `key`
 const _getProposalId = (res) => {
   let user;
   for (const event of res._events) {
@@ -128,15 +135,17 @@ const refreshProposalFinalizeProposal = async (res) => {
   proposal.stage = proposalStages.DRAFT;
   proposal.finalVersionIpfsDoc = proposalDetails[readProposalIndices.finalVersionIpfsDoc];
 
-  const draftVotingPhase = await getContracts().daoConfigsStorage.uintConfigs.call(daoConfigsKeys.CONFIG_DRAFT_VOTING_PHASE);
+  const draftVotingPhase = (await getContracts().daoConfigsStorage.uintConfigs.call(daoConfigsKeys.CONFIG_DRAFT_VOTING_PHASE)).toNumber();
+  const draftQuotaNumerator = await getContracts().daoConfigsStorage.uintConfigs.call(daoConfigsKeys.CONFIG_DRAFT_QUOTA_NUMERATOR);
+  const draftQuotaDenominator = await getContracts().daoConfigsStorage.uintConfigs.call(daoConfigsKeys.CONFIG_DRAFT_QUOTA_DENOMINATOR);
   proposal.draftVoting = {};
-  proposal.draftVoting.startTime = await getContracts().daoStorage.readProposalDraftVotingTime.call(res._proposalId);
-  proposal.draftVoting.votingDeadline = proposal.draftVoting.startTime.plus(draftVotingPhase);
-  proposal.draftVoting.totalVoterStake = new BigNumber(0);
-  proposal.draftVoting.totalVoterCount = new BigNumber(0);
-  proposal.draftVoting.currentResult = new BigNumber(0);
-  proposal.draftVoting.quorum = new BigNumber(0);
-  proposal.draftVoting.quota = new BigNumber(0);
+  proposal.draftVoting.startTime = (await getContracts().daoStorage.readProposalDraftVotingTime.call(res._proposalId)).toNumber();
+  proposal.draftVoting.votingDeadline = proposal.draftVoting.startTime + draftVotingPhase;
+  proposal.draftVoting.totalVoterStake = 0;
+  proposal.draftVoting.totalVoterCount = 0;
+  proposal.draftVoting.currentResult = 0;
+  proposal.draftVoting.quorum = (await getContracts().daoCalculatorService.minimumDraftQuorum.call(res._proposalId)).toNumber();
+  proposal.draftVoting.quota = draftQuotaNumerator.idiv(draftQuotaDenominator).toNumber();
   proposal.draftVoting.claimed = false;
   proposal.draftVoting.passed = false;
   proposal.draftVoting.funded = false;
@@ -148,37 +157,52 @@ const refreshProposalFinalizeProposal = async (res) => {
   console.log('INSERTED refreshProposalFinalizeProposal');
 };
 
-const refreshProposalDraftVote = async (db, contracts, res) => {
-  // update proposals
-  const proposals = db.get('proposals');
-  proposals.findOne({ proposalId: res._proposalId }, async function (err, proposal) {
-    addresses.getAllAddresses(db, async (allAddresses) => {
-      const draftVotingCount = await contracts.daoStorage.readDraftVotingCount.call(res._proposalId, allAddresses);
-      const yesVoters = await contracts.daoStorage.readDraftVotingVotes.call(res._proposalId, allAddresses, true);
-      const noVoters = await contracts.daoStorage.readDraftVotingVotes.call(res._proposalId, allAddresses, false);
-      const quotaNumerator = await contracts.daoConfigsStorage.uintConfigs.call(daoConfigsKeys.CONFIG_DRAFT_QUOTA_NUMERATOR);
-      const quotaDenominator = await contracts.daoConfigsStorage.uintConfigs.call(daoConfigsKeys.CONFIG_DRAFT_QUOTA_DENOMINATOR);
-      proposal.draftVoting.totalVoterStake = draftVotingCount[0].plus(draftVotingCount[1]);
-      proposal.draftVoting.totalVoterCount = yesVoters[1].plus(noVoters[1]);
-      proposal.draftVoting.currentResult = draftVotingCount[0].idiv(draftVotingCount[0].plus(draftVotingCount[1]));
-      proposal.quorum = await contracts.daoCalculatorService.minimumDraftQuorum.call(res._proposalId);
-      console.log('quorum = ', proposal.quorum);
-      proposal.quota = quotaNumerator.idiv(quotaDenominator);
+// DONE
+const refreshProposalDraftVote = async (res) => {
+  // get info
+  const addressDetails = await getAddressDetails(res._from);
+  const proposal = await getProposal(res._proposalId);
+  const vote = res._vote;
+  const currentYes = proposal.draftVoting.currentResult * proposal.draftVoting.totalVoterStake;
 
-      proposals.update({ proposalId: res._proposalId }, proposal, { upsert: true });
-    });
-  });
+  const votes = {};
+  votes[res._proposalId] = {
+    draftVoting: { vote },
+  };
 
-  // update addresses
-  const addresses = db.get('addresses');
-  addresses.findOne({ address: res._from }, function (err, participant) {
-    participant.votes[res._proposalId].draftVoting = {};
-    participant.votes[res._proposalId].votingRound = {};
-    participant.votes[res._proposalId].draftVoting.commit = true;
-    participant.votes[res._proposalId].draftVoting.reveal = true;
+  // calculate which parts to update
+  if (addressDetails.votes[res._proposalId] === undefined) {
+    const totalVoterCount = proposal.draftVoting.totalVoterCount + 1;
+    const totalVoterStake = proposal.draftVoting.totalVoterStake + addressDetails.lockedDgdStake;
+    let currentResult;
+    if (vote === true) {
+      currentResult = (currentYes + addressDetails.lockedDgdStake) / totalVoterStake;
+    } else {
+      currentResult = currentYes / totalVoterStake;
+    }
+    proposal.draftVoting.totalVoterCount = totalVoterCount;
+    proposal.draftVoting.totalVoterStake = totalVoterStake;
+    proposal.draftVoting.currentResult = currentResult;
+  } else {
+    const previousVote = addressDetails.votes[res._proposalId].draftVoting.vote;
+    let { currentResult } = proposal.draftVoting;
+    if (previousVote === true && vote === false) {
+      currentResult = (currentYes - addressDetails.lockedDgdStake) / proposal.draftVoting.totalVoterStake;
+    } else if (previousVote === false && vote === true) {
+      currentResult = (currentYes + addressDetails.lockedDgdStake) / proposal.draftVoting.totalVoterStake;
+    }
+    proposal.draftVoting.currentResult = currentResult;
+  }
 
-    addresses.update({ address: res._from }, participant, { upsert: true });
-  });
+  // update proposal
+  await updateProposal(res._proposalId, {
+    $set: proposal,
+  }, { upsert: true });
+
+  // update address
+  await updateAddress(res._from, {
+    $set: { votes },
+  }, {});
 };
 
 const refreshProposalDraftVotingClaim = async (db, contracts, res) => {
@@ -419,4 +443,5 @@ module.exports = {
   refreshProposalDetails,
   refreshProposalEndorseProposal,
   refreshProposalFinalizeProposal,
+  refreshProposalDraftVote,
 };

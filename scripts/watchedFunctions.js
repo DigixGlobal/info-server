@@ -3,6 +3,7 @@ const {
   refreshProposalDetails,
   refreshProposalEndorseProposal,
   refreshProposalFinalizeProposal,
+  refreshProposalDraftVote,
 } = require('./proposals');
 
 const {
@@ -23,7 +24,7 @@ const watchedFunctionsMap = {
   modifyProposal: refreshProposalDetails,
   endorseProposal: refreshProposalEndorseProposal,
   finalizeProposal: refreshProposalFinalizeProposal,
-  // voteOnDraft: refreshProposalDraftVote,
+  voteOnDraft: refreshProposalDraftVote,
   // claimDraftVotingResult: refreshProposalDraftVotingClaim,
   // commitVoteOnProposal: refreshProposalCommitVote,
   // revealVoteOnProposal: refreshProposalRevealVote,

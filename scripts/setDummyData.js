@@ -78,13 +78,11 @@ module.exports = (db) => {
     votes: {
       proposalId: {
         draftVoting: {
-          commit: true,
-          reveal: true,
+          vote: true,
         },
         votingRound: {
           0: {
-            commit: true,
-            reveal: true,
+            vote: true, // whether voted for or against
           },
           1: {
             commit: true,
