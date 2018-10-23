@@ -16,7 +16,27 @@ const sumArrayBN = function (array) {
   return sum;
 };
 
+const getFromFunctionArg = function (transaction, argName) {
+  for (const param of transaction.decodedInputs.params) {
+    if (param.name === argName) {
+      return param.value;
+    }
+  }
+};
+
+const getFromEventLog = function (res, argName) {
+  for (const event of res._events) {
+    for (const arg in event) {
+      if (arg === argName) {
+        return event[arg];
+      }
+    }
+  }
+};
+
 module.exports = {
   sumArray,
   sumArrayBN,
+  getFromFunctionArg,
+  getFromEventLog,
 };

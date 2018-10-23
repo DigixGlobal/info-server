@@ -23,34 +23,19 @@ const {
 } = require('../helpers/contracts');
 
 const {
+  getFromFunctionArg,
+} = require('../helpers/utils');
+
+const {
   watchedFunctionsMap,
 } = require('./watchedFunctions');
-
-// TODO: move to a generic function
-// get the param value for a param name
-const _getProposalId = (transaction) => {
-  for (const param of transaction.decodedInputs.params) {
-    if (param.name === '_proposalId') {
-      return param.value;
-    }
-  }
-};
-
-// TODO: move to a generic function
-// get the param value for a param name
-const _getVote = (transaction) => {
-  for (const param of transaction.decodedInputs.params) {
-    if (param.name === '_vote') {
-      return param.value;
-    }
-  }
-};
 
 const _formEventObj = (transaction) => {
   const res = {
     _from: transaction.tx.from,
-    _proposalId: _getProposalId(transaction),
-    _vote: _getVote(transaction),
+    _proposalId: getFromFunctionArg(transaction, '_proposalId'),
+    _index: getFromFunctionArg(transaction, '_index'),
+    _vote: getFromFunctionArg(transaction, '_vote'),
     _events: [],
   };
   for (const eventLog of transaction.decodedEvents) {

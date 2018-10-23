@@ -36,6 +36,7 @@ module.exports = (db) => {
         commitDeadline: 1540598400,
         revealDeadline: 1540598400,
         totalVoterStake: 123e9, // 123 DGD,
+        totalCommitCount: 13,
         totalVoterCount: 12,
         currentResult: 0.61, // 61%
         quorum: 140e9, // 140 DGD
@@ -82,6 +83,8 @@ module.exports = (db) => {
         },
         votingRound: {
           0: {
+            commit: true,
+            reveal: true,
             vote: true, // whether voted for or against
           },
           1: {

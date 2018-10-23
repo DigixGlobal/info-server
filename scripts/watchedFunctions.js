@@ -5,6 +5,9 @@ const {
   refreshProposalFinalizeProposal,
   refreshProposalDraftVote,
   refreshProposalDraftVotingClaim,
+  refreshProposalCommitVote,
+  refreshProposalRevealVote,
+  refreshProposalVotingClaim,
 } = require('./proposals');
 
 const {
@@ -27,9 +30,9 @@ const watchedFunctionsMap = {
   finalizeProposal: refreshProposalFinalizeProposal,
   voteOnDraft: refreshProposalDraftVote,
   claimDraftVotingResult: refreshProposalDraftVotingClaim,
-  // commitVoteOnProposal: refreshProposalCommitVote,
-  // revealVoteOnProposal: refreshProposalRevealVote,
-  // claimProposalVotingResult: refreshProposalVotingClaim,
+  commitVoteOnProposal: refreshProposalCommitVote,
+  revealVoteOnProposal: refreshProposalRevealVote,
+  claimProposalVotingResult: refreshProposalVotingClaim,
   // commitVoteOnSpecialProposal: refreshProposalCommitVoteOnSpecial,
   // revealVoteOnSpecialProposal: refreshProposalRevealVoteOnSpecial,
 };
