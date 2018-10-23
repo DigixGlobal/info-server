@@ -329,6 +329,11 @@ const refreshProposalRevealVote = async (res) => {
 };
 
 // DONE
+// TODO: if this is the final voting round, i.e. `index === milestoneFundings.length`
+// 1. claimableFunding will be the finalReward (this has been taken care of)
+// 2. currentMilestone should not change
+// 3. currentMilestoneStart should not change
+// 4. proposal.stage should be ARCHIVED
 const refreshProposalVotingClaim = async (res) => {
   // this is a multi-step function
   // if there were no event logs, it is only an intermediate step
