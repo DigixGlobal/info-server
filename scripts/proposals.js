@@ -32,6 +32,17 @@ const {
   updateAddress,
 } = require('../dbWrapper/addresses');
 
+// TODO: proposal.votingStage does not change
+// from COMMIT to REVEAL automatically
+// check all proposals in votingStage === COMMIT (in cron)
+// and update them to REVEAL if the commitDeadline has passed
+
+// TODO: proposal.votingStage does not change
+// from REVEAL to ONGOING/ARCHIVE automatically
+// unless the voting round is claimed by the proposer/someone
+// check all proposals in votingStage === REVEAL (in cron)
+// and mark them as CLAIMABLE if the revealDeadline has passed
+
 // DONE
 const refreshProposalNew = async (res) => {
   const proposal = {};
@@ -207,22 +218,26 @@ const refreshProposalDraftVotingClaim = async (res) => {
   proposal.draftVoting.claimed = true;
   proposal.draftVoting.passed = getFromEventLog(res, '_result');
 
+  // if the draft voting has failed
+  proposal.stage = proposalStages.ARCHIVED;
+  proposal.votingStage = proposalVotingStages.NONE;
+
   if (proposal.draftVoting.passed === true) {
     proposal.stage = proposalStages.PROPOSAL;
     proposal.votingStage = proposalVotingStages.COMMIT;
     proposal.currentVotingRound = 0;
     proposal.votingRounds = [];
-    const votingStartTime = await getContracts().daoStorage.readProposalVotingTime.call(res._proposalId, new BigNumber(0));
-    const commitPhaseDuration = await getContracts().daoConfigsStorage.uintConfigs.call(daoConfigsKeys.CONFIG_VOTING_COMMIT_PHASE);
-    const votingPhaseDuration = await getContracts().daoConfigsStorage.uintConfigs.call(daoConfigsKeys.CONFIG_VOTING_PHASE_TOTAL);
-    const votingQuorum = await getContracts().daoCalculatorService.minimumVotingQuorum.call(res._proposalId, new BigNumber(0));
+    const votingStartTime = (await getContracts().daoStorage.readProposalVotingTime.call(res._proposalId, new BigNumber(0))).toNumber();
+    const commitPhaseDuration = (await getContracts().daoConfigsStorage.uintConfigs.call(daoConfigsKeys.CONFIG_VOTING_COMMIT_PHASE)).toNumber();
+    const votingPhaseDuration = (await getContracts().daoConfigsStorage.uintConfigs.call(daoConfigsKeys.CONFIG_VOTING_PHASE_TOTAL)).toNumber();
+    const votingQuorum = (await getContracts().daoCalculatorService.minimumVotingQuorum.call(res._proposalId, new BigNumber(0))).toNumber();
     const quotaNumerator = (await getContracts().daoConfigsStorage.uintConfigs.call(daoConfigsKeys.CONFIG_VOTING_QUOTA_NUMERATOR)).toNumber();
     const quotaDenominator = (await getContracts().daoConfigsStorage.uintConfigs.call(daoConfigsKeys.CONFIG_VOTING_QUOTA_DENOMINATOR)).toNumber();
     proposal.votingRounds.push({
-      startTime: votingStartTime.toNumber(),
-      commitDeadline: votingStartTime.plus(commitPhaseDuration).toNumber(),
-      revealDeadline: votingStartTime.plus(votingPhaseDuration).toNumber(),
-      quorum: votingQuorum.toNumber(),
+      startTime: votingStartTime,
+      commitDeadline: votingStartTime + commitPhaseDuration,
+      revealDeadline: votingStartTime + votingPhaseDuration,
+      quorum: votingQuorum,
       quota: quotaNumerator * 100 / quotaDenominator,
       totalCommitCount: 0,
       totalVoterCount: 0,
@@ -232,9 +247,6 @@ const refreshProposalDraftVotingClaim = async (res) => {
       passed: false,
       funded: false,
     });
-  } else {
-    proposal.stage = proposalStages.ARCHIVED;
-    proposal.votingStage = proposalVotingStages.NONE;
   }
 
   // update the proposal
@@ -350,45 +362,62 @@ const refreshProposalVotingClaim = async (res) => {
   console.log('INSERTED refreshProposalVotingClaim');
 };
 
-// const refreshProposalClaimFunding = async (db, contracts, res) => {
-//   // read current proposal from DB
-//   const proposals = db.get('proposals');
-//   proposals.findOne({ proposalId: res._proposalId }, async function (err, proposal) {
-//     console.log('res = ', res);
-//     const fundingClaimed = new BigNumber(res._funding);
-//     proposal.claimableFunding = proposal.claimableFunding.minus(fundingClaimed);
-//
-//     console.log('[refreshProposalClaimFunding] = ', proposal);
-//     // update the database
-//     proposals.update({ proposalId: res._proposalId }, proposal, { upsert: true });
-//   });
-// };
-//
-// const refreshProposalFinishMilestone = async (db, contracts, res) => {
-//   // read current proposal from DB
-//   const proposals = db.get('proposals');
-//   proposals.findOne({ proposalId: res._proposalId }, async function (err, proposal) {
-//     proposal.stage = proposalStages.REVIEW;
-//     proposal.votingStage = proposalVotingStages.COMMIT;
-//     proposal.currentVotingRound = res._milestoneIndex + 1;
-//     const votingStartTime = await contracts.daoStorage.readProposalVotingTime.call(res._proposalId, new BigNumber(res._milestoneIndex + 1));
-//     const commitPhaseDuration = await contracts.daoConfigsStorage.uintConfigs.call(daoConfigsKeys.CONFIG_INTERIM_COMMIT_PHASE);
-//     const votingPhaseDuration = await contracts.daoConfigsStorage.uintConfigs.call(daoConfigsKeys.CONFIG_INTERIM_PHASE_TOTAL);
-//     proposal.votingRounds.push({
-//       startTime: votingStartTime,
-//       commitDeadline: votingStartTime.plus(commitPhaseDuration),
-//       revealDeadline: votingStartTime.plus(votingPhaseDuration),
-//       claimed: false,
-//       passed: false,
-//       funded: false,
-//     });
-//
-//     console.log('[refreshProposalFinishMilestone] = ', proposal);
-//     // update the database
-//     proposals.update({ proposalId: res._proposalId }, proposal, { upsert: true });
-//   });
-// };
-//
+// DONE
+const refreshProposalClaimFunding = async (res) => {
+  // get the current proposal
+  const proposal = await getProposal(res._proposalId);
+  const fundingClaimed = getFromEventLog(res, '_funding');
+
+  // claimable funding is now reduced by the claimed funds
+  const claimableFunding = proposal.claimableFunding - fundingClaimed;
+
+  // update proposal for claimableFunding
+  await updateProposal(res._proposalId, {
+    $set: { claimableFunding },
+  });
+  console.log('INSERTED refreshProposalClaimFunding');
+};
+
+// DONE
+const refreshProposalFinishMilestone = async (res) => {
+  // get current proposal details
+  const proposal = await getProposal(res._proposalId);
+  proposal.stage = proposalStages.REVIEW;
+  proposal.votingStage = proposalVotingStages.COMMIT;
+  const index = parseInt(getFromEventLog(res, '_milestoneIndex'), 10);
+  proposal.currentVotingRound = index + 1;
+
+  // read voting round info
+  const votingStartTime = (await getContracts().daoStorage.readProposalVotingTime.call(res._proposalId, new BigNumber(proposal.currentVotingRound))).toNumber();
+  const commitPhaseDuration = (await getContracts().daoConfigsStorage.uintConfigs.call(daoConfigsKeys.CONFIG_INTERIM_COMMIT_PHASE)).toNumber();
+  const votingPhaseDuration = (await getContracts().daoConfigsStorage.uintConfigs.call(daoConfigsKeys.CONFIG_INTERIM_PHASE_TOTAL)).toNumber();
+  const votingQuorum = (await getContracts().daoCalculatorService.minimumVotingQuorum.call(res._proposalId, new BigNumber(proposal.currentVotingRound))).toNumber();
+  const quotaNumerator = (await getContracts().daoConfigsStorage.uintConfigs.call(daoConfigsKeys.CONFIG_VOTING_QUOTA_NUMERATOR)).toNumber();
+  const quotaDenominator = (await getContracts().daoConfigsStorage.uintConfigs.call(daoConfigsKeys.CONFIG_VOTING_QUOTA_DENOMINATOR)).toNumber();
+
+  // add new voting round
+  proposal.votingRounds.push({
+    startTime: votingStartTime,
+    commitDeadline: votingStartTime + commitPhaseDuration,
+    revealDeadline: votingStartTime + votingPhaseDuration,
+    quorum: votingQuorum,
+    quota: quotaNumerator * 100 / quotaDenominator,
+    totalCommitCount: 0,
+    totalVoterCount: 0,
+    totalVoterStake: 0,
+    currentResult: 0,
+    claimed: false,
+    passed: false,
+    funded: false,
+  });
+
+  // update proposal
+  await updateProposal(res._proposalId, {
+    $set: proposal,
+  });
+  console.log('INSERTED refreshProposalFinishMilestone');
+};
+
 // const refreshProposalCloseProposal = async (db, contracts, res) => {
 //   // read current proposal from DB
 //   const proposals = db.get('proposals');
@@ -481,4 +510,6 @@ module.exports = {
   refreshProposalCommitVote,
   refreshProposalRevealVote,
   refreshProposalVotingClaim,
+  refreshProposalClaimFunding,
+  refreshProposalFinishMilestone,
 };

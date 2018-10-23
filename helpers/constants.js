@@ -61,6 +61,8 @@ const watchedFunctionNames = {
   COMMIT_VOTE: 'commitVoteOnProposal',
   REVEAL_VOTE: 'revealVoteOnProposal',
   CLAIM_VOTING: 'claimProposalVotingResult',
+  CLAIM_FUNDING: 'claimFunding',
+  FINISH_MILESTONE: 'finishMilestone',
   // COMMIT_VOTE_SPECIAL: 'commitVoteOnSpecialProposal',
   // REVEAL_VOTE_SPECIAL: 'revealVoteOnSpecialProposal',
 };
@@ -80,6 +82,8 @@ const watchedFunctionsList = [
   watchedFunctionNames.COMMIT_VOTE,
   watchedFunctionNames.REVEAL_VOTE,
   watchedFunctionNames.CLAIM_VOTING,
+  watchedFunctionNames.CLAIM_FUNDING,
+  watchedFunctionNames.FINISH_MILESTONE,
   // watchedFunctionNames.COMMIT_VOTE_SPECIAL,
   // watchedFunctionNames.REVEAL_VOTE_SPECIAL,
 ];
