@@ -10,10 +10,10 @@ const insertProposal = async (proposal) => {
     .insertOne(proposal);
 };
 
-const updateProposal = async (proposalId, update) => {
+const updateProposal = async (proposalId, update, moreOptions = {}) => {
   await mongoUtil.getDB()
     .collection(collections.PROPOSALS)
-    .updateOne({ proposalId }, update);
+    .updateOne({ proposalId }, update, moreOptions);
 };
 
 const getProposalsCursor = (filter) => {
