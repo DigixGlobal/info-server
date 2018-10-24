@@ -10,6 +10,11 @@ const {
   refreshProposalVotingClaim,
   refreshProposalClaimFunding,
   refreshProposalFinishMilestone,
+  refreshProposalClose,
+  refreshProposalsFounderClose,
+  refreshProposalPRLAction,
+  // refreshProposalCommitVoteOnSpecial,
+  // refreshProposalRevealVoteOnSpecial,
 } = require('./proposals');
 
 const {
@@ -37,6 +42,9 @@ const watchedFunctionsMap = {
   claimProposalVotingResult: refreshProposalVotingClaim,
   claimFunding: refreshProposalClaimFunding,
   finishMilestone: refreshProposalFinishMilestone,
+  closeProposal: refreshProposalClose,
+  founderCloseProposals: refreshProposalsFounderClose,
+  updatePRL: refreshProposalPRLAction,
   // commitVoteOnSpecialProposal: refreshProposalCommitVoteOnSpecial,
   // revealVoteOnSpecialProposal: refreshProposalRevealVoteOnSpecial,
 };

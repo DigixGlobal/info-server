@@ -10,6 +10,8 @@ module.exports = {
       PORT: '3001',
       DB_URL: 'mongodb://localhost:27017/digixdao',
       DIGIXDAO_DB_NAME: 'digixdao',
+      IPFS_ENDPOINT: 'http://localhost:5001',
+      HTTP_ENDPOINT: 'http://localhost:9001/ipfs',
       WEB3_HTTP_PROVIDER: 'http://localhost:8545',
       BLOCK_CONFIRMATIONS: 0,
       START_BLOCK: 0,

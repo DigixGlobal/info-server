@@ -12,6 +12,7 @@ const {
 const {
   readProposalIndices,
   readProposalVersionIndices,
+  readProposalPRLActions,
   daoConfigsKeys,
   proposalStages,
   proposalVotingStages,
@@ -31,6 +32,10 @@ const {
   getAddressDetails,
   updateAddress,
 } = require('../dbWrapper/addresses');
+
+const {
+  fetchProposalVersion,
+} = require('../dijixWrapper/proposals');
 
 // TODO: proposal.votingStage does not change
 // from COMMIT to REVEAL automatically
@@ -71,6 +76,7 @@ const refreshProposalNew = async (res) => {
       finalReward: proposalVersion[readProposalVersionIndices.finalReward],
       moreDocs: [],
       totalFunding: proposalVersion[readProposalVersionIndices.finalReward].plus(sumArrayBN(proposalVersion[readProposalVersionIndices.milestoneFundings])),
+      dijixObject: await fetchProposalVersion(proposalVersion[readProposalVersionIndices.docIpfsHash]).data.attestation,
     });
     currentVersion = await getContracts().daoStorage.getNextProposalVersion.call(_proposalId, currentVersion);
   }
@@ -110,6 +116,7 @@ const refreshProposalDetails = async (res) => {
       finalReward: proposalVersion[readProposalVersionIndices.finalReward],
       moreDocs: proposalDocs,
       totalFunding: proposalVersion[readProposalVersionIndices.finalReward].plus(sumArrayBN(proposalVersion[readProposalVersionIndices.milestoneFundings])),
+      dijixObject: await fetchProposalVersion(proposalVersion[readProposalVersionIndices.docIpfsHash]).data.attestation,
     });
     currentVersion = await getContracts().daoStorage.getNextProposalVersion.call(res._proposalId, currentVersion);
   }
@@ -367,7 +374,7 @@ const refreshProposalVotingClaim = async (res) => {
   console.log('INSERTED refreshProposalVotingClaim');
 };
 
-// DONE
+// TO BE TESTED
 const refreshProposalClaimFunding = async (res) => {
   // get the current proposal
   const proposal = await getProposal(res._proposalId);
@@ -383,7 +390,7 @@ const refreshProposalClaimFunding = async (res) => {
   console.log('INSERTED refreshProposalClaimFunding');
 };
 
-// DONE
+// TO BE TESTED
 const refreshProposalFinishMilestone = async (res) => {
   // get current proposal details
   const proposal = await getProposal(res._proposalId);
@@ -423,35 +430,49 @@ const refreshProposalFinishMilestone = async (res) => {
   console.log('INSERTED refreshProposalFinishMilestone');
 };
 
-// const refreshProposalCloseProposal = async (db, contracts, res) => {
-//   // read current proposal from DB
-//   const proposals = db.get('proposals');
-//   proposals.findOne({ proposalId: res._proposalId }, async function (err, proposal) {
-//     proposal.stage = proposalStages.ARCHIVED;
-//     proposal.votingStage = proposalVotingStages.NONE;
-//
-//     console.log('[refreshProposalCloseProposal] = ', proposal);
-//     // update the database
-//     proposals.update({ proposalId: res._proposalId }, proposal, { upsert: true });
-//   });
-// };
-//
-// const refreshProposalPRLAction = async (db, contracts, res) => {
-//   // read current proposal from DB
-//   const proposals = db.get('proposals');
-//   proposals.findOne({ proposalId: res._proposalId }, async function (err, proposal) {
-//     proposal.prl = res._actionId; // TODO: take from constants
-//     if (res._actionId.toNumber() === 1) {
-//       proposal.stage = proposalStages.ARCHIVED;
-//       proposal.votingStage = proposalVotingStages.NONE;
-//     }
-//
-//     console.log('[refreshProposalPRLAction] = ', proposal);
-//     // update the database
-//     proposals.update({ proposalId: res._proposalId }, proposal, { upsert: true });
-//   });
-// };
-//
+// TO BE TESTED
+const refreshProposalClose = async (res) => {
+  await updateProposal(res._proposalId, {
+    $set: {
+      stage: proposalStages.ARCHIVED,
+      votingStage: proposalVotingStages.NONE,
+    },
+  });
+  console.log('INSERTED refreshProposalClose');
+};
+
+// TO BE TESTED
+const refreshProposalsFounderClose = async (res) => {
+  if (res._events.length === 0) return;
+  for (const event of res._events) {
+    console.log('event is = ', event);
+    await updateProposal(event._proposalId, {
+      $set: {
+        stage: proposalStages.ARCHIVED,
+        votingStage: proposalVotingStages.NONE,
+      },
+    });
+    console.log('INSERTED one of refreshProposalsFounderClose');
+  }
+};
+
+// TO BE TESTED
+const refreshProposalPRLAction = async (res) => {
+  const actionId = getFromEventLog(res, '_actionId');
+  console.log('action Id = ', actionId);
+  const updateObj = { prl: readProposalPRLActions[actionId] };
+  if (actionId === 1) {
+    console.log('it is stop');
+    updateObj.stage = proposalStages.ARCHIVED;
+    updateObj.votingStage = proposalVotingStages.NONE;
+  }
+
+  await updateProposal(res._proposalId, {
+    $set: updateObj,
+  });
+};
+
+// IN LATER SPRINTS
 // const refreshProposalCommitVoteOnSpecial = async (db, contracts, res) => {
 //   // update proposals
 //   const proposals = db.get('proposals');
@@ -476,7 +497,8 @@ const refreshProposalFinishMilestone = async (res) => {
 //     });
 //   });
 // };
-//
+
+// IN LATER SPRINTS
 // const refreshProposalRevealVoteOnSpecial = async (db, contracts, res) => {
 //   // update proposals
 //   const proposals = db.get('proposals');
@@ -517,4 +539,9 @@ module.exports = {
   refreshProposalVotingClaim,
   refreshProposalClaimFunding,
   refreshProposalFinishMilestone,
+  refreshProposalClose,
+  refreshProposalsFounderClose,
+  refreshProposalPRLAction,
+  // refreshProposalCommitVoteOnSpecial,
+  // refreshProposalRevealVoteOnSpecial,
 };

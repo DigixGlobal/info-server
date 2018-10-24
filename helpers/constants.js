@@ -18,6 +18,12 @@ const readProposalVersionIndices = {
   finalReward: 3,
 };
 
+const readProposalPRLActions = {
+  1: 'stopped',
+  2: 'paused',
+  3: 'ok',
+};
+
 const proposalStages = {
   IDEA: 'idea',
   DRAFT: 'draft',
@@ -63,6 +69,9 @@ const watchedFunctionNames = {
   CLAIM_VOTING: 'claimProposalVotingResult',
   CLAIM_FUNDING: 'claimFunding',
   FINISH_MILESTONE: 'finishMilestone',
+  CLOSE_PROPOSAL: 'closeProposal',
+  FOUNDER_CLOSE_PROPOSALS: 'founderCloseProposals',
+  PRL_ACTION: 'updatePRL',
   // COMMIT_VOTE_SPECIAL: 'commitVoteOnSpecialProposal',
   // REVEAL_VOTE_SPECIAL: 'revealVoteOnSpecialProposal',
 };
@@ -84,6 +93,9 @@ const watchedFunctionsList = [
   watchedFunctionNames.CLAIM_VOTING,
   watchedFunctionNames.CLAIM_FUNDING,
   watchedFunctionNames.FINISH_MILESTONE,
+  watchedFunctionNames.CLOSE_PROPOSAL,
+  watchedFunctionNames.FOUNDER_CLOSE_PROPOSALS,
+  watchedFunctionNames.PRL_ACTION,
   // watchedFunctionNames.COMMIT_VOTE_SPECIAL,
   // watchedFunctionNames.REVEAL_VOTE_SPECIAL,
 ];
@@ -160,4 +172,5 @@ module.exports = {
   proposalVotingStages,
   watchedFunctionNames,
   watchedFunctionsList,
+  readProposalPRLActions,
 };

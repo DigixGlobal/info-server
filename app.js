@@ -6,6 +6,7 @@ const cron = require('node-cron');
 const Web3 = require('web3');
 
 const mongoUtil = require('./dbWrapper/mongoUtil');
+const dijixUtil = require('./dijixWrapper/dijixUtil');
 
 const {
   initContracts,
@@ -42,6 +43,10 @@ const initDB = async () => {
   await db.collection(collections.TRANSACTIONS).createIndex('index', { unique: true });
 };
 
+const initIpfs = async () => {
+  await dijixUtil.init(process.env.IPFS_ENDPOINT, process.env.HTTP_ENDPOINT);
+};
+
 const initCron = async () => {
   cron.schedule('* * * * *', async () => {
     // schedule a script to run every min
@@ -60,6 +65,7 @@ const initCron = async () => {
 
 const init = async () => {
   await initDB();
+  await initIpfs();
 
   // TODO: no need to do this (ask @vu)
   // middleware to inject db object // not sure if is a good practice
