@@ -16,6 +16,31 @@ module.exports = (db) => {
         finalReward: [1e18],
         moreDocs: ['Qm..', 'Qm..'],
         totalFunding: 4e18,
+        // dijix
+        dijixObject: {
+          title: 'first title',
+          description: 'first description first description',
+          details: 'first details first details first details first details first details',
+          milestones: [
+            {
+              title: 'first milestone',
+              description: 'first milestone description in detail',
+            },
+            {
+              title: 'second milestone',
+              description: 'second milestone description in detail',
+            },
+          ],
+          images: [
+            'Qm34...',
+            'Qm12...',
+          ],
+          videos: [
+            'Qm45...',
+            'Qm23...',
+          ],
+        },
+        // dijix
       },
     ],
     draftVoting: {
