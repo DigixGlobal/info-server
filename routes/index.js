@@ -1,6 +1,7 @@
 const express = require('express');
 
 const proposalRoutes = require('./proposals');
+const transactionRoutes = require('./transactions');
 
 const {
   collections,
@@ -11,6 +12,8 @@ const router = express.Router();
 // add other subroutes in different files
 
 router.use('/proposals', proposalRoutes);
+
+router.use('/transactions', transactionRoutes);
 
 router.get('/daoInfo', async (req, res) => {
   const result = await req.db.collection(collections.DAO).findOne({});
