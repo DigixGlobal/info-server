@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const cron = require('node-cron');
 const Web3 = require('web3');
+const rateLimit = require('express-rate-limit');
 
 const mongoUtil = require('./dbWrapper/mongoUtil');
 const dijixUtil = require('./dijixWrapper/dijixUtil');
@@ -74,6 +75,13 @@ const init = async () => {
     next();
   });
   app.use('/', routes);
+
+  const defaultLimiter = rateLimit({
+    windowMs: process.env.RATE_LIMIT_WINDOW_MS, // 1 minute
+    max: process.env.RATE_LIMIT_PER_WINDOW, // limit each IP to 10 requests per minute
+  });
+  //  apply to all requests
+  app.use(defaultLimiter);
 
   const networkId = await w3.version.network;
   await initContracts(w3, networkId);

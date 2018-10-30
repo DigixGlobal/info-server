@@ -9,8 +9,6 @@ const {
 
 const router = express.Router();
 
-// add other subroutes in different files
-
 router.use('/proposals', proposalRoutes);
 
 router.use('/transactions', transactionRoutes);
