@@ -10,6 +10,21 @@ const insertTransactions = async (transactions) => {
     .insertMany(transactions);
 };
 
+const insertPendingTransactions = async (pendingTransactions) => {
+  await mongoUtil.getDB()
+    .collection(collections.PENDING_TRANSACTIONS)
+    .insertMany(pendingTransactions);
+};
+
+const isExistPendingTransaction = async (txhash) => {
+  const txnCursor = mongoUtil.getDB()
+    .collection(collections.PENDING_TRANSACTIONS)
+    .find({ txhash })
+    .limit(1);
+  const isExist = await txnCursor.hasNext();
+  return isExist;
+};
+
 const getTransaction = async (txhash) => {
   const tx = await mongoUtil.getDB()
     .collection(collections.TRANSACTIONS)
@@ -55,6 +70,8 @@ const getLastTransaction = async () => {
 
 module.exports = {
   insertTransactions,
+  insertPendingTransactions,
+  isExistPendingTransaction,
   getTransaction,
   getTransactions,
   getUserTransactions,

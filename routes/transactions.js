@@ -1,10 +1,17 @@
 const express = require('express');
+const crypto = require('crypto');
 
 const {
   getTransaction,
   getTransactions,
   getUserTransactions,
+  insertPendingTransactions,
 } = require('../dbWrapper/transactions');
+
+const {
+  getDaoServerNonce,
+  setDaoServerNonce,
+} = require('../dbWrapper/counters');
 
 const router = express.Router();
 
@@ -48,6 +55,34 @@ router.get('/users/:address', async (req, res) => {
     newestFirst,
   );
   return res.json({ result });
+});
+
+router.post('/watch', async (req, res) => {
+  const retrievedSig = req.headers['access-sign'];
+  const retrievedNonce = parseInt(req.headers['access-nonce'], 10);
+  const message = req.method + req.originalUrl + req.body.txns + retrievedNonce;
+  const computedSig = crypto
+    .createHmac('sha256', process.env.SERVER_SECRET)
+    .update(message)
+    .digest('hex');
+
+  const currentDaoServerNonce = await getDaoServerNonce();
+
+  if (
+    (computedSig === retrievedSig)
+    && (retrievedNonce > currentDaoServerNonce)
+  ) {
+    await setDaoServerNonce(parseInt(retrievedNonce, 10));
+    const txns = req.body.txns.split(',').map(function (txn) {
+      return {
+        txhash: txn,
+      };
+    });
+    if (txns.length > 0) await insertPendingTransactions(txns);
+    res.send(200);
+  } else {
+    res.send(403);
+  }
 });
 
 module.exports = router;

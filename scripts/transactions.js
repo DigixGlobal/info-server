@@ -10,8 +10,13 @@ const {
 
 const {
   getTransactions,
+  isExistPendingTransaction,
   insertTransactions,
 } = require('../dbWrapper/transactions');
+
+const {
+  notifyDaoServer,
+} = require('./notifier');
 
 const {
   watchedFunctionsList,
@@ -82,11 +87,31 @@ const _formTxnDocument = async (web3, txnIds) => {
   return transactions;
 };
 
+const checkAndNotify = async (transactions) => {
+  const completedTxns = [];
+  for (const txn of transactions) {
+    if (await isExistPendingTransaction(txn.tx.hash)) {
+      completedTxns.push({
+        txhash: txn.tx.hash,
+        from: txn.tx.from,
+        gasPrice: txn.tx.gasPrice,
+        blockHash: txn.txReceipt.blockHash,
+        blockNumber: txn.txReceipt.blockNumber,
+        gasUsed: txn.txReceipt.gasUsed,
+      });
+    }
+  }
+  if (completedTxns.length > 0) {
+    notifyDaoServer(completedTxns);
+  }
+};
+
 const filterAndInsertTxns = async (web3, txnIds) => {
   const transactions = await _formTxnDocument(web3, txnIds);
   if (transactions.length > 0) {
     await insertTransactions(transactions);
     await incrementMaxValue(counters.TRANSACTIONS, transactions.length);
+    await checkAndNotify(transactions);
   }
 };
 

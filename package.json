@@ -21,6 +21,7 @@
     "awaiting": "^3.0.0",
     "body-parser": "^1.18.2",
     "cors": "^2.8.4",
+    "crypto": "^1.0.1",
     "dijix": "0.0.15",
     "dijix-attestation": "0.0.9",
     "dijix-image": "0.0.10",

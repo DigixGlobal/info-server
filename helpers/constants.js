@@ -43,6 +43,7 @@ const proposalVotingStages = {
 const collections = {
   COUNTERS: 'counters',
   TRANSACTIONS: 'allTransactions',
+  PENDING_TRANSACTIONS: 'pendingTransactions',
   PROPOSALS: 'proposals',
   ADDRESSES: 'addresses',
   DAO: 'daoInfo',
@@ -50,6 +51,7 @@ const collections = {
 
 const counters = {
   TRANSACTIONS: 'allTransactions',
+  NONCE: 'nonce',
 };
 
 const watchedFunctionNames = {
