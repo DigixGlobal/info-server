@@ -2,6 +2,7 @@ const BigNumber = require('bignumber.js');
 
 const {
   indexRange,
+  decodeHash,
 } = require('@digix/helpers/lib/helpers');
 
 const {
@@ -69,6 +70,7 @@ const refreshProposalNew = async (res) => {
   for (const v in indexRange(0, nVersions)) {
     console.log('version id : ', v);
     const proposalVersion = await getContracts().daoStorage.readProposalVersion.call(_proposalId, currentVersion);
+    const ipfsDoc = await fetchProposalVersion('Qm'.concat(decodeHash(proposalVersion[readProposalVersionIndices.docIpfsHash]).slice(2)));
     proposal.proposalVersions.push({
       docIpfsHash: proposalVersion[readProposalVersionIndices.docIpfsHash],
       created: proposalVersion[readProposalVersionIndices.created],
@@ -76,7 +78,10 @@ const refreshProposalNew = async (res) => {
       finalReward: proposalVersion[readProposalVersionIndices.finalReward],
       moreDocs: [],
       totalFunding: proposalVersion[readProposalVersionIndices.finalReward].plus(sumArrayBN(proposalVersion[readProposalVersionIndices.milestoneFundings])),
-      dijixObject: await fetchProposalVersion(proposalVersion[readProposalVersionIndices.docIpfsHash]).data.attestation,
+      dijixObject: {
+        ...ipfsDoc.data.attestation,
+        images: ipfsDoc.data.proofs,
+      },
     });
     currentVersion = await getContracts().daoStorage.getNextProposalVersion.call(_proposalId, currentVersion);
   }
@@ -105,6 +110,7 @@ const refreshProposalDetails = async (res) => {
   for (const v in indexRange(0, nVersions)) {
     console.log('version id : ', v);
     const proposalVersion = await getContracts().daoStorage.readProposalVersion.call(res._proposalId, currentVersion);
+    const ipfsDoc = await fetchProposalVersion('Qm'.concat(decodeHash(proposalVersion[readProposalVersionIndices.docIpfsHash]).slice(2)));
     let proposalDocs = [];
     if (proposalVersion === proposal.finalVersionIpfsDoc) {
       proposalDocs = await getContracts().daoStorage.readProposalDocs.call(res._proposalId);
@@ -116,7 +122,10 @@ const refreshProposalDetails = async (res) => {
       finalReward: proposalVersion[readProposalVersionIndices.finalReward],
       moreDocs: proposalDocs,
       totalFunding: proposalVersion[readProposalVersionIndices.finalReward].plus(sumArrayBN(proposalVersion[readProposalVersionIndices.milestoneFundings])),
-      dijixObject: await fetchProposalVersion(proposalVersion[readProposalVersionIndices.docIpfsHash]).data.attestation,
+      dijixObject: {
+        ...ipfsDoc.data.attestation,
+        images: ipfsDoc.data.proofs,
+      },
     });
     currentVersion = await getContracts().daoStorage.getNextProposalVersion.call(res._proposalId, currentVersion);
   }
