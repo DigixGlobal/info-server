@@ -1,5 +1,8 @@
 ### Outline of server structure: [link](OUTLINE.md)
 
+### SETUP INSTRUCTIONS
+Please refer [HERE](https://gist.github.com/roynalnaruto/52f2be795f256ed7b0f156666108f8fc). The Info-server runs together with [DigixDAO contracts](https://github.com/DigixGlobal/dao-contracts/tree/dev-info-server) and [Dao-server](https://github.com/DigixGlobal/dao-server/tree/dev)
+
 ### Setup:
 * Install MongoDB: https://docs.mongodb.com/manual/administration/install-on-linux/
 * Make sure `mongod` is running:
