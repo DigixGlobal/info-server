@@ -73,7 +73,7 @@ router.post('/watch', async (req, res) => {
     && (retrievedNonce > currentDaoServerNonce)
   ) {
     await setDaoServerNonce(parseInt(retrievedNonce, 10));
-    const txns = req.body.txns.split(',').map(function (txn) {
+    const txns = req.body.txns.map(function (txn) {
       return {
         txhash: txn,
       };
