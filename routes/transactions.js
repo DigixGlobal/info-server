@@ -4,6 +4,7 @@ const crypto = require('crypto');
 const {
   getTransaction,
   getTransactions,
+  isExistTransaction,
   getUserTransactions,
   insertPendingTransactions,
 } = require('../dbWrapper/transactions');
@@ -27,21 +28,8 @@ router.get('/details/:txhash', async (req, res) => {
 router.get('/status', async (req, res) => {
   const txHashes = req.query.txns;
   if (txHashes.length === 0) return res.json({});
-  const transactions = await getTransactions({
-    'tx.hash': {
-      $in: txHashes,
-    },
-  });
-  const result = transactions.map(function (txn) {
-    return {
-      txhash: txn.tx.hash,
-      from: txn.tx.from,
-      gasPrice: txn.tx.gasPrice,
-      blockHash: txn.txReceipt.blockHash,
-      blockNumber: txn.txReceipt.blockNumber,
-      gasUsed: txn.txReceipt.gasUsed,
-    };
-  });
+  const transactions = await _getTransactions(txHashes);
+  const result = _formTransactionsObj(transactions);
   return res.json({ result });
 });
 
@@ -78,11 +66,48 @@ router.post('/watch', async (req, res) => {
         txhash: txn,
       };
     });
-    if (txns.length > 0) await insertPendingTransactions(txns);
-    res.send(200);
+    const confirmedTxns = [];
+    if (txns.length > 0) {
+      for (const txn of txns) {
+        if (await isExistTransaction(txn)) {
+          confirmedTxns.push(txn);
+          txns.splice(txns.indexOf(txn), 1);
+        }
+      }
+      if (txns.length > 0) await insertPendingTransactions(txns);
+    }
+    let result = [];
+    if (confirmedTxns.length > 0) {
+      const transactions = await _getTransactions(confirmedTxns);
+      result = _formTransactionsObj(transactions);
+    }
+    res.status(200).send(result);
   } else {
-    res.send(403);
+    res.status(403);
   }
 });
+
+const _formTransactionsObj = (transactions) => {
+  const result = transactions.map(function (txn) {
+    return {
+      txhash: txn.tx.hash,
+      from: txn.tx.from,
+      gasPrice: txn.tx.gasPrice,
+      blockHash: txn.txReceipt.blockHash,
+      blockNumber: txn.txReceipt.blockNumber,
+      gasUsed: txn.txReceipt.gasUsed,
+    };
+  });
+  return result;
+};
+
+const _getTransactions = async (txns) => {
+  const transactions = await getTransactions({
+    'tx.hash': {
+      $in: txns,
+    },
+  });
+  return transactions;
+};
 
 module.exports = router;

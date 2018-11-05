@@ -16,9 +16,28 @@ const insertPendingTransactions = async (pendingTransactions) => {
     .insertMany(pendingTransactions);
 };
 
+const removePendingTransactions = async (txHashes) => {
+  await mongoUtil.getDB()
+    .collection(collections.PENDING_TRANSACTIONS)
+    .remove({
+      txhash: {
+        $in: txHashes,
+      },
+    });
+};
+
 const isExistPendingTransaction = async (txhash) => {
   const txnCursor = mongoUtil.getDB()
     .collection(collections.PENDING_TRANSACTIONS)
+    .find({ txhash })
+    .limit(1);
+  const isExist = await txnCursor.hasNext();
+  return isExist;
+};
+
+const isExistTransaction = async (txhash) => {
+  const txnCursor = mongoUtil.getDB()
+    .collection(collections.TRANSACTIONS)
     .find({ txhash })
     .limit(1);
   const isExist = await txnCursor.hasNext();
@@ -71,7 +90,9 @@ const getLastTransaction = async () => {
 module.exports = {
   insertTransactions,
   insertPendingTransactions,
+  removePendingTransactions,
   isExistPendingTransaction,
+  isExistTransaction,
   getTransaction,
   getTransactions,
   getUserTransactions,

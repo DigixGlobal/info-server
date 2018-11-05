@@ -5,6 +5,10 @@ const {
   incrementAndGetSelfNonce,
 } = require('../dbWrapper/counters');
 
+const {
+  removePendingTransactions,
+} = require('../dbWrapper/transactions');
+
 const notifyDaoServer = async (txns) => {
   const nonce = await incrementAndGetSelfNonce();
 
@@ -30,9 +34,13 @@ const notifyDaoServer = async (txns) => {
     },
   };
 
-  request(options, function (err, response) {
+  request(options, async function (err, response) {
     if (err) console.log(err);
     console.log('response body = ', response.body);
+    // TODO: check if status is 200
+    // only then remove those pending txns
+    const txhashes = txns.map(txn => txn.txhash);
+    await removePendingTransactions(txhashes);
   });
 };
 
