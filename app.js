@@ -34,14 +34,12 @@ app.set('json spaces', 4);
 
 const initDB = async () => {
   await mongoUtil.connectToServer(process.env.DB_URL, process.env.DIGIXDAO_DB_NAME);
-  const db = mongoUtil.getDB();
 
-  // TODO: this should be done at the time of deployment
-  await db.collection(collections.COUNTERS).createIndex('name', { unique: true });
-  await db.collection(collections.DAO).createIndex('index');
-  await db.collection(collections.PROPOSALS).createIndex('proposalId', { unique: true });
-  await db.collection(collections.ADDRESSES).createIndex('address', { unique: true });
-  await db.collection(collections.TRANSACTIONS).createIndex('index', { unique: true });
+  if (process.env.FORCE_REFRESH_DB === 'true') {
+    await mongoUtil.initFreshDb();
+  } else {
+    await mongoUtil.checkAndInitFreshDb();
+  }
 };
 
 const initIpfs = async () => {
@@ -86,7 +84,7 @@ const init = async () => {
   const networkId = await w3.version.network;
   await initContracts(w3, networkId);
 
-  await scripts.syncToLatestBlock(w3);
+  await scripts.syncAndProcessToLatestBlock(w3);
 
   scripts.watchNewBlocks(w3);
 

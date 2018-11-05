@@ -19,6 +19,8 @@ module.exports = {
       RATE_LIMIT_PER_WINDOW: 10,
       BLOCK_CONFIRMATIONS: 0,
       START_BLOCK: 0,
+      FORCE_REFRESH_DB: 'true',
+      SYNC_REPORT_FREQUENCY: 10,
     },
   }],
 };

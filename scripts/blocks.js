@@ -3,29 +3,33 @@ const {
 } = require('../dbWrapper/transactions');
 
 const {
-  filterAndInsertTxns,
+  processTransactions,
   updateTransactionsDatabase,
 } = require('./transactions');
 
-const syncToLatestBlock = async (web3) => {
+const syncAndProcessToLatestBlock = async (web3) => {
   const lastTxn = await getLastTransaction();
   await updateTransactionsDatabase(web3, lastTxn);
+  await processTransactions(web3);
 };
 
 const watchNewBlocks = async (web3) => {
-  const lastTxn = await getLastTransaction();
+  // const lastTxn = await getLastTransaction();
   const filter = web3.eth.filter('latest');
-  filter.watch(async (err, result) => {
-    const latestBlock = await web3.eth.getBlock(result);
-    const latestBlockNumber = latestBlock.number - parseInt(process.env.BLOCK_CONFIRMATIONS, 10);
-
-    if (lastTxn && (lastTxn.tx.blockNumber >= latestBlockNumber)) return;
-
-    await filterAndInsertTxns(web3, latestBlock.transactions);
+  filter.watch(async () => {
+    syncAndProcessToLatestBlock(web3);
+    // const latestBlock = await web3.eth.getBlock(result);
+    // const blockNumberToProcess = latestBlock.number - parseInt(process.env.BLOCK_CONFIRMATIONS, 10);
+    //
+    // if (lastTxn && (lastTxn.tx.blockNumber >= blockNumberToProcess)) return;
+    //
+    // const newBlockToProcess = await web3.eth.getBlock(blockNumberToProcess);
+    //
+    // await filterAndInsertTxns(web3, newBlockToProcess.transactions);
   });
 };
 
 module.exports = {
-  syncToLatestBlock,
+  syncAndProcessToLatestBlock,
   watchNewBlocks,
 };

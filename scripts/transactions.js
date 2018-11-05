@@ -119,15 +119,18 @@ const updateTransactionsDatabase = async (web3, lastTxn) => {
   const startBlock = (lastTxn === null) ? process.env.START_BLOCK
     : (lastTxn.tx.blockNumber + 1);
   const endBlock = web3.eth.blockNumber - parseInt(process.env.BLOCK_CONFIRMATIONS, 10);
+  if (startBlock > endBlock) return;
 
   for (const blockNumber of indexRange(startBlock, endBlock + 1)) {
     const block = await web3.eth.getBlock(blockNumber);
     await filterAndInsertTxns(web3, block.transactions);
+    if (block.number % parseInt(process.env.SYNC_REPORT_FREQUENCY, 10) === 0) console.log(`\tSynced transactions to block ${block.number}/${endBlock}`);
   }
 };
 
 const processTransactions = async () => {
   const counter = await getCounter(counters.TRANSACTIONS);
+  console.log(`\tProcessing transactions, last_processed = ${counter.last_processed}, max_value = ${counter.max_value}`);
   if (counter.last_processed === counter.max_value) return;
   const transactions = await getTransactions({}, counter.last_processed);
   if (transactions.length <= 0) return;
@@ -136,6 +139,7 @@ const processTransactions = async () => {
     await watchedFunctionsMap[transaction.decodedInputs.name](res);
   }
   await incrementLastProcessed(counters.TRANSACTIONS, transactions.length);
+  console.log(`\tDone processing transactions until max_value = ${counter.max_value}`);
 };
 
 module.exports = {

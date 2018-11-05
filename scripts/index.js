@@ -1,5 +1,5 @@
 const {
-  syncToLatestBlock,
+  syncAndProcessToLatestBlock,
   watchNewBlocks,
 } = require('./blocks');
 
@@ -12,7 +12,7 @@ const {
 } = require('./dao');
 
 module.exports = {
-  syncToLatestBlock,
+  syncAndProcessToLatestBlock,
   watchNewBlocks,
   processTransactions,
   refreshDao,
