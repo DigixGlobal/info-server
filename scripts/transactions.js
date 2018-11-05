@@ -63,6 +63,7 @@ const _formTxnDocument = async (web3, txnIds) => {
   const contracts = getContracts();
 
   let currentIndex = r.max_value;
+  const otherWatchedTxns = [];
   for (const txnId of txnIds) {
     const transaction = {};
     transaction.tx = web3.eth.getTransaction(txnId);
@@ -77,14 +78,21 @@ const _formTxnDocument = async (web3, txnIds) => {
       if (
         transaction.decodedInputs !== undefined
         && watchedFunctionsList.includes(transaction.decodedInputs.name)
-      ) {
+      ) { // if we are already watching this txn
         transaction.index = currentIndex + 1;
         transactions.push(transaction);
         currentIndex++;
+      } else if (
+        await isExistPendingTransaction(transaction.tx.hash)
+      ) { // if this was in pending txn, but not a watched function
+        otherWatchedTxns.push(transaction);
       }
     }
   }
-  return transactions;
+  return {
+    transactions,
+    otherWatchedTxns,
+  };
 };
 
 const checkAndNotify = async (transactions) => {
@@ -107,11 +115,12 @@ const checkAndNotify = async (transactions) => {
 };
 
 const filterAndInsertTxns = async (web3, txnIds) => {
-  const transactions = await _formTxnDocument(web3, txnIds);
+  const filteredTxnObject = await _formTxnDocument(web3, txnIds);
+  const { transactions, otherWatchedTxns } = filteredTxnObject;
   if (transactions.length > 0) {
     await insertTransactions(transactions);
     await incrementMaxValue(counters.TRANSACTIONS, transactions.length);
-    await checkAndNotify(transactions);
+    await checkAndNotify(transactions.concat(otherWatchedTxns));
   }
 };
 
