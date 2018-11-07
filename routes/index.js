@@ -19,7 +19,7 @@ router.use('/transactions', transactionRoutes);
 
 router.get('/daoInfo', async (req, res) => {
   const info = await getDaoInfo();
-  return res.json({ info });
+  return res.json({ result: info });
 });
 
 router.get('/address/:address', async (req, res) => {
