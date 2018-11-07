@@ -23,7 +23,7 @@ router.get('/daoInfo', async (req, res) => {
 });
 
 router.get('/address/:address', async (req, res) => {
-  const details = await getAddressDetails(req.params.address);
+  const details = await getAddressDetails(req.params.address.toLowerCase());
   return res.json({ result: details || 'notFound' });
 });
 
