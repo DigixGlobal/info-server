@@ -48,7 +48,8 @@ router.get('/users/:address', async (req, res) => {
 router.post('/watch', async (req, res) => {
   const retrievedSig = req.headers['access-sign'];
   const retrievedNonce = parseInt(req.headers['access-nonce'], 10);
-  const message = req.method + req.originalUrl + req.body.txns + retrievedNonce;
+  // console.log('req.body.payload ', JSON.stringify(req.body.payload));
+  const message = req.method + req.originalUrl + JSON.stringify(req.body.payload) + retrievedNonce;
   const computedSig = crypto
     .createHmac('sha256', process.env.SERVER_SECRET)
     .update(message)
@@ -61,11 +62,12 @@ router.post('/watch', async (req, res) => {
     && (retrievedNonce > currentDaoServerNonce)
   ) {
     await setDaoServerNonce(parseInt(retrievedNonce, 10));
-    const txns = req.body.txns.map(function (txn) {
+    const txns = req.body.payload.txns.map(function (txn) {
       return {
         txhash: txn,
       };
     });
+    console.log('txns = ', txns);
     const confirmedTxns = [];
     if (txns.length > 0) {
       for (const txn of txns) {
@@ -81,6 +83,7 @@ router.post('/watch', async (req, res) => {
       const transactions = await _getTransactions(confirmedTxns);
       result = _formTransactionsObj(transactions);
     }
+    console.log('result = ', result);
     res.status(200).send(result);
   } else {
     res.status(403);
