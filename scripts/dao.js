@@ -19,12 +19,12 @@ const initDao = async () => {
   // don't need to wait for this to be completed
   await updateDao({
     $set: {
-      currentQuarter: daoInfo[0],
-      startOfQuarter: daoInfo[1],
-      startOfMainphase: daoInfo[2],
-      startOfNextQuarter: daoInfo[3],
-      totalLockedDgds,
-      totalModeratorLockedDgds,
+      currentQuarter: daoInfo[0].toNumber(),
+      startOfQuarter: daoInfo[1].toNumber(),
+      startOfMainphase: daoInfo[2].toNumber(),
+      startOfNextQuarter: daoInfo[3].toNumber(),
+      totalLockedDgds: totalLockedDgds.toNumber(),
+      totalModeratorLockedDgds: totalModeratorLockedDgds.toNumber(),
     },
   }, { upsert: true });
 };
@@ -38,10 +38,10 @@ const refreshDao = async () => {
   // don't need to wait for this to be completed
   await updateDao({
     $set: {
-      currentQuarter: daoInfo[0],
-      startOfQuarter: daoInfo[1],
-      startOfMainphase: daoInfo[2],
-      startOfNextQuarter: daoInfo[3],
+      currentQuarter: daoInfo[0].toNumber(),
+      startOfQuarter: daoInfo[1].toNumber(),
+      startOfMainphase: daoInfo[2].toNumber(),
+      startOfNextQuarter: daoInfo[3].toNumber(),
     },
   });
 };

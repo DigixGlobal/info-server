@@ -2,15 +2,19 @@ const BigNumber = require('bignumber.js');
 
 const sumArray = function (array) {
   let sum = 0;
-  for (const item in array) {
+  for (const item of array) {
     sum += item;
   }
   return sum;
 };
 
+const bNArrayToDecimal = function (array) {
+  return array.map(a => a.toNumber());
+};
+
 const sumArrayBN = function (array) {
   let sum = new BigNumber(0);
-  for (const item in array) {
+  for (const item of array) {
     sum = sum.plus(item);
   }
   return sum;
@@ -39,4 +43,5 @@ module.exports = {
   sumArrayBN,
   getFromFunctionArg,
   getFromEventLog,
+  bNArrayToDecimal,
 };

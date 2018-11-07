@@ -13,12 +13,6 @@ const {
   initContracts,
 } = require('./helpers/contracts');
 
-// TODO: this will not be here
-// when the below "TODO" is taken care of
-const {
-  collections,
-} = require('./helpers/constants');
-
 const routes = require('./routes');
 const scripts = require('./scripts');
 

@@ -8,6 +8,7 @@ const {
 const {
   sumArrayBN,
   getFromEventLog,
+  bNArrayToDecimal,
 } = require('../helpers/utils');
 
 const {
@@ -58,7 +59,7 @@ const refreshProposalNew = async (res) => {
   proposal.proposer = proposalDetails[readProposalIndices.proposer];
   proposal.endorser = proposalDetails[readProposalIndices.endorser];
   proposal.stage = proposalStages.IDEA;
-  proposal.timeCreated = proposalDetails[readProposalIndices.timeCreated];
+  proposal.timeCreated = proposalDetails[readProposalIndices.timeCreated].toNumber();
   proposal.finalVersionIpfsDoc = proposalDetails[readProposalIndices.finalVersionIpfsDoc];
   proposal.prl = proposalDetails[readProposalIndices.prl];
   proposal.isDigix = proposalDetails[readProposalIndices.isDigix];
@@ -73,11 +74,11 @@ const refreshProposalNew = async (res) => {
     const ipfsDoc = await fetchProposalVersion('Qm'.concat(decodeHash(proposalVersion[readProposalVersionIndices.docIpfsHash]).slice(2)));
     proposal.proposalVersions.push({
       docIpfsHash: proposalVersion[readProposalVersionIndices.docIpfsHash],
-      created: proposalVersion[readProposalVersionIndices.created],
-      milestoneFundings: proposalVersion[readProposalVersionIndices.milestoneFundings],
-      finalReward: proposalVersion[readProposalVersionIndices.finalReward],
+      created: proposalVersion[readProposalVersionIndices.created].toNumber(),
+      milestoneFundings: bNArrayToDecimal(proposalVersion[readProposalVersionIndices.milestoneFundings]),
+      finalReward: proposalVersion[readProposalVersionIndices.finalReward].toNumber(),
       moreDocs: [],
-      totalFunding: proposalVersion[readProposalVersionIndices.finalReward].plus(sumArrayBN(proposalVersion[readProposalVersionIndices.milestoneFundings])),
+      totalFunding: proposalVersion[readProposalVersionIndices.finalReward].plus(sumArrayBN(proposalVersion[readProposalVersionIndices.milestoneFundings])).toNumber(),
       dijixObject: {
         ...ipfsDoc.data.attestation,
         images: ipfsDoc.data.proofs,
@@ -99,7 +100,7 @@ const refreshProposalDetails = async (res) => {
   proposal.proposalId = proposalDetails[readProposalIndices.proposalId];
   proposal.proposer = proposalDetails[readProposalIndices.proposer];
   proposal.endorser = proposalDetails[readProposalIndices.endorser];
-  proposal.timeCreated = proposalDetails[readProposalIndices.timeCreated];
+  proposal.timeCreated = proposalDetails[readProposalIndices.timeCreated].toNumber();
   proposal.finalVersionIpfsDoc = proposalDetails[readProposalIndices.finalVersionIpfsDoc];
   proposal.prl = proposalDetails[readProposalIndices.prl];
   proposal.isDigix = proposalDetails[readProposalIndices.isDigix];
@@ -117,11 +118,11 @@ const refreshProposalDetails = async (res) => {
     }
     proposal.proposalVersions.push({
       docIpfsHash: proposalVersion[readProposalVersionIndices.docIpfsHash],
-      created: proposalVersion[readProposalVersionIndices.created],
-      milestoneFundings: proposalVersion[readProposalVersionIndices.milestoneFundings],
-      finalReward: proposalVersion[readProposalVersionIndices.finalReward],
+      created: proposalVersion[readProposalVersionIndices.created].toNumber(),
+      milestoneFundings: bNArrayToDecimal(proposalVersion[readProposalVersionIndices.milestoneFundings]),
+      finalReward: proposalVersion[readProposalVersionIndices.finalReward].toNumber(),
       moreDocs: proposalDocs,
-      totalFunding: proposalVersion[readProposalVersionIndices.finalReward].plus(sumArrayBN(proposalVersion[readProposalVersionIndices.milestoneFundings])),
+      totalFunding: proposalVersion[readProposalVersionIndices.finalReward].plus(sumArrayBN(proposalVersion[readProposalVersionIndices.milestoneFundings])).toNumber(),
       dijixObject: {
         ...ipfsDoc.data.attestation,
         images: ipfsDoc.data.proofs,
