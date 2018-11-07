@@ -12,6 +12,10 @@ const {
   getContracts,
 } = require('../helpers/contracts');
 
+const {
+  notifyDaoServer,
+} = require('./notifier');
+
 const _getAddressObject = (userInfo) => {
   return {
     isParticipant: userInfo[0],
@@ -58,6 +62,14 @@ const refreshAddress = async (res) => {
     await insertAddress({
       ..._getAddressObject(userInfo),
       ..._getInsertAddressObj(user),
+    });
+    // new address, tell dao-server about new address
+    notifyDaoServer({
+      method: 'POST',
+      path: '/user/new',
+      payload: {
+        address: user,
+      },
     });
   }
 

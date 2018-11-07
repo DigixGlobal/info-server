@@ -48,7 +48,6 @@ router.get('/users/:address', async (req, res) => {
 router.post('/watch', async (req, res) => {
   const retrievedSig = req.headers['access-sign'];
   const retrievedNonce = parseInt(req.headers['access-nonce'], 10);
-  // console.log('req.body.payload ', JSON.stringify(req.body.payload));
   const message = req.method + req.originalUrl + JSON.stringify(req.body.payload) + retrievedNonce;
   const computedSig = crypto
     .createHmac('sha256', process.env.SERVER_SECRET)
@@ -62,28 +61,29 @@ router.post('/watch', async (req, res) => {
     && (retrievedNonce > currentDaoServerNonce)
   ) {
     await setDaoServerNonce(parseInt(retrievedNonce, 10));
-    const txns = req.body.payload.txns.map(function (txn) {
-      return {
-        txhash: txn,
-      };
-    });
-    console.log('txns = ', txns);
+    const { txns } = req.body.payload;
     const confirmedTxns = [];
     if (txns.length > 0) {
       for (const txn of txns) {
-        if (await isExistTransaction(txn)) {
+        const exists = await isExistTransaction(txn);
+        if (exists) {
           confirmedTxns.push(txn);
           txns.splice(txns.indexOf(txn), 1);
         }
       }
-      if (txns.length > 0) await insertPendingTransactions(txns);
+      if (txns.length > 0) {
+        await insertPendingTransactions(txns.map(function (txn) {
+          return {
+            txhash: txn,
+          };
+        }));
+      }
     }
     let result = [];
     if (confirmedTxns.length > 0) {
       const transactions = await _getTransactions(confirmedTxns);
       result = _formTransactionsObj(transactions);
     }
-    console.log('result = ', result);
     res.status(200).send(result);
   } else {
     res.status(403);

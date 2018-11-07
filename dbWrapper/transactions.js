@@ -38,7 +38,7 @@ const isExistPendingTransaction = async (txhash) => {
 const isExistTransaction = async (txhash) => {
   const txnCursor = mongoUtil.getDB()
     .collection(collections.TRANSACTIONS)
-    .find({ txhash })
+    .find({ 'tx.hash': txhash })
     .limit(1);
   const isExist = await txnCursor.hasNext();
   return isExist;

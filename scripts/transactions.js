@@ -110,7 +110,11 @@ const checkAndNotify = async (transactions) => {
     }
   }
   if (completedTxns.length > 0) {
-    notifyDaoServer(completedTxns);
+    notifyDaoServer({
+      method: 'POST',
+      path: '/transactions/confirmed',
+      payload: completedTxns,
+    });
   }
 };
 
