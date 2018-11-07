@@ -10,6 +10,15 @@ const updateDao = async (update, moreOptions = {}) => {
     .updateOne({ index: 'index' }, update, moreOptions);
 };
 
+const getDaoInfo = async () => {
+  const info = await mongoUtil.getDB()
+    .collection(collections.DAO)
+    .findOne({});
+  if (info && info._id) delete info._id;
+  return info;
+};
+
 module.exports = {
   updateDao,
+  getDaoInfo,
 };

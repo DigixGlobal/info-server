@@ -27,6 +27,7 @@ const getProposal = async (proposalId) => {
   const proposal = await mongoUtil.getDB()
     .collection(collections.PROPOSALS)
     .findOne({ proposalId });
+  if (proposal && proposal._id) delete proposal._id;
   return proposal;
 };
 
@@ -36,6 +37,7 @@ const getProposals = async (filter) => {
     .collection(collections.PROPOSALS)
     .find(filter);
   for (let proposal = await cursor.next(); proposal != null; proposal = await cursor.next()) {
+    if (proposal && proposal._id) delete proposal._id;
     proposals.push(proposal);
   }
   return proposals;

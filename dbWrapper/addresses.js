@@ -20,6 +20,7 @@ const getAddressDetails = async (address) => {
   const addressDetails = await mongoUtil.getDB()
     .collection(collections.ADDRESSES)
     .findOne({ address });
+  if (addressDetails && addressDetails._id) delete addressDetails._id;
   return addressDetails;
 };
 

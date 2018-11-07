@@ -64,6 +64,7 @@ const refreshProposalNew = async (res) => {
   proposal.prl = proposalDetails[readProposalIndices.prl];
   proposal.isDigix = proposalDetails[readProposalIndices.isDigix];
   proposal.claimableFunding = 0;
+  proposal.currentMilestone = -1;
 
   const nVersions = proposalDetails[readProposalIndices.nVersions];
   proposal.proposalVersions = [];

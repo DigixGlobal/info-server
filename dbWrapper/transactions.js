@@ -48,6 +48,7 @@ const getTransaction = async (txhash) => {
   const tx = await mongoUtil.getDB()
     .collection(collections.TRANSACTIONS)
     .findOne({ 'tx.hash': txhash });
+  if (tx && tx._id) delete tx._id;
   return tx;
 };
 
@@ -58,6 +59,7 @@ const getTransactions = async (filter, skip = 0) => {
     .skip(skip);
   const transactions = [];
   for (let txn = await cursor.next(); txn != null; txn = await cursor.next()) {
+    if (txn && txn._id) delete txn._id;
     transactions.push(txn);
   }
   return transactions;
@@ -72,6 +74,7 @@ const getUserTransactions = async (address, count = 10, skip = 0, newestFirst = 
     .limit(count);
   const transactions = [];
   for (let txn = await cursor.next(); txn != null; txn = await cursor.next()) {
+    if (txn && txn._id) delete txn._id;
     transactions.push(txn);
   }
   return transactions;
@@ -84,6 +87,7 @@ const getLastTransaction = async () => {
     .sort({ _id: -1 })
     .limit(1);
   const transaction = await cursor.next();
+  if (transaction && transaction._id) delete transaction._id;
   return transaction;
 };
 

@@ -4,8 +4,12 @@ const proposalRoutes = require('./proposals');
 const transactionRoutes = require('./transactions');
 
 const {
-  collections,
-} = require('../helpers/constants');
+  getDaoInfo,
+} = require('../dbWrapper/dao');
+
+const {
+  getAddressDetails,
+} = require('../dbWrapper/addresses');
 
 const router = express.Router();
 
@@ -14,13 +18,13 @@ router.use('/proposals', proposalRoutes);
 router.use('/transactions', transactionRoutes);
 
 router.get('/daoInfo', async (req, res) => {
-  const result = await req.db.collection(collections.DAO).findOne({});
-  return res.json({ result });
+  const info = await getDaoInfo();
+  return res.json({ info });
 });
 
 router.get('/address/:address', async (req, res) => {
-  const result = await req.db.collection(collections.ADDRESSES).findOne({ address: req.params.address });
-  return res.json({ result: result || 'notFound' });
+  const details = await getAddressDetails(req.params.address);
+  return res.json({ result: details || 'notFound' });
 });
 
 module.exports = router;
