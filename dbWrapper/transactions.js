@@ -19,7 +19,7 @@ const insertPendingTransactions = async (pendingTransactions) => {
 const removePendingTransactions = async (txHashes) => {
   await mongoUtil.getDB()
     .collection(collections.PENDING_TRANSACTIONS)
-    .remove({
+    .deleteMany({
       txhash: {
         $in: txHashes,
       },

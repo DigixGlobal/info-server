@@ -84,7 +84,7 @@ router.post('/watch', async (req, res) => {
       const transactions = await _getTransactions(confirmedTxns);
       result = _formTransactionsObj(transactions);
     }
-    res.status(200).send(result);
+    res.status(200).send({ result });
   } else {
     res.status(403);
   }
