@@ -113,7 +113,9 @@ const checkAndNotify = async (transactions) => {
     notifyDaoServer({
       method: 'POST',
       path: '/transactions/confirmed',
-      payload: completedTxns,
+      body: {
+        payload: completedTxns,
+      },
     });
   }
 };
@@ -128,9 +130,10 @@ const filterAndInsertTxns = async (web3, txnIds) => {
   }
 };
 
-const updateTransactionsDatabase = async (web3, lastTxn) => {
+const updateTransactionsDatabase = async (web3, lastTxn, watching = false) => {
   const startBlock = (lastTxn === null) ? process.env.START_BLOCK
     : (lastTxn.tx.blockNumber + 1);
+  // use BLOCK_CONFIRMATIONS = 2 for testing
   const endBlock = web3.eth.blockNumber - parseInt(process.env.BLOCK_CONFIRMATIONS, 10);
   if (startBlock > endBlock) return;
 
@@ -138,6 +141,28 @@ const updateTransactionsDatabase = async (web3, lastTxn) => {
     const block = await web3.eth.getBlock(blockNumber);
     await filterAndInsertTxns(web3, block.transactions);
     if (block.number % parseInt(process.env.SYNC_REPORT_FREQUENCY, 10) === 0) console.log(`\tSynced transactions to block ${block.number}/${endBlock}`);
+  }
+
+  if (watching) {
+    // TODO: swap these lines (only kept so that testrpc query happens after dao-server requests)
+    // const recentBlock = await web3.eth.getBlock(web3.eth.blockNumber);
+    const recentBlock = await web3.eth.getBlock(web3.eth.blockNumber - 1);
+    const watchedTxns = [];
+    for (const txn of recentBlock.transactions) {
+      if (await isExistPendingTransaction(txn)) {
+        watchedTxns.push(txn);
+      }
+    }
+    notifyDaoServer({
+      method: 'POST',
+      path: '/transactions/latest',
+      body: {
+        payload: {
+          blockNumber: recentBlock.number,
+          transactions: watchedTxns,
+        },
+      },
+    });
   }
 };
 

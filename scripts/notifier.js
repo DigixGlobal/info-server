@@ -14,7 +14,7 @@ const notifyDaoServer = async (notification) => {
 
   const message = notification.method
     + notification.path
-    + JSON.stringify(notification.payload)
+    + JSON.stringify(notification.body.payload)
     + nonce;
   const signature = crypto
     .createHmac('sha256', process.env.SERVER_SECRET)
@@ -25,7 +25,7 @@ const notifyDaoServer = async (notification) => {
     baseUrl: process.env.DAO_SERVER_URL,
     url: notification.path,
     method: notification.method,
-    body: JSON.stringify(notification.payload),
+    body: JSON.stringify(notification.body),
     headers: {
       'ACCESS-SIGN': signature,
       'ACCESS-NONCE': nonce,
@@ -38,7 +38,7 @@ const notifyDaoServer = async (notification) => {
     if (notification.path === '/transactions/confirmed') {
       // TODO: check if status is 200
       // only then remove those pending txns
-      const txhashes = notification.payload.map(txn => txn.txhash);
+      const txhashes = notification.body.payload.map(txn => txn.txhash);
       await removePendingTransactions(txhashes);
     }
   });
