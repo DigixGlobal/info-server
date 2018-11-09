@@ -4,7 +4,6 @@ const crypto = require('crypto');
 const {
   getTransaction,
   getTransactions,
-  isExistTransaction,
   getUserTransactions,
   insertPendingTransactions,
 } = require('../dbWrapper/transactions');
@@ -13,6 +12,10 @@ const {
   getDaoServerNonce,
   setDaoServerNonce,
 } = require('../dbWrapper/counters');
+
+const {
+  getWeb3,
+} = require('../web3Wrapper/web3Util');
 
 const router = express.Router();
 
@@ -62,33 +65,47 @@ router.post('/watch', async (req, res) => {
   ) {
     await setDaoServerNonce(parseInt(retrievedNonce, 10));
     const { txns } = req.body.payload;
-    const confirmedTxns = [];
-    if (txns.length > 0) {
-      for (const txn of txns) {
-        const exists = await isExistTransaction(txn);
-        if (exists) {
-          confirmedTxns.push(txn);
-          txns.splice(txns.indexOf(txn), 1);
+    const web3 = getWeb3();
+    const result = { seen: [], confirmed: [] };
+    for (const txn of txns) {
+      const transaction = web3.eth.getTransaction(txn);
+      if (transaction) {
+        const transactionReceipt = web3.eth.getTransactionReceipt(txn);
+        if (transaction.blockNumber <= web3.eth.blockNumber - parseInt(process.env.BLOCK_CONFIRMATIONS, 10)) {
+          // if mined BLOCK_CONFIRMATIONS blocks in the past
+          result.confirmed.push(_formTransactionObj(transaction));
+        } else {
+          // if mined, but not BLOCK_CONFIRMATIONS blocks in the past
+          result.seen.push(_formTransactionObj(transaction, transactionReceipt));
+          await insertPendingTransactions([_formPendingTxn(transaction)]);
         }
+      } else {
+        // simply add to pendingTransactions
+        await insertPendingTransactions([_formPendingTxn(transaction)]);
       }
-      if (txns.length > 0) {
-        await insertPendingTransactions(txns.map(function (txn) {
-          return {
-            txhash: txn,
-          };
-        }));
-      }
-    }
-    let result = [];
-    if (confirmedTxns.length > 0) {
-      const transactions = await _getTransactions(confirmedTxns);
-      result = _formTransactionsObj(transactions);
     }
     res.status(200).send({ result });
   } else {
     res.status(403);
   }
 });
+
+const _formPendingTxn = (transaction) => {
+  return {
+    txhash: transaction.hash,
+  };
+};
+
+const _formTransactionObj = (transaction, transactionReceipt) => {
+  return {
+    txhash: transaction.hash,
+    from: transaction.from,
+    gasPrice: transaction.gasPrice,
+    blockHash: transactionReceipt.blockHash,
+    blockNumber: transactionReceipt.blockNumber,
+    gasUsed: transactionReceipt.gasUsed,
+  };
+};
 
 const _formTransactionsObj = (transactions) => {
   const result = transactions.map(function (txn) {

@@ -15,6 +15,10 @@ const {
 } = require('../dbWrapper/transactions');
 
 const {
+  getWeb3,
+} = require('../web3Wrapper/web3Util');
+
+const {
   notifyDaoServer,
 } = require('./notifier');
 
@@ -130,7 +134,8 @@ const filterAndInsertTxns = async (web3, txnIds) => {
   }
 };
 
-const updateTransactionsDatabase = async (web3, lastTxn, watching = false) => {
+const updateTransactionsDatabase = async (lastTxn, watching = false) => {
+  const web3 = getWeb3();
   const startBlock = (lastTxn === null) ? process.env.START_BLOCK
     : (lastTxn.tx.blockNumber + 1);
   // use BLOCK_CONFIRMATIONS = 2 for testing
@@ -144,9 +149,7 @@ const updateTransactionsDatabase = async (web3, lastTxn, watching = false) => {
   }
 
   if (watching) {
-    // TODO: swap these lines (only kept so that testrpc query happens after dao-server requests)
-    // const recentBlock = await web3.eth.getBlock(web3.eth.blockNumber);
-    const recentBlock = await web3.eth.getBlock(web3.eth.blockNumber - 1);
+    const recentBlock = await web3.eth.getBlock(web3.eth.blockNumber);
     const watchedTxns = [];
     for (const txn of recentBlock.transactions) {
       if (await isExistPendingTransaction(txn)) {

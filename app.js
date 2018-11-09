@@ -3,11 +3,11 @@ const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const cron = require('node-cron');
-const Web3 = require('web3');
 const rateLimit = require('express-rate-limit');
 
 const mongoUtil = require('./dbWrapper/mongoUtil');
 const dijixUtil = require('./dijixWrapper/dijixUtil');
+const web3Util = require('./web3Wrapper/web3Util');
 
 const {
   initContracts,
@@ -18,7 +18,7 @@ const scripts = require('./scripts');
 
 const app = express();
 
-const w3 = new Web3(new Web3.providers.HttpProvider(process.env.WEB3_HTTP_PROVIDER));
+web3Util.initWeb3(process.env.WEB3_HTTP_PROVIDER);
 
 app.use(cors());
 app.use(morgan('combined'));
@@ -46,7 +46,7 @@ const initCron = async () => {
     console.log('\tIn cron.schedule');
 
     // process the pending transactions
-    scripts.processTransactions(w3);
+    scripts.processTransactions();
 
     // TODO: remove this part
     // don't need to refresh dao every minute
@@ -75,12 +75,13 @@ const init = async () => {
   //  apply to all requests
   app.use(defaultLimiter);
 
-  const networkId = await w3.version.network;
-  await initContracts(w3, networkId);
+  const web3 = web3Util.getWeb3();
+  const networkId = await web3.version.network;
+  await initContracts(web3, networkId);
 
-  await scripts.syncAndProcessToLatestBlock(w3);
+  await scripts.syncAndProcessToLatestBlock();
 
-  scripts.watchNewBlocks(w3);
+  scripts.watchNewBlocks();
 
   initCron();
 };
