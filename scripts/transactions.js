@@ -45,6 +45,8 @@ const _formEventObj = (transaction) => {
     _proposalId: getFromFunctionArg(transaction, '_proposalId'),
     _index: getFromFunctionArg(transaction, '_index'),
     _vote: getFromFunctionArg(transaction, '_vote'),
+    _passed: getFromFunctionArg(transaction, '_passed'),
+    _done: getFromFunctionArg(transaction, '_done'),
     _events: [],
   };
   for (const eventLog of transaction.decodedEvents) {
@@ -73,8 +75,7 @@ const _formTxnDocument = async (web3, txnIds) => {
     transaction.tx = web3.eth.getTransaction(txnId);
     transaction.txReceipt = web3.eth.getTransactionReceipt(txnId);
 
-    // make sure transaction is valid, is to our contracts, and has been mined
-    if (transaction.tx && (contracts.fromAddress[transaction.tx.to]) && (transaction.txReceipt.status === '0x01')) {
+    if (transaction.tx && (contracts.fromAddress[transaction.tx.to]) && (parseInt(transaction.txReceipt.status, 16) === 1)) {
       // decode the function args and logs
       transaction.decodedInputs = contracts.decoder.decodeMethod(transaction.tx.input);
       transaction.decodedEvents = contracts.decoder.decodeLogs(transaction.txReceipt.logs);
