@@ -14,7 +14,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@digix/dao-contracts": "file:../dao-contracts",
+    "@digix/dao-contracts-kovan": "^0.0.2",
     "@digix/helpers": "^1.0.1",
     "@digix/lite-dgx-contract": "1.0.1",
     "abi-decoder": "^1.2.0",
