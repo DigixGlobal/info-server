@@ -231,10 +231,10 @@ const refreshProposalDraftVote = async (res) => {
 
 // DONE
 const refreshProposalDraftVotingClaim = async (res) => {
-  if (res._events.length === 0) return;
+  if (res._done === false) return;
   const proposal = await getProposal(res._proposalId);
   proposal.draftVoting.claimed = true;
-  proposal.draftVoting.passed = getFromEventLog(res, '_result');
+  proposal.draftVoting.passed = res._passed;
 
   // if the draft voting has failed
   proposal.stage = proposalStages.ARCHIVED;
@@ -356,11 +356,11 @@ const refreshProposalVotingClaim = async (res) => {
   // this is a multi-step function
   // if there were no event logs, it is only an intermediate step
   // consider this fn call only if event logs were present
-  if (res._events.length === 0) return;
+  if (res._done === false) return;
 
   // get the current proposal info
   const proposal = await getProposal(res._proposalId);
-  const result = getFromEventLog(res, '_result');
+  const result = res._passed;
   const index = res._index;
   proposal.votingRounds[index].claimed = true;
   proposal.votingRounds[index].passed = result;
