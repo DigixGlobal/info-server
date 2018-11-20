@@ -32,9 +32,8 @@ const notifyDaoServer = async (notification) => {
     },
   };
 
-  request(options, async function (err, response) {
+  request(options, async function (err) {
     if (err) console.log(err);
-    console.log('response body = ', response.body);
     if (notification.path === '/transactions/confirmed') {
       // TODO: check if status is 200
       // only then remove those pending txns

@@ -157,16 +157,18 @@ const updateTransactionsDatabase = async (lastTxn, watching = false) => {
         watchedTxns.push(txn);
       }
     }
-    notifyDaoServer({
-      method: 'POST',
-      path: '/transactions/latest',
-      body: {
-        payload: {
-          blockNumber: recentBlock.number,
-          transactions: watchedTxns,
+    if (watchedTxns.length > 0) {
+      notifyDaoServer({
+        method: 'POST',
+        path: '/transactions/latest',
+        body: {
+          payload: {
+            blockNumber: recentBlock.number,
+            transactions: watchedTxns,
+          },
         },
-      },
-    });
+      });
+    }
   }
 };
 
