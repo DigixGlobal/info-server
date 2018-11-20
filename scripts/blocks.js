@@ -1,6 +1,6 @@
 const {
-  getLastTransaction,
-} = require('../dbWrapper/transactions');
+  getCounter,
+} = require('../dbWrapper/counters');
 
 const {
   getWeb3,
@@ -11,9 +11,13 @@ const {
   updateTransactionsDatabase,
 } = require('./transactions');
 
+const {
+  counters,
+} = require('../helpers/constants');
+
 const syncAndProcessToLatestBlock = async (watching = false) => {
-  const lastTxn = await getLastTransaction();
-  await updateTransactionsDatabase(lastTxn, watching);
+  const lastProcessedBlock = (await getCounter(counters.TRANSACTIONS)).last_processed_block;
+  await updateTransactionsDatabase(lastProcessedBlock, watching);
   await processTransactions();
 };
 
