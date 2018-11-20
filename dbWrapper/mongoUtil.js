@@ -31,7 +31,12 @@ const checkAndInitFreshDb = async () => {
 
 const initFreshDb = async () => {
   await _db.dropDatabase();
-  await _db.collection(collections.COUNTERS).insertOne({ name: 'allTransactions', max_value: 0, last_processed: 0 });
+  await _db.collection(collections.COUNTERS).insertOne({
+    name: 'allTransactions',
+    max_value: 0,
+    last_processed: 0,
+    last_processed_block: 0,
+  });
   await _db.collection(collections.COUNTERS).insertOne({ name: 'nonce', daoServer: 0, self: 0 });
   await _db.collection(collections.COUNTERS).createIndex('name', { unique: true });
   await _db.collection(collections.DAO).createIndex('index');
