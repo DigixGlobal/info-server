@@ -6,6 +6,7 @@ const {
   getCounter,
   incrementMaxValue,
   incrementLastProcessed,
+  setLastProcessedBlock,
 } = require('../dbWrapper/counters');
 
 const {
@@ -135,11 +136,10 @@ const filterAndInsertTxns = async (web3, txnIds) => {
   }
 };
 
-const updateTransactionsDatabase = async (lastTxn, watching = false) => {
+const updateTransactionsDatabase = async (lastProcessedBlock, watching = false) => {
   const web3 = getWeb3();
-  const startBlock = (lastTxn === null) ? process.env.START_BLOCK
-    : (lastTxn.tx.blockNumber + 1);
-  // use BLOCK_CONFIRMATIONS = 2 for testing
+  const startBlock = (lastProcessedBlock === 0) ? process.env.START_BLOCK
+    : (lastProcessedBlock + 1);
   const endBlock = web3.eth.blockNumber - parseInt(process.env.BLOCK_CONFIRMATIONS, 10);
   if (startBlock > endBlock) return;
 
@@ -148,6 +148,8 @@ const updateTransactionsDatabase = async (lastTxn, watching = false) => {
     await filterAndInsertTxns(web3, block.transactions);
     if (block.number % parseInt(process.env.SYNC_REPORT_FREQUENCY, 10) === 0) console.log(`\tSynced transactions to block ${block.number}/${endBlock}`);
   }
+
+  await setLastProcessedBlock(endBlock);
 
   if (watching) {
     const recentBlock = await web3.eth.getBlock(web3.eth.blockNumber);

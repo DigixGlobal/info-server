@@ -68,11 +68,24 @@ const incrementLastProcessed = async (name, incrementBy) => {
     });
 };
 
+const setLastProcessedBlock = async (block) => {
+  await mongoUtil.getDB()
+    .collection(collections.COUNTERS)
+    .updateOne({
+      name: counters.TRANSACTIONS,
+    }, {
+      $set: {
+        last_processed_block: block,
+      },
+    });
+};
+
 module.exports = {
   getCounter,
   incrementMaxValue,
   incrementLastProcessed,
   setDaoServerNonce,
   getDaoServerNonce,
+  setLastProcessedBlock,
   incrementAndGetSelfNonce,
 };
