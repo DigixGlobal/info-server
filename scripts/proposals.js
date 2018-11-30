@@ -142,7 +142,12 @@ const refreshProposalDetails = async (res) => {
 // DONE
 const refreshProposalEndorseProposal = async (res) => {
   // update the database
-  await updateProposal(res._proposalId, { $set: { endorser: res._from } });
+  await updateProposal(res._proposalId, {
+    $set: {
+      endorser: res._from,
+      stage: proposalStages.DRAFT,
+    },
+  });
   console.log('INSERTED refreshProposalEndorseProposal');
 };
 
@@ -151,7 +156,6 @@ const refreshProposalFinalizeProposal = async (res) => {
   // read current proposal from DB
   const proposal = await getProposal(res._proposalId);
   const proposalDetails = await getContracts().daoStorage.readProposal.call(res._proposalId);
-  proposal.stage = proposalStages.DRAFT;
   proposal.finalVersionIpfsDoc = proposalDetails[readProposalIndices.finalVersionIpfsDoc];
 
   const draftVotingPhase = (await getContracts().daoConfigsStorage.uintConfigs.call(daoConfigsKeys.CONFIG_DRAFT_VOTING_PHASE)).toNumber();
