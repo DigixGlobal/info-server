@@ -19,6 +19,8 @@ module.exports = {
       RATE_LIMIT_PER_WINDOW: 10,
       BLOCK_CONFIRMATIONS: 2,
       START_BLOCK: 0,
+      N_BLOCKS_BUCKET: 200,
+      N_BLOCKS_CONCURRENT: 100,
       FORCE_REFRESH_DB: 'true',
       SYNC_REPORT_FREQUENCY: 10,
     },
