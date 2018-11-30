@@ -3,7 +3,6 @@ const Dao = require('@digix/dao-contracts/build/contracts/Dao.json');
 const DaoCalculatorService = require('@digix/dao-contracts/build/contracts/DaoCalculatorService.json');
 const MockDaoConfigsStorage = require('@digix/dao-contracts/build/contracts/MockDaoConfigsStorage.json');
 const DaoFundingManager = require('@digix/dao-contracts/build/contracts/DaoFundingManager.json');
-const DaoFundingStorage = require('@digix/dao-contracts/build/contracts/DaoFundingStorage.json');
 const DaoIdentity = require('@digix/dao-contracts/build/contracts/DaoIdentity.json');
 const DaoIdentityStorage = require('@digix/dao-contracts/build/contracts/DaoIdentityStorage.json');
 const DaoListingService = require('@digix/dao-contracts/build/contracts/DaoListingService.json');
@@ -33,7 +32,6 @@ const contracts = {
   daoCalculatorService: DaoCalculatorService,
   daoConfigsStorage: MockDaoConfigsStorage,
   daoFundingManager: DaoFundingManager,
-  daoFundingStorage: DaoFundingStorage,
   daoIdentity: DaoIdentity,
   daoIdentityStorage: DaoIdentityStorage,
   daoListingService: DaoListingService,
