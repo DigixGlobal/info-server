@@ -156,7 +156,7 @@ const updateTransactionsDatabase = async (lastProcessedBlock) => {
   const web3 = getWeb3();
   const startBlock = (lastProcessedBlock === 0) ? parseInt(process.env.START_BLOCK, 10)
     : (lastProcessedBlock + 1);
-  const endBlock = web3.eth.blockNumber - parseInt(process.env.BLOCK_CONFIRMATIONS, 10);
+  const endBlock = (web3.eth.blockNumber + 1) - parseInt(process.env.BLOCK_CONFIRMATIONS, 10);
 
   const blocksInBucket = parseInt(process.env.N_BLOCKS_BUCKET, 10);
   const blocksConcurrent = parseInt(process.env.N_BLOCKS_CONCURRENT, 10);
