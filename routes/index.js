@@ -11,6 +11,11 @@ const {
   getAddressDetails,
 } = require('../dbWrapper/addresses');
 
+const {
+  deserializeDaoInfo,
+  deserializeAddress,
+} = require('../helpers/utils');
+
 const router = express.Router();
 
 router.use('/proposals', proposalRoutes);
@@ -18,12 +23,12 @@ router.use('/proposals', proposalRoutes);
 router.use('/transactions', transactionRoutes);
 
 router.get('/daoInfo', async (req, res) => {
-  const info = await getDaoInfo();
+  const info = deserializeDaoInfo(await getDaoInfo());
   return res.json({ result: info });
 });
 
 router.get('/address/:address', async (req, res) => {
-  const details = await getAddressDetails(req.params.address.toLowerCase());
+  const details = deserializeAddress(await getAddressDetails(req.params.address.toLowerCase()));
   return res.json({ result: details || 'notFound' });
 });
 

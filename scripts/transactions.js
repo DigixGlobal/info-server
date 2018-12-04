@@ -48,8 +48,6 @@ const _formEventObj = (transaction) => {
     _proposalId: getFromFunctionArg(transaction, '_proposalId'),
     _index: getFromFunctionArg(transaction, '_index'),
     _vote: getFromFunctionArg(transaction, '_vote'),
-    _passed: getFromFunctionArg(transaction, '_passed'),
-    _done: getFromFunctionArg(transaction, '_done'),
     _events: [],
   };
   for (const eventLog of transaction.decodedEvents) {

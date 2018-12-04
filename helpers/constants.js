@@ -54,6 +54,14 @@ const counters = {
   NONCE: 'nonce',
 };
 
+const denominators = {
+  DGD: 1e9,
+  DGX: 1e9,
+  ETH: 1e18,
+  REPUTATION_POINT: 1,
+  QUARTER_POINT: 1,
+};
+
 const watchedFunctionNames = {
   START_DAO: 'setStartOfFirstQuarter',
   LOCK_DGD: 'lockDGD',
@@ -175,4 +183,5 @@ module.exports = {
   watchedFunctionNames,
   watchedFunctionsList,
   readProposalPRLActions,
+  denominators,
 };
