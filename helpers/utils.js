@@ -73,7 +73,8 @@ const serializeProposal = function (proposal) {
     proposal.draftVoting.totalVoterStake = new BigNumber(proposal.draftVoting.totalVoterStake);
     proposal.draftVoting.quorum = new BigNumber(proposal.draftVoting.quorum);
     proposal.draftVoting.quota = new BigNumber(proposal.draftVoting.quota);
-    proposal.draftVoting.currentResult = new BigNumber(proposal.draftVoting.currentResult);
+    proposal.draftVoting.yes = new BigNumber(proposal.draftVoting.yes);
+    proposal.draftVoting.no = new BigNumber(proposal.draftVoting.no);
     proposal.draftVoting.totalVoterCount = new BigNumber(proposal.draftVoting.totalVoterCount);
   }
 
@@ -83,7 +84,8 @@ const serializeProposal = function (proposal) {
       round.totalVoterStake = new BigNumber(round.totalVoterStake);
       round.quorum = new BigNumber(round.quorum);
       round.quota = new BigNumber(round.quota);
-      round.currentResult = new BigNumber(round.currentResult);
+      round.yes = new BigNumber(round.yes);
+      round.no = new BigNumber(round.no);
       round.totalVoterCount = new BigNumber(round.totalVoterCount);
     }
   }
@@ -103,7 +105,8 @@ const serializeProposalVotingRound = function (proposal, index) {
       round.totalVoterStake = new BigNumber(round.totalVoterStake);
       round.quorum = new BigNumber(round.quorum);
       round.quota = new BigNumber(round.quota);
-      round.currentResult = new BigNumber(round.currentResult);
+      round.yes = new BigNumber(round.yes);
+      round.no = new BigNumber(round.no);
       round.totalVoterCount = new BigNumber(round.totalVoterCount);
     }
   }
@@ -133,7 +136,8 @@ const deserializeProposal = function (proposal) {
     proposal.draftVoting.totalVoterStake = ofOne(proposal.draftVoting.totalVoterStake, denominators.DGD);
     proposal.draftVoting.quorum = ofOne(proposal.draftVoting.quorum, denominators.DGD);
     proposal.draftVoting.quota = ofOne(proposal.draftVoting.quota, 1);
-    proposal.draftVoting.currentResult = ofOne(proposal.draftVoting.currentResult, 1);
+    proposal.draftVoting.yes = ofOne(proposal.draftVoting.yes, denominators.DGD);
+    proposal.draftVoting.no = ofOne(proposal.draftVoting.no, denominators.DGD);
     proposal.draftVoting.totalVoterCount = ofOne(proposal.draftVoting.totalVoterCount, 1);
   }
 
@@ -143,7 +147,8 @@ const deserializeProposal = function (proposal) {
       round.totalVoterStake = ofOne(round.totalVoterStake, denominators.DGD);
       round.quorum = ofOne(round.quorum, denominators.DGD);
       round.quota = ofOne(round.quota, 1);
-      round.currentResult = ofOne(round.currentResult, 1);
+      round.yes = ofOne(round.yes, denominators.DGD);
+      round.no = ofOne(round.no, denominators.DGD);
       round.totalVoterCount = ofOne(round.totalVoterCount, 1);
     }
   }

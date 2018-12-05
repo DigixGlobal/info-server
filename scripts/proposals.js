@@ -169,7 +169,8 @@ const refreshProposalFinalizeProposal = async (res) => {
   proposal.draftVoting.votingDeadline = proposal.draftVoting.startTime + draftVotingPhase;
   proposal.draftVoting.totalVoterStake = '0';
   proposal.draftVoting.totalVoterCount = '0';
-  proposal.draftVoting.currentResult = '0';
+  proposal.draftVoting.yes = '0';
+  proposal.draftVoting.no = '0';
   proposal.draftVoting.quorum = (await getContracts().daoCalculatorService.minimumDraftQuorum.call(res._proposalId)).toString();
   proposal.draftVoting.quota = draftQuotaNumerator.div(draftQuotaDenominator).toString();
   proposal.draftVoting.claimed = false;
@@ -191,32 +192,31 @@ const refreshProposalDraftVote = async (res) => {
   const addressDetails = serializeAddress(await getAddressDetails(res._from));
   const proposal = serializeProposal(await getProposal(res._proposalId));
   const vote = res._vote;
-  const currentYes = proposal.draftVoting.currentResult.times(proposal.draftVoting.totalVoterStake);
 
   const { votes } = addressDetails;
 
   // calculate which parts to update
+  let currentYes = proposal.draftVoting.yes;
+  let currentNo = proposal.draftVoting.no;
   if (addressDetails.votes[res._proposalId] === undefined) {
     const totalVoterCount = proposal.draftVoting.totalVoterCount.plus(1);
     const totalVoterStake = proposal.draftVoting.totalVoterStake.plus(addressDetails.lockedDgdStake);
-    let currentResult;
     if (vote === true) {
-      currentResult = (currentYes.plus(addressDetails.lockedDgdStake)).div(totalVoterStake);
+      currentYes = currentYes.plus(addressDetails.lockedDgdStake);
     } else {
-      currentResult = currentYes.div(totalVoterStake);
+      currentNo = currentNo.plus(addressDetails.lockedDgdStake);
     }
     proposal.draftVoting.totalVoterCount = totalVoterCount.toString();
     proposal.draftVoting.totalVoterStake = totalVoterStake.toString();
-    proposal.draftVoting.currentResult = currentResult.toString();
   } else {
     const previousVote = addressDetails.votes[res._proposalId].draftVoting.vote;
-    let { currentResult } = proposal.draftVoting;
     if (previousVote === true && vote === false) {
-      currentResult = (currentYes.minus(addressDetails.lockedDgdStake)).div(proposal.draftVoting.totalVoterStake);
+      currentYes = currentYes.minus(addressDetails.lockedDgdStake);
+      currentNo = currentNo.plus(addressDetails.lockedDgdStake);
     } else if (previousVote === false && vote === true) {
-      currentResult = (currentYes.plus(addressDetails.lockedDgdStake)).div(proposal.draftVoting.totalVoterStake);
+      currentYes = currentYes.plus(addressDetails.lockedDgdStake);
+      currentNo = currentNo.minus(addressDetails.lockedDgdStake);
     }
-    proposal.draftVoting.currentResult = currentResult.toString();
     proposal.draftVoting.totalVoterCount = proposal.draftVoting.totalVoterCount.toString();
     proposal.draftVoting.totalVoterStake = proposal.draftVoting.totalVoterStake.toString();
   }
@@ -229,6 +229,8 @@ const refreshProposalDraftVote = async (res) => {
   // update proposal
   proposal.draftVoting.quorum = proposal.draftVoting.quorum.toString();
   proposal.draftVoting.quota = proposal.draftVoting.quota.toString();
+  proposal.draftVoting.yes = currentYes.toString();
+  proposal.draftVoting.no = currentNo.toString();
   await updateProposal(res._proposalId, {
     $set: {
       draftVoting: proposal.draftVoting,
@@ -274,7 +276,8 @@ const refreshProposalDraftVotingClaim = async (res) => {
       totalCommitCount: '0',
       totalVoterCount: '0',
       totalVoterStake: '0',
-      currentResult: '0',
+      yes: '0',
+      no: '0',
       claimed: false,
       passed: false,
       funded: false,
@@ -329,20 +332,21 @@ const refreshProposalRevealVote = async (res) => {
   const proposal = serializeProposalVotingRound(await getProposal(res._proposalId), res._index);
   const addressDetails = serializeAddress(await getAddressDetails(res._from));
   const vote = res._vote;
-  const currentYes = proposal.votingRounds[res._index].currentResult.times(proposal.votingRounds[res._index].totalVoterStake);
 
   // vote can be revealed only once, so this condition has to be satisied if revealing
   if (addressDetails.votes[res._proposalId].votingRound[res._index].reveal === false) {
     // revealing vote
     proposal.votingRounds[res._index].totalVoterCount = proposal.votingRounds[res._index].totalVoterCount.plus(1);
     proposal.votingRounds[res._index].totalVoterStake = proposal.votingRounds[res._index].totalVoterStake.plus(addressDetails.lockedDgdStake);
-    let currentResult;
+    let currentYes = proposal.votingRounds[res._index].yes;
+    let currentNo = proposal.votingRounds[res._index].no;
     if (vote === true) {
-      currentResult = (currentYes.plus(addressDetails.lockedDgdStake)).div(proposal.votingRounds[res._index].totalVoterStake);
+      currentYes = currentYes.plus(addressDetails.lockedDgdStake);
     } else {
-      currentResult = currentYes.div(proposal.votingRounds[res._index].totalVoterStake);
+      currentNo = currentNo.plus(addressDetails.lockedDgdStake);
     }
-    proposal.votingRounds[res._index].currentResult = currentResult.toString();
+    proposal.votingRounds[res._index].yes = currentYes.toString();
+    proposal.votingRounds[res._index].no = currentNo.toString();
     proposal.votingRounds[res._index].totalVoterCount = proposal.votingRounds[res._index].totalVoterCount.toString();
     proposal.votingRounds[res._index].totalVoterStake = proposal.votingRounds[res._index].totalVoterStake.toString();
   }
