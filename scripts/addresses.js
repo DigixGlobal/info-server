@@ -66,7 +66,7 @@ const refreshAddress = async (res) => {
     // new address, tell dao-server about new address
     notifyDaoServer({
       method: 'POST',
-      path: '/user/new',
+      path: '/user',
       body: {
         payload: {
           address: user,
