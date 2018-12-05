@@ -30,6 +30,7 @@ const notifyDaoServer = async (notification) => {
     headers: {
       'ACCESS-SIGN': signature,
       'ACCESS-NONCE': nonce,
+      'content-type': 'application/json',
     },
   };
 
