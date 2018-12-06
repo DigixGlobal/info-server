@@ -39,8 +39,8 @@ const updateLatestTxns = async () => {
   }
   if (watchedTxns.length > 0) {
     notifyDaoServer({
-      method: 'POST',
-      path: '/transactions/latest',
+      method: 'PUT',
+      path: '/transactions/seen',
       body: {
         payload: {
           blockNumber: recentBlock.number,
