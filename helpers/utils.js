@@ -103,8 +103,6 @@ const serializeProposalVotingRound = function (proposal, index) {
     const round = proposal.votingRounds[index];
     if (round) {
       round.totalVoterStake = new BigNumber(round.totalVoterStake);
-      round.quorum = new BigNumber(round.quorum);
-      round.quota = new BigNumber(round.quota);
       round.yes = new BigNumber(round.yes);
       round.no = new BigNumber(round.no);
       round.totalVoterCount = new BigNumber(round.totalVoterCount);

@@ -349,6 +349,10 @@ const refreshProposalRevealVote = async (res) => {
     proposal.votingRounds[res._index].no = currentNo.toString();
     proposal.votingRounds[res._index].totalVoterCount = proposal.votingRounds[res._index].totalVoterCount.toString();
     proposal.votingRounds[res._index].totalVoterStake = proposal.votingRounds[res._index].totalVoterStake.toString();
+
+    await updateProposal(res._proposalId, {
+      $set: proposal,
+    });
   }
 
   // update the vote info for this address
@@ -360,9 +364,6 @@ const refreshProposalRevealVote = async (res) => {
     $set: { votes },
   });
 
-  await updateProposal(res._proposalId, {
-    $set: proposal,
-  });
   console.log('INSERTED refreshProposalRevealVote');
 };
 
@@ -406,7 +407,7 @@ const refreshProposalVotingClaim = async (res) => {
   console.log('INSERTED refreshProposalVotingClaim');
 };
 
-// TO BE TESTED
+// DONE
 const refreshProposalClaimFunding = async (res) => {
   // get the current proposal
   const proposal = serializeProposal(await getProposal(res._proposalId));
@@ -422,7 +423,7 @@ const refreshProposalClaimFunding = async (res) => {
   console.log('INSERTED refreshProposalClaimFunding');
 };
 
-// TO BE TESTED
+// DONE
 const refreshProposalFinishMilestone = async (res) => {
   // get current proposal details
   const proposal = await getProposal(res._proposalId);
@@ -445,11 +446,12 @@ const refreshProposalFinishMilestone = async (res) => {
     commitDeadline: votingStartTime + commitPhaseDuration,
     revealDeadline: votingStartTime + votingPhaseDuration,
     quorum: votingQuorum.toString(),
-    quota: quotaNumerator.div(quotaDenominator),
+    quota: quotaNumerator.div(quotaDenominator).toString(),
     totalCommitCount: '0',
     totalVoterCount: '0',
     totalVoterStake: '0',
-    currentResult: '0',
+    yes: '0',
+    no: '0',
     claimed: false,
     passed: false,
     funded: false,
