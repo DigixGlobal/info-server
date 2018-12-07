@@ -34,7 +34,9 @@ const updateLatestTxns = async () => {
   const watchedTxns = [];
   for (const txn of recentBlock.transactions) {
     if (await isExistPendingTransaction(txn)) {
-      watchedTxns.push(txn);
+      watchedTxns.push({
+        txhash: txn,
+      });
     }
   }
   if (watchedTxns.length > 0) {

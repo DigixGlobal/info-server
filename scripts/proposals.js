@@ -42,6 +42,10 @@ const {
   fetchProposalVersion,
 } = require('../dijixWrapper/proposals');
 
+const {
+  notifyDaoServer,
+} = require('./notifier');
+
 // TODO: proposal.votingStage does not change
 // from COMMIT to REVEAL automatically
 // check all proposals in votingStage === COMMIT (in cron)
@@ -94,6 +98,18 @@ const refreshProposalNew = async (res) => {
   // update the database
   await insertProposal(proposal);
   console.log('INSERTED refreshProposalNew');
+
+  // new proposal, tell dao-server about new proposal
+  notifyDaoServer({
+    method: 'POST',
+    path: '/proposals',
+    body: {
+      payload: {
+        proposalId: proposal.proposalId,
+        proposer: proposal.proposer,
+      },
+    },
+  });
 };
 
 // DONE
