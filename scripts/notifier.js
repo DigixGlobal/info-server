@@ -39,7 +39,8 @@ const notifyDaoServer = async (notification) => {
     if (notification.path === '/transactions/confirmed') {
       // TODO: check if status is 200
       // only then remove those pending txns
-      const txhashes = notification.body.payload.map(txn => txn.txhash);
+      const txhashes = notification.body.payload.success.map(txn => txn.txhash);
+      txhashes.push(notification.body.payload.failed.map(txn => txn.txhash));
       await removePendingTransactions(txhashes);
     }
   });
