@@ -71,6 +71,7 @@ const _formTxnDocument = async (web3, txns) => {
   let currentIndex = r.max_value;
   const filteredTxns = [];
   const otherWatchedTxns = [];
+  const failedTxns = [];
   for (const txn of txns) {
     const transaction = {};
     transaction.tx = txn;
@@ -95,19 +96,20 @@ const _formTxnDocument = async (web3, txns) => {
           otherWatchedTxns.push(transaction);
         }
       } else {
-        // TODO: handle revert txn
-        console.log('reverted');
+        failedTxns.push(transaction);
       }
     }
   }
   return {
     filteredTxns,
     otherWatchedTxns,
+    failedTxns,
   };
 };
 
-const checkAndNotify = async (transactions) => {
+const checkAndNotify = async (transactions, failedTransactions) => {
   const completedTxns = [];
+  const failedTxns = [];
   for (const txn of transactions) {
     if (await isExistPendingTransaction(txn.tx.hash)) {
       completedTxns.push({
@@ -117,15 +119,32 @@ const checkAndNotify = async (transactions) => {
         blockHash: txn.txReceipt.blockHash,
         blockNumber: txn.txReceipt.blockNumber,
         gasUsed: txn.txReceipt.gasUsed,
+        status: 1,
       });
     }
   }
-  if (completedTxns.length > 0) {
+  for (const txn of failedTransactions) {
+    if (await isExistPendingTransaction(txn.tx.hash)) {
+      failedTxns.push({
+        txhash: txn.tx.hash,
+        from: txn.tx.from,
+        gasPrice: txn.tx.gasPrice,
+        blockHash: txn.txReceipt.blockHash,
+        blockNumber: txn.txReceipt.blockNumber,
+        gasUsed: txn.txReceipt.gasUsed,
+        status: 0,
+      });
+    }
+  }
+  if (completedTxns.length > 0 || failedTxns.length > 0) {
     notifyDaoServer({
       method: 'PUT',
       path: '/transactions/confirmed',
       body: {
-        payload: completedTxns,
+        payload: {
+          success: completedTxns,
+          failed: failedTxns,
+        },
       },
     });
   }
@@ -133,11 +152,11 @@ const checkAndNotify = async (transactions) => {
 
 const filterAndInsertTxns = async (web3, txns) => {
   const filteredTxnObject = await _formTxnDocument(web3, txns);
-  const { filteredTxns, otherWatchedTxns } = filteredTxnObject;
+  const { filteredTxns, otherWatchedTxns, failedTxns } = filteredTxnObject;
   if (filteredTxns.length > 0) {
     await insertTransactions(filteredTxns);
     await incrementMaxValue(counters.TRANSACTIONS, filteredTxns.length);
-    await checkAndNotify(filteredTxns.concat(otherWatchedTxns));
+    await checkAndNotify(filteredTxns.concat(otherWatchedTxns), failedTxns);
   }
 };
 
