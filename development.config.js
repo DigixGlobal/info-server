@@ -11,7 +11,7 @@ module.exports = {
       DB_URL: 'mongodb://mongo:27017/digixdao',
       DIGIXDAO_DB_NAME: 'digixdao',
       IPFS_ENDPOINT: 'http://ipfs:5001',
-      HTTP_ENDPOINT: 'http://ipfs:8081/ipfs',
+      HTTP_ENDPOINT: 'http://ipfs:8080/ipfs',
       WEB3_HTTP_PROVIDER: 'http://ganache:8545',
       DAO_SERVER_URL: 'http://dao-server:3005',
       SERVER_SECRET: 'this-is-a-secret-between-dao-and-info-server',
