@@ -21,10 +21,10 @@ const _getAddressObject = (userInfo) => {
     isParticipant: userInfo[0],
     isModerator: userInfo[1],
     lastParticipatedQuarter: userInfo[2].toNumber(),
-    lockedDgdStake: userInfo[3].toNumber(),
-    lockedDgd: userInfo[4].toNumber(),
-    reputationPoint: userInfo[5].toNumber(),
-    quarterPoint: userInfo[6].toNumber(),
+    lockedDgdStake: userInfo[3].toString(),
+    lockedDgd: userInfo[4].toString(),
+    reputationPoint: userInfo[5].toString(),
+    quarterPoint: userInfo[6].toString(),
   };
 };
 
@@ -66,7 +66,7 @@ const refreshAddress = async (res) => {
     // new address, tell dao-server about new address
     notifyDaoServer({
       method: 'POST',
-      path: '/user/new',
+      path: '/user',
       body: {
         payload: {
           address: user,
@@ -86,8 +86,8 @@ const refreshAddress = async (res) => {
     .call()).toNumber();
   await updateDao({
     $set: {
-      totalLockedDgds,
-      totalModeratorLockedDgds,
+      totalLockedDgds: totalLockedDgds.toString(),
+      totalModeratorLockedDgds: totalModeratorLockedDgds.toString(),
     },
   });
 };

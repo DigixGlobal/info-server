@@ -6,6 +6,10 @@ const {
   getProposals,
 } = require('../dbWrapper/proposals');
 
+const {
+  deserializeProposal,
+} = require('../helpers/utils');
+
 const router = express.Router();
 
 router.get('/test', async (req, res) => {
@@ -25,7 +29,7 @@ router.get('/count', async (req, res) => {
 });
 
 router.get('/details/:id', async (req, res) => {
-  const details = await getProposal(req.params.id);
+  const details = deserializeProposal(await getProposal(req.params.id));
   return res.json({ result: details || 'notFound' });
 });
 

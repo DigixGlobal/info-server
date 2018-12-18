@@ -8,7 +8,10 @@ const {
 const {
   sumArrayBN,
   getFromEventLog,
-  bNArrayToDecimal,
+  bNArrayToString,
+  serializeAddress,
+  serializeProposal,
+  serializeProposalVotingRound,
 } = require('../helpers/utils');
 
 const {
@@ -38,6 +41,10 @@ const {
 const {
   fetchProposalVersion,
 } = require('../dijixWrapper/proposals');
+
+const {
+  notifyDaoServer,
+} = require('./notifier');
 
 // TODO: proposal.votingStage does not change
 // from COMMIT to REVEAL automatically
@@ -76,10 +83,10 @@ const refreshProposalNew = async (res) => {
     proposal.proposalVersions.push({
       docIpfsHash: proposalVersion[readProposalVersionIndices.docIpfsHash],
       created: proposalVersion[readProposalVersionIndices.created].toNumber(),
-      milestoneFundings: bNArrayToDecimal(proposalVersion[readProposalVersionIndices.milestoneFundings]),
-      finalReward: proposalVersion[readProposalVersionIndices.finalReward].toNumber(),
+      milestoneFundings: bNArrayToString(proposalVersion[readProposalVersionIndices.milestoneFundings]),
+      finalReward: proposalVersion[readProposalVersionIndices.finalReward].toString(),
       moreDocs: [],
-      totalFunding: proposalVersion[readProposalVersionIndices.finalReward].plus(sumArrayBN(proposalVersion[readProposalVersionIndices.milestoneFundings])).toNumber(),
+      totalFunding: proposalVersion[readProposalVersionIndices.finalReward].plus(sumArrayBN(proposalVersion[readProposalVersionIndices.milestoneFundings])).toString(),
       dijixObject: {
         ...ipfsDoc.data.attestation,
         images: ipfsDoc.data.proofs,
@@ -91,6 +98,18 @@ const refreshProposalNew = async (res) => {
   // update the database
   await insertProposal(proposal);
   console.log('INSERTED refreshProposalNew');
+
+  // new proposal, tell dao-server about new proposal
+  notifyDaoServer({
+    method: 'POST',
+    path: '/proposals',
+    body: {
+      payload: {
+        proposalId: proposal.proposalId,
+        proposer: proposal.proposer,
+      },
+    },
+  });
 };
 
 // DONE
@@ -120,10 +139,10 @@ const refreshProposalDetails = async (res) => {
     proposal.proposalVersions.push({
       docIpfsHash: proposalVersion[readProposalVersionIndices.docIpfsHash],
       created: proposalVersion[readProposalVersionIndices.created].toNumber(),
-      milestoneFundings: bNArrayToDecimal(proposalVersion[readProposalVersionIndices.milestoneFundings]),
-      finalReward: proposalVersion[readProposalVersionIndices.finalReward].toNumber(),
+      milestoneFundings: bNArrayToString(proposalVersion[readProposalVersionIndices.milestoneFundings]),
+      finalReward: proposalVersion[readProposalVersionIndices.finalReward].toString(),
       moreDocs: proposalDocs,
-      totalFunding: proposalVersion[readProposalVersionIndices.finalReward].plus(sumArrayBN(proposalVersion[readProposalVersionIndices.milestoneFundings])).toNumber(),
+      totalFunding: proposalVersion[readProposalVersionIndices.finalReward].plus(sumArrayBN(proposalVersion[readProposalVersionIndices.milestoneFundings])).toString(),
       dijixObject: {
         ...ipfsDoc.data.attestation,
         images: ipfsDoc.data.proofs,
@@ -142,7 +161,12 @@ const refreshProposalDetails = async (res) => {
 // DONE
 const refreshProposalEndorseProposal = async (res) => {
   // update the database
-  await updateProposal(res._proposalId, { $set: { endorser: res._from } });
+  await updateProposal(res._proposalId, {
+    $set: {
+      endorser: res._from,
+      stage: proposalStages.DRAFT,
+    },
+  });
   console.log('INSERTED refreshProposalEndorseProposal');
 };
 
@@ -151,20 +175,20 @@ const refreshProposalFinalizeProposal = async (res) => {
   // read current proposal from DB
   const proposal = await getProposal(res._proposalId);
   const proposalDetails = await getContracts().daoStorage.readProposal.call(res._proposalId);
-  proposal.stage = proposalStages.DRAFT;
   proposal.finalVersionIpfsDoc = proposalDetails[readProposalIndices.finalVersionIpfsDoc];
 
   const draftVotingPhase = (await getContracts().daoConfigsStorage.uintConfigs.call(daoConfigsKeys.CONFIG_DRAFT_VOTING_PHASE)).toNumber();
-  const draftQuotaNumerator = (await getContracts().daoConfigsStorage.uintConfigs.call(daoConfigsKeys.CONFIG_DRAFT_QUOTA_NUMERATOR)).toNumber();
-  const draftQuotaDenominator = (await getContracts().daoConfigsStorage.uintConfigs.call(daoConfigsKeys.CONFIG_DRAFT_QUOTA_DENOMINATOR)).toNumber();
+  const draftQuotaNumerator = await getContracts().daoConfigsStorage.uintConfigs.call(daoConfigsKeys.CONFIG_DRAFT_QUOTA_NUMERATOR);
+  const draftQuotaDenominator = await getContracts().daoConfigsStorage.uintConfigs.call(daoConfigsKeys.CONFIG_DRAFT_QUOTA_DENOMINATOR);
   proposal.draftVoting = {};
   proposal.draftVoting.startTime = (await getContracts().daoStorage.readProposalDraftVotingTime.call(res._proposalId)).toNumber();
   proposal.draftVoting.votingDeadline = proposal.draftVoting.startTime + draftVotingPhase;
-  proposal.draftVoting.totalVoterStake = 0;
-  proposal.draftVoting.totalVoterCount = 0;
-  proposal.draftVoting.currentResult = 0;
-  proposal.draftVoting.quorum = (await getContracts().daoCalculatorService.minimumDraftQuorum.call(res._proposalId)).toNumber();
-  proposal.draftVoting.quota = (draftQuotaNumerator * 100) / draftQuotaDenominator;
+  proposal.draftVoting.totalVoterStake = '0';
+  proposal.draftVoting.totalVoterCount = '0';
+  proposal.draftVoting.yes = '0';
+  proposal.draftVoting.no = '0';
+  proposal.draftVoting.quorum = (await getContracts().daoCalculatorService.minimumDraftQuorum.call(res._proposalId)).toString();
+  proposal.draftVoting.quota = draftQuotaNumerator.div(draftQuotaDenominator).toString();
   proposal.draftVoting.claimed = false;
   proposal.draftVoting.passed = false;
   proposal.draftVoting.funded = false;
@@ -181,35 +205,36 @@ const refreshProposalFinalizeProposal = async (res) => {
 // DONE
 const refreshProposalDraftVote = async (res) => {
   // get info
-  const addressDetails = await getAddressDetails(res._from);
-  const proposal = await getProposal(res._proposalId);
+  const addressDetails = serializeAddress(await getAddressDetails(res._from));
+  const proposal = serializeProposal(await getProposal(res._proposalId));
   const vote = res._vote;
-  const currentYes = proposal.draftVoting.currentResult * proposal.draftVoting.totalVoterStake;
 
   const { votes } = addressDetails;
 
   // calculate which parts to update
+  let currentYes = proposal.draftVoting.yes;
+  let currentNo = proposal.draftVoting.no;
   if (addressDetails.votes[res._proposalId] === undefined) {
-    const totalVoterCount = proposal.draftVoting.totalVoterCount + 1;
-    const totalVoterStake = proposal.draftVoting.totalVoterStake + addressDetails.lockedDgdStake;
-    let currentResult;
+    const totalVoterCount = proposal.draftVoting.totalVoterCount.plus(1);
+    const totalVoterStake = proposal.draftVoting.totalVoterStake.plus(addressDetails.lockedDgdStake);
     if (vote === true) {
-      currentResult = (currentYes + addressDetails.lockedDgdStake) / totalVoterStake;
+      currentYes = currentYes.plus(addressDetails.lockedDgdStake);
     } else {
-      currentResult = currentYes / totalVoterStake;
+      currentNo = currentNo.plus(addressDetails.lockedDgdStake);
     }
-    proposal.draftVoting.totalVoterCount = totalVoterCount;
-    proposal.draftVoting.totalVoterStake = totalVoterStake;
-    proposal.draftVoting.currentResult = currentResult;
+    proposal.draftVoting.totalVoterCount = totalVoterCount.toString();
+    proposal.draftVoting.totalVoterStake = totalVoterStake.toString();
   } else {
     const previousVote = addressDetails.votes[res._proposalId].draftVoting.vote;
-    let { currentResult } = proposal.draftVoting;
     if (previousVote === true && vote === false) {
-      currentResult = (currentYes - addressDetails.lockedDgdStake) / proposal.draftVoting.totalVoterStake;
+      currentYes = currentYes.minus(addressDetails.lockedDgdStake);
+      currentNo = currentNo.plus(addressDetails.lockedDgdStake);
     } else if (previousVote === false && vote === true) {
-      currentResult = (currentYes + addressDetails.lockedDgdStake) / proposal.draftVoting.totalVoterStake;
+      currentYes = currentYes.plus(addressDetails.lockedDgdStake);
+      currentNo = currentNo.minus(addressDetails.lockedDgdStake);
     }
-    proposal.draftVoting.currentResult = currentResult;
+    proposal.draftVoting.totalVoterCount = proposal.draftVoting.totalVoterCount.toString();
+    proposal.draftVoting.totalVoterStake = proposal.draftVoting.totalVoterStake.toString();
   }
 
   votes[res._proposalId] = {
@@ -218,8 +243,14 @@ const refreshProposalDraftVote = async (res) => {
   };
 
   // update proposal
+  proposal.draftVoting.quorum = proposal.draftVoting.quorum.toString();
+  proposal.draftVoting.quota = proposal.draftVoting.quota.toString();
+  proposal.draftVoting.yes = currentYes.toString();
+  proposal.draftVoting.no = currentNo.toString();
   await updateProposal(res._proposalId, {
-    $set: proposal,
+    $set: {
+      draftVoting: proposal.draftVoting,
+    },
   });
 
   // update address
@@ -231,10 +262,11 @@ const refreshProposalDraftVote = async (res) => {
 
 // DONE
 const refreshProposalDraftVotingClaim = async (res) => {
-  if (res._done === false) return;
+  const isClaimed = await getContracts().daoStorage.isDraftClaimed.call(res._proposalId);
+  if (isClaimed === false) return;
   const proposal = await getProposal(res._proposalId);
   proposal.draftVoting.claimed = true;
-  proposal.draftVoting.passed = res._passed;
+  proposal.draftVoting.passed = await getContracts().daoStorage.readProposalDraftVotingResult.call(res._proposalId);
 
   // if the draft voting has failed
   proposal.stage = proposalStages.ARCHIVED;
@@ -248,19 +280,20 @@ const refreshProposalDraftVotingClaim = async (res) => {
     const votingStartTime = (await getContracts().daoStorage.readProposalVotingTime.call(res._proposalId, new BigNumber(0))).toNumber();
     const commitPhaseDuration = (await getContracts().daoConfigsStorage.uintConfigs.call(daoConfigsKeys.CONFIG_VOTING_COMMIT_PHASE)).toNumber();
     const votingPhaseDuration = (await getContracts().daoConfigsStorage.uintConfigs.call(daoConfigsKeys.CONFIG_VOTING_PHASE_TOTAL)).toNumber();
-    const votingQuorum = (await getContracts().daoCalculatorService.minimumVotingQuorum.call(res._proposalId, new BigNumber(0))).toNumber();
-    const quotaNumerator = (await getContracts().daoConfigsStorage.uintConfigs.call(daoConfigsKeys.CONFIG_VOTING_QUOTA_NUMERATOR)).toNumber();
-    const quotaDenominator = (await getContracts().daoConfigsStorage.uintConfigs.call(daoConfigsKeys.CONFIG_VOTING_QUOTA_DENOMINATOR)).toNumber();
+    const votingQuorum = await getContracts().daoCalculatorService.minimumVotingQuorum.call(res._proposalId, new BigNumber(0));
+    const quotaNumerator = await getContracts().daoConfigsStorage.uintConfigs.call(daoConfigsKeys.CONFIG_VOTING_QUOTA_NUMERATOR);
+    const quotaDenominator = await getContracts().daoConfigsStorage.uintConfigs.call(daoConfigsKeys.CONFIG_VOTING_QUOTA_DENOMINATOR);
     proposal.votingRounds.push({
       startTime: votingStartTime,
       commitDeadline: votingStartTime + commitPhaseDuration,
       revealDeadline: votingStartTime + votingPhaseDuration,
-      quorum: votingQuorum,
-      quota: quotaNumerator * 100 / quotaDenominator,
-      totalCommitCount: 0,
-      totalVoterCount: 0,
-      totalVoterStake: 0,
-      currentResult: 0,
+      quorum: votingQuorum.toString(),
+      quota: quotaNumerator.div(quotaDenominator).toString(),
+      totalCommitCount: '0',
+      totalVoterCount: '0',
+      totalVoterStake: '0',
+      yes: '0',
+      no: '0',
       claimed: false,
       passed: false,
       funded: false,
@@ -290,7 +323,7 @@ const refreshProposalCommitVote = async (res) => {
   // vote for the first time for this voting round
   if (votes[res._proposalId].votingRound[res._index] === undefined) {
     // first time committing in this round
-    proposal.votingRounds[res._index].totalCommitCount += 1;
+    proposal.votingRounds[res._index].totalCommitCount = (new BigNumber(proposal.votingRounds[res._index].totalCommitCount)).plus(1).toString();
   }
 
   // set commit to true
@@ -312,23 +345,30 @@ const refreshProposalCommitVote = async (res) => {
 // DONE
 const refreshProposalRevealVote = async (res) => {
   // get proposal and address info
-  const proposal = await getProposal(res._proposalId);
-  const addressDetails = await getAddressDetails(res._from);
+  const proposal = serializeProposalVotingRound(await getProposal(res._proposalId), res._index);
+  const addressDetails = serializeAddress(await getAddressDetails(res._from));
   const vote = res._vote;
-  const currentYes = proposal.votingRounds[res._index].currentResult * proposal.votingRounds[res._index].totalVoterStake;
 
   // vote can be revealed only once, so this condition has to be satisied if revealing
   if (addressDetails.votes[res._proposalId].votingRound[res._index].reveal === false) {
     // revealing vote
-    proposal.votingRounds[res._index].totalVoterCount += 1;
-    proposal.votingRounds[res._index].totalVoterStake += addressDetails.lockedDgdStake;
-    let currentResult;
+    proposal.votingRounds[res._index].totalVoterCount = proposal.votingRounds[res._index].totalVoterCount.plus(1);
+    proposal.votingRounds[res._index].totalVoterStake = proposal.votingRounds[res._index].totalVoterStake.plus(addressDetails.lockedDgdStake);
+    let currentYes = proposal.votingRounds[res._index].yes;
+    let currentNo = proposal.votingRounds[res._index].no;
     if (vote === true) {
-      currentResult = (currentYes + addressDetails.lockedDgdStake) / proposal.votingRounds[res._index].totalVoterStake;
+      currentYes = currentYes.plus(addressDetails.lockedDgdStake);
     } else {
-      currentResult = currentYes / proposal.votingRounds[res._index].totalVoterStake;
+      currentNo = currentNo.plus(addressDetails.lockedDgdStake);
     }
-    proposal.votingRounds[res._index].currentResult = currentResult;
+    proposal.votingRounds[res._index].yes = currentYes.toString();
+    proposal.votingRounds[res._index].no = currentNo.toString();
+    proposal.votingRounds[res._index].totalVoterCount = proposal.votingRounds[res._index].totalVoterCount.toString();
+    proposal.votingRounds[res._index].totalVoterStake = proposal.votingRounds[res._index].totalVoterStake.toString();
+
+    await updateProposal(res._proposalId, {
+      $set: proposal,
+    });
   }
 
   // update the vote info for this address
@@ -340,9 +380,6 @@ const refreshProposalRevealVote = async (res) => {
     $set: { votes },
   });
 
-  await updateProposal(res._proposalId, {
-    $set: proposal,
-  });
   console.log('INSERTED refreshProposalRevealVote');
 };
 
@@ -356,12 +393,13 @@ const refreshProposalVotingClaim = async (res) => {
   // this is a multi-step function
   // if there were no event logs, it is only an intermediate step
   // consider this fn call only if event logs were present
-  if (res._done === false) return;
+  const isClaimed = await getContracts().daoStorage.isClaimed.call(res._proposalId, res._index);
+  if (isClaimed === false) return;
 
   // get the current proposal info
   const proposal = await getProposal(res._proposalId);
-  const result = res._passed;
   const index = res._index;
+  const result = await getContracts().daoStorage.readProposalVotingResult.call(res._proposalId, index);
   proposal.votingRounds[index].claimed = true;
   proposal.votingRounds[index].passed = result;
 
@@ -373,7 +411,7 @@ const refreshProposalVotingClaim = async (res) => {
   if (result === true) {
     proposal.stage = proposalStages.ONGOING;
     const milestoneFunding = await getContracts().daoStorage.readProposalMilestone.call(res._proposalId, new BigNumber(index));
-    proposal.claimableFunding += milestoneFunding.toNumber();
+    proposal.claimableFunding = ((new BigNumber(proposal.claimableFunding)).plus(milestoneFunding)).toString();
     proposal.currentMilestone = parseInt(index, 10) + 1;
     proposal.currentMilestoneStart = proposal.votingRounds[index].revealDeadline;
   }
@@ -385,23 +423,23 @@ const refreshProposalVotingClaim = async (res) => {
   console.log('INSERTED refreshProposalVotingClaim');
 };
 
-// TO BE TESTED
+// DONE
 const refreshProposalClaimFunding = async (res) => {
   // get the current proposal
-  const proposal = await getProposal(res._proposalId);
+  const proposal = serializeProposal(await getProposal(res._proposalId));
   const fundingClaimed = getFromEventLog(res, '_funding');
 
   // claimable funding is now reduced by the claimed funds
-  const claimableFunding = proposal.claimableFunding - fundingClaimed;
+  const claimableFunding = proposal.claimableFunding.minus(fundingClaimed);
 
   // update proposal for claimableFunding
   await updateProposal(res._proposalId, {
-    $set: { claimableFunding },
+    $set: { claimableFunding: claimableFunding.toString() },
   });
   console.log('INSERTED refreshProposalClaimFunding');
 };
 
-// TO BE TESTED
+// DONE
 const refreshProposalFinishMilestone = async (res) => {
   // get current proposal details
   const proposal = await getProposal(res._proposalId);
@@ -414,21 +452,22 @@ const refreshProposalFinishMilestone = async (res) => {
   const votingStartTime = (await getContracts().daoStorage.readProposalVotingTime.call(res._proposalId, new BigNumber(proposal.currentVotingRound))).toNumber();
   const commitPhaseDuration = (await getContracts().daoConfigsStorage.uintConfigs.call(daoConfigsKeys.CONFIG_INTERIM_COMMIT_PHASE)).toNumber();
   const votingPhaseDuration = (await getContracts().daoConfigsStorage.uintConfigs.call(daoConfigsKeys.CONFIG_INTERIM_PHASE_TOTAL)).toNumber();
-  const votingQuorum = (await getContracts().daoCalculatorService.minimumVotingQuorum.call(res._proposalId, new BigNumber(proposal.currentVotingRound))).toNumber();
-  const quotaNumerator = (await getContracts().daoConfigsStorage.uintConfigs.call(daoConfigsKeys.CONFIG_VOTING_QUOTA_NUMERATOR)).toNumber();
-  const quotaDenominator = (await getContracts().daoConfigsStorage.uintConfigs.call(daoConfigsKeys.CONFIG_VOTING_QUOTA_DENOMINATOR)).toNumber();
+  const votingQuorum = await getContracts().daoCalculatorService.minimumVotingQuorum.call(res._proposalId, new BigNumber(proposal.currentVotingRound));
+  const quotaNumerator = await getContracts().daoConfigsStorage.uintConfigs.call(daoConfigsKeys.CONFIG_VOTING_QUOTA_NUMERATOR);
+  const quotaDenominator = await getContracts().daoConfigsStorage.uintConfigs.call(daoConfigsKeys.CONFIG_VOTING_QUOTA_DENOMINATOR);
 
   // add new voting round
   proposal.votingRounds.push({
     startTime: votingStartTime,
     commitDeadline: votingStartTime + commitPhaseDuration,
     revealDeadline: votingStartTime + votingPhaseDuration,
-    quorum: votingQuorum,
-    quota: quotaNumerator * 100 / quotaDenominator,
-    totalCommitCount: 0,
-    totalVoterCount: 0,
-    totalVoterStake: 0,
-    currentResult: 0,
+    quorum: votingQuorum.toString(),
+    quota: quotaNumerator.div(quotaDenominator).toString(),
+    totalCommitCount: '0',
+    totalVoterCount: '0',
+    totalVoterStake: '0',
+    yes: '0',
+    no: '0',
     claimed: false,
     passed: false,
     funded: false,
