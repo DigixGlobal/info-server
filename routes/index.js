@@ -4,6 +4,10 @@ const proposalRoutes = require('./proposals');
 const transactionRoutes = require('./transactions');
 
 const {
+  getCounter,
+} = require('../dbWrapper/counters');
+
+const {
   getDaoInfo,
 } = require('../dbWrapper/dao');
 
@@ -17,6 +21,10 @@ const {
   deserializeAddress,
   readConfig,
 } = require('../helpers/utils');
+
+const {
+  counters,
+} = require('../helpers/constants');
 
 const router = express.Router();
 
@@ -50,6 +58,7 @@ router.get('/points', async (req, res) => {
 
 router.get('/config', async (req, res) => {
   const config = readConfig();
+  config.CURRENT_BLOCK_NUMBER = (await getCounter(counters.TRANSACTIONS)).last_processed_block;
   return res.json({ result: config });
 });
 
