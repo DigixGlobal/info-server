@@ -9,11 +9,13 @@ const {
 
 const {
   getAddressDetails,
+  getAddressesDetails,
 } = require('../dbWrapper/addresses');
 
 const {
   deserializeDaoInfo,
   deserializeAddress,
+  readConfig,
 } = require('../helpers/utils');
 
 const router = express.Router();
@@ -30,6 +32,25 @@ router.get('/daoInfo', async (req, res) => {
 router.get('/address/:address', async (req, res) => {
   const details = deserializeAddress(await getAddressDetails(req.params.address.toLowerCase()));
   return res.json({ result: details || 'notFound' });
+});
+
+router.get('/points', async (req, res) => {
+  const users = req.query.address;
+  const details = await getAddressesDetails({
+    address: { $in: users },
+  });
+  const filteredDetails = details.map(function (d) {
+    return {
+      reputation: d.reputationPoint,
+      quarterPoints: d.quarterPoint,
+    };
+  });
+  return res.json({ result: filteredDetails });
+});
+
+router.get('/config', async (req, res) => {
+  const config = readConfig();
+  return res.json({ result: config });
 });
 
 module.exports = router;

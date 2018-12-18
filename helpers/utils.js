@@ -4,6 +4,12 @@ const {
   denominators,
 } = require('./constants');
 
+const readConfig = function () {
+  return {
+    BLOCK_CONFIRMATIONS: process.env.BLOCK_CONFIRMATIONS,
+  };
+};
+
 const sumArray = function (array) {
   let sum = 0;
   for (const item of array) {
@@ -190,4 +196,5 @@ module.exports = {
   deserializeProposal,
   deserializeAddress,
   deserializeDaoInfo,
+  readConfig,
 };

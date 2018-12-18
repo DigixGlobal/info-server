@@ -24,6 +24,17 @@ const getAddressDetails = async (address) => {
   return addressDetails;
 };
 
+const getAddressesDetails = async (filter) => {
+  const addressesDetails = [];
+  const cursor = mongoUtil.getDB()
+    .collection(collections.ADDRESSES)
+    .find(filter, { _id: 0 });
+  for (let address = await cursor.next(); address != null; address = await cursor.next()) {
+    addressesDetails.push(address);
+  }
+  return addressesDetails;
+};
+
 const getAllAddresses = async (filter) => {
   const addresses = await mongoUtil.getDB()
     .collection(collections.ADDRESSES)
@@ -38,4 +49,5 @@ module.exports = {
   insertAddress,
   getAddressDetails,
   getAllAddresses,
+  getAddressesDetails,
 };
