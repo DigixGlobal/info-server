@@ -6,7 +6,7 @@ const {
 
 const readConfig = function () {
   return {
-    BLOCK_CONFIRMATIONS: process.env.BLOCK_CONFIRMATIONS,
+    BLOCK_CONFIRMATIONS: parseInt(process.env.BLOCK_CONFIRMATIONS, 10),
   };
 };
 
