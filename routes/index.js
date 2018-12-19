@@ -49,6 +49,7 @@ router.get('/points', async (req, res) => {
   });
   const filteredDetails = details.map(function (d) {
     return {
+      address: d.address,
       reputation: d.reputationPoint,
       quarterPoints: d.quarterPoint,
     };
