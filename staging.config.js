@@ -3,6 +3,9 @@ module.exports = {
     name: 'info-server:staging',
     script: './app.js',
     watch: false,
+
+
+
     env: {
       PORT: '3002',
       DB_URL: 'mongodb://localhost:27017/digixdao',
@@ -13,6 +16,8 @@ module.exports = {
       RATE_LIMIT_PER_WINDOW: 10,
       BLOCK_CONFIRMATIONS: 2,
       START_BLOCK: 0,
+      N_BLOCKS_BUCKET: 200,
+      N_BLOCKS_CONCURRENT: 100,
       FORCE_REFRESH_DB: 'false',
       SYNC_REPORT_FREQUENCY: 10,
       WEB3_HTTP_PROVIDER: 'https://kovan.digixdev.com',
