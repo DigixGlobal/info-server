@@ -68,9 +68,9 @@ router.post('/watch', async (req, res) => {
     const web3 = getWeb3();
     const result = { seen: [], confirmed: [] };
     for (const txn of txns) {
-      const transaction = web3.eth.getTransaction(txn);
+      const transaction = await web3.eth.getTransaction(txn);
       if (transaction) {
-        const transactionReceipt = web3.eth.getTransactionReceipt(txn);
+        const transactionReceipt = await web3.eth.getTransactionReceipt(txn);
         if (transaction.blockNumber <= web3.eth.blockNumber - parseInt(process.env.BLOCK_CONFIRMATIONS, 10)) {
           // if mined BLOCK_CONFIRMATIONS blocks in the past
           result.confirmed.push(_formTransactionObj(transaction));
@@ -81,7 +81,7 @@ router.post('/watch', async (req, res) => {
         }
       } else {
         // simply add to pendingTransactions
-        await insertPendingTransactions([_formPendingTxn(transaction)]);
+        await insertPendingTransactions([_formPendingTxn(txn)]);
       }
     }
     res.status(200).send({ result });
@@ -90,9 +90,9 @@ router.post('/watch', async (req, res) => {
   }
 });
 
-const _formPendingTxn = (transaction) => {
+const _formPendingTxn = (txn) => {
   return {
-    txhash: transaction.hash,
+    txhash: txn,
   };
 };
 
