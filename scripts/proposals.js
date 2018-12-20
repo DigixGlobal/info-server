@@ -237,6 +237,7 @@ const refreshProposalDraftVote = async (res) => {
     proposal.draftVoting.totalVoterStake = proposal.draftVoting.totalVoterStake.toString();
   }
 
+  const userInfo = await getContracts().daoInformation.readUserInfo.call(res._from);
   votes[res._proposalId] = {
     draftVoting: { vote },
     votingRound: {},
@@ -255,7 +256,16 @@ const refreshProposalDraftVote = async (res) => {
 
   // update address
   await updateAddress(res._from, {
-    $set: { votes },
+    $set: {
+      votes,
+      isParticipant: userInfo[0],
+      isModerator: userInfo[1],
+      lastParticipatedQuarter: userInfo[2].toNumber(),
+      lockedDgdStake: userInfo[3].toString(),
+      lockedDgd: userInfo[4].toString(),
+      reputationPoint: userInfo[5].toString(),
+      quarterPoint: userInfo[6].toString(),
+    },
   }, {});
   console.log('INSERTED refreshProposalDraftVote');
 };
@@ -372,12 +382,22 @@ const refreshProposalRevealVote = async (res) => {
   }
 
   // update the vote info for this address
+  const userInfo = await getContracts().daoInformation.readUserInfo.call(res._from);
   const { votes } = addressDetails;
   votes[res._proposalId].votingRound[res._index].reveal = true;
   votes[res._proposalId].votingRound[res._index].vote = vote;
 
   await updateAddress(res._from, {
-    $set: { votes },
+    $set: {
+      votes,
+      isParticipant: userInfo[0],
+      isModerator: userInfo[1],
+      lastParticipatedQuarter: userInfo[2].toNumber(),
+      lockedDgdStake: userInfo[3].toString(),
+      lockedDgd: userInfo[4].toString(),
+      reputationPoint: userInfo[5].toString(),
+      quarterPoint: userInfo[6].toString(),
+    },
   });
 
   console.log('INSERTED refreshProposalRevealVote');
