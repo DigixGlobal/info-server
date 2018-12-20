@@ -26,7 +26,7 @@ const notifyDaoServer = async (notification) => {
     url: notification.path,
     method: notification.method,
     body: JSON.stringify(notification.body),
-    strictSSL: false,
+    strictSSL: true,
     headers: {
       'ACCESS-SIGN': signature,
       'ACCESS-NONCE': nonce,
