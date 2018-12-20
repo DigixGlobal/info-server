@@ -3,9 +3,8 @@ module.exports = {
     name: 'info-server:staging',
     script: './app.js',
     watch: false,
-
-
-
+    out_file: './out.log',
+    error_file: './error.log',
     env: {
       PORT: '3002',
       DB_URL: 'mongodb://localhost:27017/digixdao',
@@ -14,7 +13,7 @@ module.exports = {
       SERVER_SECRET: 'this-is-a-secret-between-dao-and-info-server',
       RATE_LIMIT_WINDOW_MS: 60 * 1000,
       RATE_LIMIT_PER_WINDOW: 10,
-      BLOCK_CONFIRMATIONS: 2,
+      BLOCK_CONFIRMATIONS: 5,
       START_BLOCK: 0,
       N_BLOCKS_BUCKET: 200,
       N_BLOCKS_CONCURRENT: 100,

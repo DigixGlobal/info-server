@@ -43,13 +43,17 @@ router.get('/address/:address', async (req, res) => {
 });
 
 router.get('/points', async (req, res) => {
-  const users = req.query.address;
+  let users = req.query.address;
+  console.log('users = ', users);
+  if (!Array.isArray(users)) {
+    users = new Array(users);
+  }
   const details = await getAddressesDetails({
     address: { $in: users },
   });
-  const filteredDetails = details.map(function (d) {
-    return {
-      address: d.address,
+  const filteredDetails = {};
+  details.forEach(function (d) {
+    filteredDetails[d.address] = {
       reputation: d.reputationPoint,
       quarterPoints: d.quarterPoint,
     };
