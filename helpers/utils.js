@@ -166,10 +166,12 @@ const deserializeProposal = function (proposal) {
 };
 
 const deserializeAddress = function (address) {
-  address.lockedDgdStake = ofOne(address.lockedDgdStake, denominators.DGD);
-  address.lockedDgd = ofOne(address.lockedDgd, denominators.DGD);
-  address.reputationPoint = ofOne(address.reputationPoint, denominators.REPUTATION_POINT);
-  address.quarterPoint = ofOne(address.quarterPoint, denominators.QUARTER_POINT);
+  if (address) {
+    address.lockedDgdStake = ofOne(address.lockedDgdStake, denominators.DGD);
+    address.lockedDgd = ofOne(address.lockedDgd, denominators.DGD);
+    address.reputationPoint = ofOne(address.reputationPoint, denominators.REPUTATION_POINT);
+    address.quarterPoint = ofOne(address.quarterPoint, denominators.QUARTER_POINT);
+  }
 
   return address;
 };
