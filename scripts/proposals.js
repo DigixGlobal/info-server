@@ -436,6 +436,21 @@ const refreshProposalVotingClaim = async (res) => {
     proposal.currentMilestoneStart = proposal.votingRounds[index].revealDeadline;
   }
 
+  // update user profile (may have got quarter points)
+  // TODO: move to generic function and re-use (avoid code duplication)
+  const userInfo = await getContracts().daoInformation.readUserInfo.call(proposal.proposer);
+  await updateAddress(proposal.proposer, {
+    $set: {
+      isParticipant: userInfo[0],
+      isModerator: userInfo[1],
+      lastParticipatedQuarter: userInfo[2].toNumber(),
+      lockedDgdStake: userInfo[3].toString(),
+      lockedDgd: userInfo[4].toString(),
+      reputationPoint: userInfo[5].toString(),
+      quarterPoint: userInfo[6].toString(),
+    },
+  });
+
   // update proposal
   await updateProposal(res._proposalId, {
     $set: proposal,
