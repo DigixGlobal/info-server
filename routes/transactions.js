@@ -81,7 +81,7 @@ router.post('/watch', async (req, res) => {
         }
       } else {
         // simply add to pendingTransactions
-        await insertPendingTransactions([_formPendingTxn(txn)]);
+        await insertPendingTransactions([_formPendingTxn({ hash: txn })]);
       }
     }
     res.status(200).send({ result });
@@ -92,7 +92,7 @@ router.post('/watch', async (req, res) => {
 
 const _formPendingTxn = (txn) => {
   return {
-    txhash: txn,
+    txhash: txn.hash,
   };
 };
 
