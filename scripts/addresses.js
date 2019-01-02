@@ -9,8 +9,23 @@ const {
 } = require('../dbWrapper/dao');
 
 const {
+  getProposals,
+  updateProposal,
+} = require('../dbWrapper/proposals');
+
+const {
   getContracts,
 } = require('../helpers/contracts');
+
+const {
+  proposalVotingStages,
+} = require('../helpers/constants');
+
+const {
+  serializeProposal,
+  serializeProposalVotingRound,
+  serializeAddress,
+} = require('../helpers/utils');
 
 const {
   notifyDaoServer,
@@ -49,12 +64,68 @@ const _getUser = (res) => {
   return user;
 };
 
+const _updateProposalVoteWeightages = async function (addressDetails, userInfo) {
+  // update all proposals that are in Draft voting phase
+  const draftProposals = await getProposals({ votingStage: proposalVotingStages.DRAFT });
+  for (const p of draftProposals) {
+    const userVote = addressDetails.votes[p.proposalId];
+    if (userVote && userVote.draftVoting && userVote.draftVoting.vote) {
+      const proposal = serializeProposal(p);
+      if (userVote.draftVoting.vote === true) {
+        proposal.draftVoting.yes = proposal.draftVoting.yes.minus(addressDetails.lockedDgdStake).plus(userInfo[3]).toString();
+        proposal.draftVoting.no = proposal.draftVoting.no.toString();
+      } else {
+        proposal.draftVoting.no = proposal.draftVoting.no.minus(addressDetails.lockedDgdStake).plus(userInfo[3]).toString();
+        proposal.draftVoting.yes = proposal.draftVoting.yes.toString();
+      }
+      proposal.draftVoting.totalVoterStake = proposal.draftVoting.totalVoterStake.minus(addressDetails.lockedDgdStake).plus(userInfo[3]).toString();
+      proposal.draftVoting.totalVoterCount = proposal.draftVoting.totalVoterCount.toString();
+      proposal.draftVoting.quorum = proposal.draftVoting.quorum.toString();
+      proposal.draftVoting.quota = proposal.draftVoting.quota.toString();
+      await updateProposal(p.proposalId, {
+        $set: {
+          draftVoting: proposal.draftVoting,
+        },
+      });
+    }
+  }
+
+  // update all proposals that are in voting phase
+  const votingProposals = await getProposals({ votingStage: proposalVotingStages.COMMIT });
+  for (const p of votingProposals) {
+    const userVote = addressDetails.votes[p.proposalId];
+    const votingRoundIndex = p.currentVotingRound;
+    if (userVote && userVote.votingRound[votingRoundIndex] && userVote.votingRound[votingRoundIndex].reveal === true) {
+      const proposal = serializeProposalVotingRound(p, votingRoundIndex);
+      if (userVote.votingRound[votingRoundIndex].vote === true) {
+        proposal.votingRounds[votingRoundIndex].yes = proposal.votingRounds[votingRoundIndex].yes.minus(addressDetails.lockedDgdStake).plus(userInfo[3]).toString();
+        proposal.votingRounds[votingRoundIndex].no = proposal.votingRounds[votingRoundIndex].no.toString();
+      } else {
+        proposal.votingRounds[votingRoundIndex].no = proposal.votingRounds[votingRoundIndex].no.minus(addressDetails.lockedDgdStake).plus(userInfo[3]).toString();
+        proposal.votingRounds[votingRoundIndex].yes = proposal.votingRounds[votingRoundIndex].yes.toString();
+      }
+      proposal.votingRounds[votingRoundIndex].totalVoterStake = proposal.votingRounds[votingRoundIndex].totalVoterStake.minus(addressDetails.lockedDgdStake).plus(userInfo[3]).toString();
+      proposal.votingRounds[votingRoundIndex].totalVoterCount = proposal.votingRounds[votingRoundIndex].totalVoterCount.toString();
+      await updateProposal(p.proposalId, {
+        $set: proposal,
+      });
+    }
+  }
+};
+
 const refreshAddress = async (res) => {
   const user = _getUser(res);
 
-  // update address table
+  // get address details from db and contract
+  const addressDetails = await getAddressDetails(user);
   const userInfo = await getContracts().daoInformation.readUserInfo.call(user);
-  if (await getAddressDetails(user)) {
+
+  if (addressDetails) {
+    await _updateProposalVoteWeightages(serializeAddress(addressDetails), userInfo);
+  }
+
+  // update user itself
+  if (addressDetails) {
     await updateAddress(user, {
       $set: _getAddressObject(userInfo),
     }, { upsert: true });
