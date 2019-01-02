@@ -153,9 +153,11 @@ const checkAndNotify = async (transactions, failedTransactions) => {
 const filterAndInsertTxns = async (web3, txns) => {
   const filteredTxnObject = await _formTxnDocument(web3, txns);
   const { filteredTxns, otherWatchedTxns, failedTxns } = filteredTxnObject;
-  if (filteredTxns.length > 0) {
-    await insertTransactions(filteredTxns);
-    await incrementMaxValue(counters.TRANSACTIONS, filteredTxns.length);
+  if (filteredTxns.length > 0 || otherWatchedTxns.length > 0 || failedTxns.length > 0) {
+    if (filteredTxns.length > 0) {
+      await insertTransactions(filteredTxns);
+      await incrementMaxValue(counters.TRANSACTIONS, filteredTxns.length);
+    }
     await checkAndNotify(filteredTxns.concat(otherWatchedTxns), failedTxns);
   }
 };

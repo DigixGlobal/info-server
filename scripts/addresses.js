@@ -69,16 +69,17 @@ const _updateProposalVoteWeightages = async function (addressDetails, userInfo) 
   const draftProposals = await getProposals({ votingStage: proposalVotingStages.DRAFT });
   for (const p of draftProposals) {
     const userVote = addressDetails.votes[p.proposalId];
-    if (userVote && userVote.draftVoting && userVote.draftVoting.vote) {
+    if (userVote && userVote.draftVoting) {
       const proposal = serializeProposal(p);
       if (userVote.draftVoting.vote === true) {
         proposal.draftVoting.yes = proposal.draftVoting.yes.minus(addressDetails.lockedDgdStake).plus(userInfo[3]).toString();
         proposal.draftVoting.no = proposal.draftVoting.no.toString();
-      } else {
+        proposal.draftVoting.totalVoterStake = proposal.draftVoting.totalVoterStake.minus(addressDetails.lockedDgdStake).plus(userInfo[3]).toString();
+      } else if (userVote.draftVoting.vote === false) {
         proposal.draftVoting.no = proposal.draftVoting.no.minus(addressDetails.lockedDgdStake).plus(userInfo[3]).toString();
         proposal.draftVoting.yes = proposal.draftVoting.yes.toString();
+        proposal.draftVoting.totalVoterStake = proposal.draftVoting.totalVoterStake.minus(addressDetails.lockedDgdStake).plus(userInfo[3]).toString();
       }
-      proposal.draftVoting.totalVoterStake = proposal.draftVoting.totalVoterStake.minus(addressDetails.lockedDgdStake).plus(userInfo[3]).toString();
       proposal.draftVoting.totalVoterCount = proposal.draftVoting.totalVoterCount.toString();
       proposal.draftVoting.quorum = proposal.draftVoting.quorum.toString();
       proposal.draftVoting.quota = proposal.draftVoting.quota.toString();
