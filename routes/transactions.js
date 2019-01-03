@@ -89,26 +89,21 @@ router.post('/watch', async (req, res) => {
     const { txns } = req.body.payload;
     const web3 = getWeb3();
     const result = { seen: [], confirmed: [] };
-    // const tempWeb3 = new Web3(new Web3.providers.HttpProvider('https://kovan.infura.io/'));
     for (const txn of txns) {
       const transaction = await web3.eth.getTransaction(txn);
       console.log('\t\tGOT getTransaction, ', transaction);
 
-      if (transaction.blockNumber !== null) {
-        // const transactionReceipt = await tempWeb3.eth.getTransactionReceipt(txn);
-        // console.log('\t\tGOT getTransactionReceipt, ', transactionReceipt.transactionHash);
+      if (transaction !== null && transaction.blockNumber !== null) {
         console.log('\t\t\ttransaction mined in block = ', transaction.blockNumber);
         console.log('\t\t\tcurrent block number       = ', web3.eth.blockNumber);
         console.log('\t\t\tconfirmations needed       = ', parseInt(process.env.BLOCK_CONFIRMATIONS, 10));
         if (transaction.blockNumber <= web3.eth.blockNumber - parseInt(process.env.BLOCK_CONFIRMATIONS, 10)) {
           // if mined BLOCK_CONFIRMATIONS blocks in the past
           console.log('\t\tCASE 1: if mined BLOCK_CONFIRMATIONS blocks in the past');
-          // result.confirmed.push(_formTransactionObj(transaction, transactionReceipt));
           result.confirmed.push(_formTransactionObj(transaction));
         } else {
           // if mined, but not BLOCK_CONFIRMATIONS blocks in the past
           console.log('\t\tCASE 2: if mined, but not BLOCK_CONFIRMATIONS blocks in the past');
-          // result.seen.push(_formTransactionObj(transaction, transactionReceipt));
           result.seen.push(_formTransactionObj(transaction));
           await insertPendingTransactions([_formPendingTxn(transaction)]);
         }
