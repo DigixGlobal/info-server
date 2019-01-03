@@ -1,5 +1,6 @@
 const express = require('express');
 const crypto = require('crypto');
+const Web3 = require('web3');
 
 const {
   getTransaction,
@@ -87,13 +88,14 @@ router.post('/watch', async (req, res) => {
     const { txns } = req.body.payload;
     const web3 = getWeb3();
     const result = { seen: [], confirmed: [] };
+    const tempWeb3 = new Web3(new Web3.providers.HttpProvider('https://kovan.infura.io/'));
     let txnsDone = 0;
     txns.forEach(function (txn) {
-      web3.eth.getTransaction(txn, async (e1, transaction) => {
+      tempWeb3.eth.getTransaction(txn, async (e1, transaction) => {
         if (e1 !== null) console.log(e1);
         console.log('\t\tGOT getTransaction, ', transaction.hash);
         if (transaction) {
-          web3.eth.getTransactionReceipt(txn, async (e2, transactionReceipt) => {
+          tempWeb3.eth.getTransactionReceipt(txn, async (e2, transactionReceipt) => {
             if (e2 !== null) console.log(e2);
             console.log('\t\tGOT getTransactionReceipt, ', transactionReceipt.transactionHash);
             if (transaction.blockNumber <= web3.eth.blockNumber - parseInt(process.env.BLOCK_CONFIRMATIONS, 10)) {
