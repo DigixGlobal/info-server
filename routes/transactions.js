@@ -92,9 +92,9 @@ router.post('/watch', async (req, res) => {
     // const tempWeb3 = new Web3(new Web3.providers.HttpProvider('https://kovan.infura.io/'));
     for (const txn of txns) {
       const transaction = await web3.eth.getTransaction(txn);
-      if (transaction.blockNumber !== null) {
-        console.log('\t\tGOT getTransaction, ', transaction);
+      console.log('\t\tGOT getTransaction, ', transaction);
 
+      if (transaction.blockNumber !== null) {
         // const transactionReceipt = await tempWeb3.eth.getTransactionReceipt(txn);
         // console.log('\t\tGOT getTransactionReceipt, ', transactionReceipt.transactionHash);
         console.log('\t\t\ttransaction mined in block = ', transaction.blockNumber);
