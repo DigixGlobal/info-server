@@ -61,7 +61,8 @@ const betterGetTransactionReceipt = async (web3, txhash) => {
 const betterGetTransaction = async (web3, txhash) => {
   return new Promise(function (resolve, reject) {
     web3.eth.getTransaction(txhash, (error, data) => {
-      if (error !== null) reject(error);
+      // if (error !== null) reject(error);
+      if (error !== null) resolve(null);
       else resolve(data);
     });
   });
@@ -90,7 +91,8 @@ router.post('/watch', async (req, res) => {
     const result = { seen: [], confirmed: [] };
     // const tempWeb3 = new Web3(new Web3.providers.HttpProvider('https://kovan.infura.io/'));
     for (const txn of txns) {
-      const transaction = await web3.eth.getTransaction(txn);
+      // const transaction = await web3.eth.getTransaction(txn);
+      const transaction = await betterGetTransaction(web3, txn);
       console.log('\t\tGOT getTransaction, ', transaction.hash);
       if (transaction) {
         // const transactionReceipt = await tempWeb3.eth.getTransactionReceipt(txn);
