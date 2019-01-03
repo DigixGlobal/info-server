@@ -94,7 +94,7 @@ router.post('/watch', async (req, res) => {
       // const transaction = await web3.eth.getTransaction(txn);
       try {
         const transaction = await betterGetTransaction(web3, txn);
-        console.log('\t\tGOT getTransaction, ', transaction.hash);
+        console.log('\t\tGOT getTransaction, ', transaction);
 
         // const transactionReceipt = await tempWeb3.eth.getTransactionReceipt(txn);
         // console.log('\t\tGOT getTransactionReceipt, ', transactionReceipt.transactionHash);
