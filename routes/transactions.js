@@ -86,46 +86,98 @@ router.post('/watch', async (req, res) => {
   ) {
     await setDaoServerNonce(parseInt(retrievedNonce, 10));
     const { txns } = req.body.payload;
-    const web3 = getWeb3();
+    // const web3 = getWeb3();
     const result = { seen: [], confirmed: [] };
     const tempWeb3 = new Web3(new Web3.providers.HttpProvider('https://kovan.infura.io/'));
-    let txnsDone = 0;
-    txns.forEach(function (txn) {
-      tempWeb3.eth.getTransaction(txn, async (e1, transaction) => {
-        if (e1 !== null) console.log(e1);
-        console.log('\t\tGOT getTransaction, ', transaction.hash);
-        if (transaction) {
-          tempWeb3.eth.getTransactionReceipt(txn, async (e2, transactionReceipt) => {
-            if (e2 !== null) console.log(e2);
-            console.log('\t\tGOT getTransactionReceipt, ', transactionReceipt.transactionHash);
-            if (transaction.blockNumber <= web3.eth.blockNumber - parseInt(process.env.BLOCK_CONFIRMATIONS, 10)) {
-              // if mined BLOCK_CONFIRMATIONS blocks in the past
-              console.log('\t\tCASE 1: if mined BLOCK_CONFIRMATIONS blocks in the past');
-              result.confirmed.push(_formTransactionObj(transaction, transactionReceipt));
-            } else {
-              // if mined, but not BLOCK_CONFIRMATIONS blocks in the past
-              console.log('\t\tCASE 2: if mined, but not BLOCK_CONFIRMATIONS blocks in the past');
-              result.seen.push(_formTransactionObj(transaction, transactionReceipt));
-              await insertPendingTransactions([_formPendingTxn(transaction)]);
-            }
-            txnsDone++;
-            if (txnsDone === txns.length) {
-              console.log('\n\n\n');
-              res.status(200).send({ result });
-            }
-          });
+    for (const txn of txns) {
+      const transaction = await tempWeb3.eth.getTransaction(txn);
+      console.log('\t\tGOT getTransaction, ', transaction.hash);
+      if (transaction) {
+        const transactionReceipt = await tempWeb3.eth.getTransactionReceipt(txn);
+        console.log('\t\tGOT getTransactionReceipt, ', transactionReceipt.transactionHash);
+        if (transaction.blockNumber <= tempWeb3.eth.blockNumber - parseInt(process.env.BLOCK_CONFIRMATIONS, 10)) {
+          // if mined BLOCK_CONFIRMATIONS blocks in the past
+          console.log('\t\tCASE 1: if mined BLOCK_CONFIRMATIONS blocks in the past');
+          result.confirmed.push(_formTransactionObj(transaction, transactionReceipt));
         } else {
-          // simply add to pendingTransactions
-          console.log('\t\tCASE 3: txn not mined, simply add to pendingTransactions');
-          await insertPendingTransactions([_formPendingTxn({ hash: txn })]);
+          // if mined, but not BLOCK_CONFIRMATIONS blocks in the past
+          console.log('\t\tCASE 2: if mined, but not BLOCK_CONFIRMATIONS blocks in the past');
+          result.seen.push(_formTransactionObj(transaction, transactionReceipt));
+          await insertPendingTransactions([_formPendingTxn(transaction)]);
         }
-      });
-    });
+      } else {
+        // simply add to pendingTransactions
+        console.log('\t\tCASE 3: txn not mined, simply add to pendingTransactions');
+        await insertPendingTransactions([_formPendingTxn({ hash: txn })]);
+      }
+    }
+    console.log('\n\n\n');
+    res.status(200).send({ result });
   } else {
     console.log('\n\n\n');
     res.status(403);
   }
 });
+
+// router.post('/watch', async (req, res) => {
+//   console.log('\n\n\n');
+//   console.log('\t\tENTERED watch()');
+//   const retrievedSig = req.headers['access-sign'];
+//   const retrievedNonce = parseInt(req.headers['access-nonce'], 10);
+//   const message = req.method + req.originalUrl + JSON.stringify(req.body.payload) + retrievedNonce;
+//   const computedSig = crypto
+//     .createHmac('sha256', process.env.SERVER_SECRET)
+//     .update(message)
+//     .digest('hex');
+//
+//   const currentDaoServerNonce = await getDaoServerNonce();
+//
+//   if (
+//     (computedSig === retrievedSig)
+//     && (retrievedNonce > currentDaoServerNonce)
+//   ) {
+//     await setDaoServerNonce(parseInt(retrievedNonce, 10));
+//     const { txns } = req.body.payload;
+//     const web3 = getWeb3();
+//     const result = { seen: [], confirmed: [] };
+//     const tempWeb3 = new Web3(new Web3.providers.HttpProvider('https://kovan.infura.io/'));
+//     let txnsDone = 0;
+//     txns.forEach(function (txn) {
+//       tempWeb3.eth.getTransaction(txn, async (e1, transaction) => {
+//         if (e1 !== null) console.log(e1);
+//         console.log('\t\tGOT getTransaction, ', transaction.hash);
+//         if (transaction) {
+//           tempWeb3.eth.getTransactionReceipt(txn, async (e2, transactionReceipt) => {
+//             if (e2 !== null) console.log(e2);
+//             console.log('\t\tGOT getTransactionReceipt, ', transactionReceipt.transactionHash);
+//             if (transaction.blockNumber <= web3.eth.blockNumber - parseInt(process.env.BLOCK_CONFIRMATIONS, 10)) {
+//               // if mined BLOCK_CONFIRMATIONS blocks in the past
+//               console.log('\t\tCASE 1: if mined BLOCK_CONFIRMATIONS blocks in the past');
+//               result.confirmed.push(_formTransactionObj(transaction, transactionReceipt));
+//             } else {
+//               // if mined, but not BLOCK_CONFIRMATIONS blocks in the past
+//               console.log('\t\tCASE 2: if mined, but not BLOCK_CONFIRMATIONS blocks in the past');
+//               result.seen.push(_formTransactionObj(transaction, transactionReceipt));
+//               await insertPendingTransactions([_formPendingTxn(transaction)]);
+//             }
+//             txnsDone++;
+//             if (txnsDone === txns.length) {
+//               console.log('\n\n\n');
+//               res.status(200).send({ result });
+//             }
+//           });
+//         } else {
+//           // simply add to pendingTransactions
+//           console.log('\t\tCASE 3: txn not mined, simply add to pendingTransactions');
+//           await insertPendingTransactions([_formPendingTxn({ hash: txn })]);
+//         }
+//       });
+//     });
+//   } else {
+//     console.log('\n\n\n');
+//     res.status(403);
+//   }
+// });
 
 const _formPendingTxn = (txn) => {
   return {
