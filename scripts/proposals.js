@@ -424,11 +424,14 @@ const refreshProposalVotingClaim = async (res) => {
   proposal.votingRounds[index].passed = result;
 
   // result === false take care here
+  // if it was last review voting round, take care here
   proposal.votingStage = proposalVotingStages.NONE;
   proposal.stage = proposalStages.ARCHIVED;
 
   // voting round has passed
-  if (result === true) {
+  // if there is another milestone still to go and voting passed
+  const nMilestones = proposal.proposalVersions[proposal.proposalVersions.length - 1].milestoneFundings.length;
+  if (index < nMilestones && result === true) {
     proposal.stage = proposalStages.ONGOING;
     const milestoneFunding = await getContracts().daoStorage.readProposalMilestone.call(res._proposalId, new BigNumber(index));
     proposal.claimableFunding = ((new BigNumber(proposal.claimableFunding)).plus(milestoneFunding)).toString();
