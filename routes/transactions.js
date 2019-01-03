@@ -98,6 +98,9 @@ router.post('/watch', async (req, res) => {
 
         // const transactionReceipt = await tempWeb3.eth.getTransactionReceipt(txn);
         // console.log('\t\tGOT getTransactionReceipt, ', transactionReceipt.transactionHash);
+        console.log('\t\t\ttransaction mined in block = ', transaction.blockNumber);
+        console.log('\t\t\tcurrent block number       = ', web3.eth.blockNumber);
+        console.log('\t\t\tconfirmations needed       = ', parseInt(process.env.BLOCK_CONFIRMATIONS, 10));
         if (transaction.blockNumber <= web3.eth.blockNumber - parseInt(process.env.BLOCK_CONFIRMATIONS, 10)) {
           // if mined BLOCK_CONFIRMATIONS blocks in the past
           console.log('\t\tCASE 1: if mined BLOCK_CONFIRMATIONS blocks in the past');
