@@ -92,9 +92,10 @@ router.post('/watch', async (req, res) => {
     // const tempWeb3 = new Web3(new Web3.providers.HttpProvider('https://kovan.infura.io/'));
     for (const txn of txns) {
       // const transaction = await web3.eth.getTransaction(txn);
-      const transaction = await betterGetTransaction(web3, txn);
-      console.log('\t\tGOT getTransaction, ', transaction.hash);
-      if (transaction) {
+      try {
+        const transaction = await betterGetTransaction(web3, txn);
+        console.log('\t\tGOT getTransaction, ', transaction.hash);
+
         // const transactionReceipt = await tempWeb3.eth.getTransactionReceipt(txn);
         // console.log('\t\tGOT getTransactionReceipt, ', transactionReceipt.transactionHash);
         if (transaction.blockNumber <= web3.eth.blockNumber - parseInt(process.env.BLOCK_CONFIRMATIONS, 10)) {
@@ -109,7 +110,8 @@ router.post('/watch', async (req, res) => {
           result.seen.push(_formTransactionObj(transaction));
           await insertPendingTransactions([_formPendingTxn(transaction)]);
         }
-      } else {
+      } catch (e) {
+        console.log('\t\tCAUGHT ERROR');
         // simply add to pendingTransactions
         console.log('\t\tCASE 3: txn not mined, simply add to pendingTransactions');
         await insertPendingTransactions([_formPendingTxn({ hash: txn })]);
