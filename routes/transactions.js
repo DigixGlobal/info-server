@@ -51,8 +51,8 @@ router.get('/users/:address', async (req, res) => {
 const betterGetTransactionReceipt = async (web3, txhash) => {
   return new Promise(function (resolve, reject) {
     web3.eth.getTransactionReceipt(txhash, (error, data) => {
-      if (error) reject(error);
-      resolve(data);
+      if (error !== null) reject(error);
+      else resolve(data);
     });
   });
 };
@@ -60,8 +60,8 @@ const betterGetTransactionReceipt = async (web3, txhash) => {
 const betterGetTransaction = async (web3, txhash) => {
   return new Promise(function (resolve, reject) {
     web3.eth.getTransaction(txhash, (error, data) => {
-      if (error) reject(error);
-      resolve(data);
+      if (error !== null) reject(error);
+      else resolve(data);
     });
   });
 };
