@@ -86,23 +86,25 @@ router.post('/watch', async (req, res) => {
   ) {
     await setDaoServerNonce(parseInt(retrievedNonce, 10));
     const { txns } = req.body.payload;
-    // const web3 = getWeb3();
+    const web3 = getWeb3();
     const result = { seen: [], confirmed: [] };
-    const tempWeb3 = new Web3(new Web3.providers.HttpProvider('https://kovan.infura.io/'));
+    // const tempWeb3 = new Web3(new Web3.providers.HttpProvider('https://kovan.infura.io/'));
     for (const txn of txns) {
-      const transaction = await tempWeb3.eth.getTransaction(txn);
+      const transaction = await web3.eth.getTransaction(txn);
       console.log('\t\tGOT getTransaction, ', transaction.hash);
       if (transaction) {
-        const transactionReceipt = await tempWeb3.eth.getTransactionReceipt(txn);
-        console.log('\t\tGOT getTransactionReceipt, ', transactionReceipt.transactionHash);
-        if (transaction.blockNumber <= tempWeb3.eth.blockNumber - parseInt(process.env.BLOCK_CONFIRMATIONS, 10)) {
+        // const transactionReceipt = await tempWeb3.eth.getTransactionReceipt(txn);
+        // console.log('\t\tGOT getTransactionReceipt, ', transactionReceipt.transactionHash);
+        if (transaction.blockNumber <= web3.eth.blockNumber - parseInt(process.env.BLOCK_CONFIRMATIONS, 10)) {
           // if mined BLOCK_CONFIRMATIONS blocks in the past
           console.log('\t\tCASE 1: if mined BLOCK_CONFIRMATIONS blocks in the past');
-          result.confirmed.push(_formTransactionObj(transaction, transactionReceipt));
+          // result.confirmed.push(_formTransactionObj(transaction, transactionReceipt));
+          result.confirmed.push(_formTransactionObj(transaction));
         } else {
           // if mined, but not BLOCK_CONFIRMATIONS blocks in the past
           console.log('\t\tCASE 2: if mined, but not BLOCK_CONFIRMATIONS blocks in the past');
-          result.seen.push(_formTransactionObj(transaction, transactionReceipt));
+          // result.seen.push(_formTransactionObj(transaction, transactionReceipt));
+          result.seen.push(_formTransactionObj(transaction));
           await insertPendingTransactions([_formPendingTxn(transaction)]);
         }
       } else {
@@ -185,14 +187,23 @@ const _formPendingTxn = (txn) => {
   };
 };
 
-const _formTransactionObj = (transaction, transactionReceipt) => {
+// const _formTransactionObj = (transaction, transactionReceipt) => {
+//   return {
+//     txhash: transaction.hash,
+//     from: transaction.from,
+//     gasPrice: transaction.gasPrice,
+//     blockHash: transactionReceipt.blockHash,
+//     blockNumber: transactionReceipt.blockNumber,
+//     gasUsed: transactionReceipt.gasUsed,
+//   };
+// };
+
+const _formTransactionObj = (transaction) => {
   return {
     txhash: transaction.hash,
     from: transaction.from,
     gasPrice: transaction.gasPrice,
-    blockHash: transactionReceipt.blockHash,
-    blockNumber: transactionReceipt.blockNumber,
-    gasUsed: transactionReceipt.gasUsed,
+    blockNumber: transaction.blockNumber,
   };
 };
 
