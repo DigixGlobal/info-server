@@ -48,6 +48,24 @@ router.get('/users/:address', async (req, res) => {
   return res.json({ result });
 });
 
+const betterGetTransactionReceipt = async (web3, txhash) => {
+  return new Promise(function (resolve, reject) {
+    web3.eth.getTransactionReceipt(txhash, (error, data) => {
+      if (error) reject(error);
+      resolve(data);
+    });
+  });
+};
+
+const betterGetTransaction = async (web3, txhash) => {
+  return new Promise(function (resolve, reject) {
+    web3.eth.getTransaction(txhash, (error, data) => {
+      if (error) reject(error);
+      resolve(data);
+    });
+  });
+};
+
 router.post('/watch', async (req, res) => {
   const retrievedSig = req.headers['access-sign'];
   const retrievedNonce = parseInt(req.headers['access-nonce'], 10);
@@ -68,10 +86,12 @@ router.post('/watch', async (req, res) => {
     const web3 = getWeb3();
     const result = { seen: [], confirmed: [] };
     for (const txn of txns) {
-      const transaction = await web3.eth.getTransaction(txn);
+      const transaction = await betterGetTransaction(web3, txn);
       console.log('in watch(), transaction.hash = ', transaction.hash);
       if (transaction) {
-        const transactionReceipt = await web3.eth.getTransactionReceipt(txn);
+        // const transactionReceipt = await web3.eth.getTransactionReceipt(txn);
+        const transactionReceipt = await betterGetTransactionReceipt(web3, txn);
+
         console.log('in watch(), transactionReceipt.txHash = ', transactionReceipt.transactionHash);
         if (transaction.blockNumber <= web3.eth.blockNumber - parseInt(process.env.BLOCK_CONFIRMATIONS, 10)) {
           // if mined BLOCK_CONFIRMATIONS blocks in the past
