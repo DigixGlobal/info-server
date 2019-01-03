@@ -91,9 +91,8 @@ router.post('/watch', async (req, res) => {
     const result = { seen: [], confirmed: [] };
     // const tempWeb3 = new Web3(new Web3.providers.HttpProvider('https://kovan.infura.io/'));
     for (const txn of txns) {
-      // const transaction = await web3.eth.getTransaction(txn);
-      try {
-        const transaction = await betterGetTransaction(web3, txn);
+      const transaction = await web3.eth.getTransaction(txn);
+      if (transaction.blockNumber !== null) {
         console.log('\t\tGOT getTransaction, ', transaction);
 
         // const transactionReceipt = await tempWeb3.eth.getTransactionReceipt(txn);
@@ -113,8 +112,7 @@ router.post('/watch', async (req, res) => {
           result.seen.push(_formTransactionObj(transaction));
           await insertPendingTransactions([_formPendingTxn(transaction)]);
         }
-      } catch (e) {
-        console.log('\t\tCAUGHT ERROR');
+      } else {
         // simply add to pendingTransactions
         console.log('\t\tCASE 3: txn not mined, simply add to pendingTransactions');
         await insertPendingTransactions([_formPendingTxn({ hash: txn })]);
