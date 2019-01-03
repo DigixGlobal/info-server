@@ -67,6 +67,8 @@ const betterGetTransaction = async (web3, txhash) => {
 };
 
 router.post('/watch', async (req, res) => {
+  console.log('\n\n\n');
+  console.log('\t\tENTERED watch()');
   const retrievedSig = req.headers['access-sign'];
   const retrievedNonce = parseInt(req.headers['access-nonce'], 10);
   const message = req.method + req.originalUrl + JSON.stringify(req.body.payload) + retrievedNonce;
@@ -85,29 +87,40 @@ router.post('/watch', async (req, res) => {
     const { txns } = req.body.payload;
     const web3 = getWeb3();
     const result = { seen: [], confirmed: [] };
-    for (const txn of txns) {
-      const transaction = await betterGetTransaction(web3, txn);
-      console.log('in watch(), transaction.hash = ', transaction.hash);
-      if (transaction) {
-        // const transactionReceipt = await web3.eth.getTransactionReceipt(txn);
-        const transactionReceipt = await betterGetTransactionReceipt(web3, txn);
-
-        console.log('in watch(), transactionReceipt.txHash = ', transactionReceipt.transactionHash);
-        if (transaction.blockNumber <= web3.eth.blockNumber - parseInt(process.env.BLOCK_CONFIRMATIONS, 10)) {
-          // if mined BLOCK_CONFIRMATIONS blocks in the past
-          result.confirmed.push(_formTransactionObj(transaction, transactionReceipt));
+    let txnsDone = 0;
+    txns.forEach(function (txn) {
+      web3.eth.getTransaction(txn, async (e1, transaction) => {
+        if (e1 !== null) console.log(e1);
+        console.log('\t\tGOT getTransaction, ', transaction.hash);
+        if (transaction) {
+          web3.eth.getTransactionReceipt(txn, async (e2, transactionReceipt) => {
+            if (e2 !== null) console.log(e2);
+            console.log('\t\tGOT getTransactionReceipt, ', transactionReceipt.transactionHash);
+            if (transaction.blockNumber <= web3.eth.blockNumber - parseInt(process.env.BLOCK_CONFIRMATIONS, 10)) {
+              // if mined BLOCK_CONFIRMATIONS blocks in the past
+              console.log('\t\tCASE 1: if mined BLOCK_CONFIRMATIONS blocks in the past');
+              result.confirmed.push(_formTransactionObj(transaction, transactionReceipt));
+            } else {
+              // if mined, but not BLOCK_CONFIRMATIONS blocks in the past
+              console.log('\t\tCASE 2: if mined, but not BLOCK_CONFIRMATIONS blocks in the past');
+              result.seen.push(_formTransactionObj(transaction, transactionReceipt));
+              await insertPendingTransactions([_formPendingTxn(transaction)]);
+            }
+            txnsDone++;
+            if (txnsDone === txns.length) {
+              console.log('\n\n\n');
+              res.status(200).send({ result });
+            }
+          });
         } else {
-          // if mined, but not BLOCK_CONFIRMATIONS blocks in the past
-          result.seen.push(_formTransactionObj(transaction, transactionReceipt));
-          await insertPendingTransactions([_formPendingTxn(transaction)]);
+          // simply add to pendingTransactions
+          console.log('\t\tCASE 3: txn not mined, simply add to pendingTransactions');
+          await insertPendingTransactions([_formPendingTxn({ hash: txn })]);
         }
-      } else {
-        // simply add to pendingTransactions
-        await insertPendingTransactions([_formPendingTxn({ hash: txn })]);
-      }
-    }
-    res.status(200).send({ result });
+      });
+    });
   } else {
+    console.log('\n\n\n');
     res.status(403);
   }
 });
