@@ -69,8 +69,10 @@ router.post('/watch', async (req, res) => {
     const result = { seen: [], confirmed: [] };
     for (const txn of txns) {
       const transaction = await web3.eth.getTransaction(txn);
+      console.log('in watch(), transaction.hash = ', transaction.hash);
       if (transaction) {
         const transactionReceipt = await web3.eth.getTransactionReceipt(txn);
+        console.log('in watch(), transactionReceipt.txHash = ', transactionReceipt.transactionHash);
         if (transaction.blockNumber <= web3.eth.blockNumber - parseInt(process.env.BLOCK_CONFIRMATIONS, 10)) {
           // if mined BLOCK_CONFIRMATIONS blocks in the past
           result.confirmed.push(_formTransactionObj(transaction, transactionReceipt));

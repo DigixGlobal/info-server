@@ -78,6 +78,8 @@ const _formTxnDocument = async (web3, txns) => {
 
     if (transaction.tx && (contracts.fromAddress[transaction.tx.to])) {
       transaction.txReceipt = await web3.eth.getTransactionReceipt(txn.hash);
+      console.log('in _formTxnDocument, transaction.txReceipt = ', transaction.txReceipt);
+
       if (parseInt(transaction.txReceipt.status, 16) === 1) {
         // decode the function args and logs
         transaction.decodedInputs = contracts.decoder.decodeMethod(transaction.tx.input);
