@@ -34,15 +34,12 @@ const initFreshDb = async () => {
     self: 0,
     daoServer: 0,
   };
-  try {
-    const oldNonce = await _db
-      .collection(collections.COUNTERS)
-      .findOne({ name: 'nonce' });
+  const oldNonce = await _db
+    .collection(collections.COUNTERS)
+    .findOne({ name: 'nonce' });
+  if (oldNonce !== null) {
     nonces.self = oldNonce.self;
     nonces.daoServer = oldNonce.daoServer;
-  } catch (e) {
-    console.log('no DB');
-    console.log(e);
   }
   await _db.dropDatabase();
   await _db.collection(collections.COUNTERS).insertOne({
