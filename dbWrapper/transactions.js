@@ -10,6 +10,12 @@ const insertTransactions = async (transactions) => {
     .insertMany(transactions);
 };
 
+const insertTransaction = async (transaction) => {
+  await mongoUtil.getDB()
+    .collection(collections.TRANSACTIONS)
+    .insertOne(transaction);
+};
+
 const insertPendingTransactions = async (pendingTransactions) => {
   await mongoUtil.getDB()
     .collection(collections.PENDING_TRANSACTIONS)
@@ -92,6 +98,7 @@ const getLastTransaction = async () => {
 };
 
 module.exports = {
+  insertTransaction,
   insertTransactions,
   insertPendingTransactions,
   removePendingTransactions,
