@@ -14,7 +14,7 @@ const {
 const {
   getTransactions,
   isExistPendingTransaction,
-  insertTransactions,
+  insertTransaction,
 } = require('../dbWrapper/transactions');
 
 const {
@@ -65,10 +65,8 @@ const _formEventObj = (transaction) => {
 };
 
 const _formTxnDocument = async (web3, txns) => {
-  const r = await getCounter(counters.TRANSACTIONS);
   const contracts = getContracts();
 
-  let currentIndex = r.max_value;
   const filteredTxns = [];
   const otherWatchedTxns = [];
   const failedTxns = [];
@@ -87,9 +85,8 @@ const _formTxnDocument = async (web3, txns) => {
           transaction.decodedInputs !== undefined
           && watchedFunctionsList.includes(transaction.decodedInputs.name)
         ) { // if we are already watching this txn
-          transaction.index = currentIndex + 1;
+          transaction.txhash = txn.hash;
           filteredTxns.push(transaction);
-          currentIndex++;
         } else if (
           await isExistPendingTransaction(transaction.tx.hash)
         ) { // if this was in pending txn, but not a watched function
@@ -155,8 +152,14 @@ const filterAndInsertTxns = async (web3, txns) => {
   const { filteredTxns, otherWatchedTxns, failedTxns } = filteredTxnObject;
   if (filteredTxns.length > 0 || otherWatchedTxns.length > 0 || failedTxns.length > 0) {
     if (filteredTxns.length > 0) {
-      await insertTransactions(filteredTxns);
-      await incrementMaxValue(counters.TRANSACTIONS, filteredTxns.length);
+      for (const entry of filteredTxns) {
+        try {
+          await insertTransaction(entry);
+          await incrementMaxValue(counters.TRANSACTIONS, 1);
+        } catch (e) {
+          console.log('\n\nERROR = ', e, '\n\n');
+        }
+      }
     }
     await checkAndNotify(filteredTxns.concat(otherWatchedTxns), failedTxns);
   }
@@ -211,9 +214,13 @@ const processTransactions = async () => {
   if (transactions.length <= 0) return;
   for (const transaction of transactions) {
     const res = _formEventObj(transaction);
-    await watchedFunctionsMap[transaction.decodedInputs.name](res);
+    try {
+      await watchedFunctionsMap[transaction.decodedInputs.name](res);
+      await incrementLastProcessed(counters.TRANSACTIONS, 1);
+    } catch (e) {
+      console.log('\n\nERROR = ', e, '\n\n');
+    }
   }
-  await incrementLastProcessed(counters.TRANSACTIONS, transactions.length);
   console.log(`\tDone processing transactions until max_value = ${counter.max_value}`);
 };
 

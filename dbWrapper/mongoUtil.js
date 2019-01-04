@@ -43,7 +43,7 @@ const initFreshDb = async () => {
   await _db.collection(collections.PROPOSALS).createIndex('proposalId', { unique: true });
   await _db.collection(collections.ADDRESSES).createIndex('address', { unique: true });
   await _db.createCollection(collections.PENDING_TRANSACTIONS);
-  await _db.collection(collections.TRANSACTIONS).createIndex('index', { unique: true });
+  await _db.collection(collections.TRANSACTIONS).createIndex('txhash', { unique: true });
   console.log('Initialized a fresh database');
 };
 
