@@ -27,6 +27,7 @@ const {
 
 const watchedFunctionsMap = {
   setStartOfFirstQuarter: initDao,
+  calculateGlobalRewardsBeforeNewQuarter: initDao,
   lockDGD: refreshAddress,
   withdrawDGD: refreshAddress,
   confirmContinueParticipation: refreshAddress,

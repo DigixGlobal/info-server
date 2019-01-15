@@ -31,7 +31,7 @@ const {
   notifyDaoServer,
 } = require('./notifier');
 
-const _getAddressObject = (userInfo, redeemedBadge = false) => {
+const _getAddressObject = (userInfo) => {
   return {
     isParticipant: userInfo[0],
     isModerator: userInfo[1],
@@ -40,7 +40,6 @@ const _getAddressObject = (userInfo, redeemedBadge = false) => {
     lockedDgd: userInfo[4].toString(),
     reputationPoint: userInfo[5].toString(),
     quarterPoint: userInfo[6].toString(),
-    redeemedBadge,
   };
 };
 
@@ -121,7 +120,10 @@ const refreshAddress = async (res) => {
   // get address details from db and contract
   const addressDetails = await getAddressDetails(user);
   const userInfo = await getContracts().daoInformation.readUserInfo.call(user);
-  const redeemedBadge = await getContracts().daoStakeStorage.redeemedBadge.call(user);
+  const moreInfo = {};
+  moreInfo.redeemedBadge = await getContracts().daoStakeStorage.redeemedBadge.call(user);
+  moreInfo.claimableDgx = (await getContracts().daoRewardsStorage.claimableDGXs.call(user)).toString();
+  moreInfo.lastQuarterThatReputationWasUpdated = (await getContracts().daoRewardsStorage.lastQuarterThatReputationWasUpdated.call(user)).toString();
 
   if (addressDetails) {
     await _updateProposalVoteWeightages(serializeAddress(addressDetails), userInfo);
@@ -130,12 +132,16 @@ const refreshAddress = async (res) => {
   // update user itself
   if (addressDetails) {
     await updateAddress(user, {
-      $set: _getAddressObject(userInfo, redeemedBadge),
+      $set: {
+        ..._getAddressObject(userInfo),
+        ...moreInfo,
+      },
     }, { upsert: true });
   } else {
     await insertAddress({
       ..._getAddressObject(userInfo),
       ..._getInsertAddressObj(user),
+      ...moreInfo,
     });
     // new address, tell dao-server about new address
     notifyDaoServer({

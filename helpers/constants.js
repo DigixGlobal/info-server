@@ -64,6 +64,7 @@ const denominators = {
 
 const watchedFunctionNames = {
   START_DAO: 'setStartOfFirstQuarter',
+  CALCULATE_GLOBAL_REWARDS: 'calculateGlobalRewardsBeforeNewQuarter',
   LOCK_DGD: 'lockDGD',
   WITHDRAW_DGD: 'withdrawDGD',
   REDEEM_BADGE: 'redeemBadge',
@@ -88,6 +89,7 @@ const watchedFunctionNames = {
 
 const watchedFunctionsList = [
   watchedFunctionNames.START_DAO,
+  watchedFunctionNames.CALCULATE_GLOBAL_REWARDS,
   watchedFunctionNames.LOCK_DGD,
   watchedFunctionNames.WITHDRAW_DGD,
   watchedFunctionNames.REDEEM_BADGE,
