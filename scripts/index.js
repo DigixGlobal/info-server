@@ -9,6 +9,7 @@ const {
 
 const {
   refreshDao,
+  refreshDaoConfigs,
 } = require('./dao');
 
 module.exports = {
@@ -16,4 +17,5 @@ module.exports = {
   watchNewBlocks,
   processTransactions,
   refreshDao,
+  refreshDaoConfigs,
 };

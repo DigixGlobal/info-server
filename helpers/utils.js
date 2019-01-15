@@ -183,6 +183,13 @@ const deserializeDaoInfo = function (daoInfo) {
   return daoInfo;
 };
 
+const deserializeDaoConfigs = function (daoConfigs) {
+  daoConfigs.CONFIG_MINIMUM_DGD_FOR_MODERATOR = ofOne(daoConfigs.CONFIG_MINIMUM_DGD_FOR_MODERATOR, denominators.DGD);
+  daoConfigs.CONFIG_MINIMUM_REPUTATION_FOR_MODERATOR = ofOne(daoConfigs.CONFIG_MINIMUM_REPUTATION_FOR_MODERATOR, denominators.DGD);
+
+  return daoConfigs;
+};
+
 module.exports = {
   sumArray,
   sumArrayBN,
@@ -198,5 +205,6 @@ module.exports = {
   deserializeProposal,
   deserializeAddress,
   deserializeDaoInfo,
+  deserializeDaoConfigs,
   readConfig,
 };

@@ -9,6 +9,7 @@ const {
 
 const {
   getDaoInfo,
+  getDaoConfigs,
 } = require('../dbWrapper/dao');
 
 const {
@@ -18,6 +19,7 @@ const {
 
 const {
   deserializeDaoInfo,
+  deserializeDaoConfigs,
   deserializeAddress,
   readConfig,
 } = require('../helpers/utils');
@@ -38,14 +40,9 @@ router.get('/daoInfo', async (req, res) => {
 });
 
 router.get('/daoConfigs', async (req, res) => {
+  const daoConfigs = deserializeDaoConfigs(await getDaoConfigs());
   return res.json({
-    result: {
-      CONFIG_MINIMUM_DGD_FOR_MODERATOR: '100.0',
-      CONFIG_MINIMUM_REPUTATION_FOR_MODERATOR: '100.0',
-      CONFIG_PREPROPOSAL_COLLATERAL: '2000000000000000000',
-      CONFIG_VOTE_CLAIMING_DEADLINE: '60000',
-      CONFIG_PROPOSAL_DEAD_DURATION: '15552000',
-    },
+    result: daoConfigs,
   });
 });
 

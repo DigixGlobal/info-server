@@ -1,10 +1,15 @@
 const {
   updateDao,
+  updateDaoConfigs,
 } = require('../dbWrapper/dao');
 
 const {
   getContracts,
 } = require('../helpers/contracts');
+
+const {
+  daoConfigsIndices,
+} = require('../helpers/constants');
 
 const initDao = async () => {
   const daoInfo = await getContracts().daoInformation.readDaoInfo.call();
@@ -29,6 +34,17 @@ const initDao = async () => {
   }, { upsert: true });
 };
 
+const refreshDaoConfigs = async () => {
+  const readDaoConfigs = await getContracts().daoConfigsStorage.readUintConfigs.call();
+  const daoConfigs = {};
+  for (const k in daoConfigsIndices) {
+    daoConfigs[k] = readDaoConfigs[daoConfigsIndices[k]].toString();
+  }
+  await updateDaoConfigs({
+    $set: daoConfigs,
+  }, { upsert: true });
+};
+
 // TODO: we don't really need to `refreshDao` after every minute
 // since the values `daoInfo` stores are not gonna change
 // they change only when someobody locks/withdraws tokens
@@ -49,4 +65,5 @@ const refreshDao = async () => {
 module.exports = {
   initDao,
   refreshDao,
+  refreshDaoConfigs,
 };
