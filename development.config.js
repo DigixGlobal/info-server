@@ -17,7 +17,7 @@ module.exports = {
       SERVER_SECRET: 'this-is-a-secret-between-dao-and-info-server',
       RATE_LIMIT_WINDOW_MS: 60 * 1000,
       RATE_LIMIT_PER_WINDOW: 10,
-      BLOCK_CONFIRMATIONS: 3,
+      BLOCK_CONFIRMATIONS: 0,
       START_BLOCK: 0,
       N_BLOCKS_BUCKET: 200,
       N_BLOCKS_CONCURRENT: 100,

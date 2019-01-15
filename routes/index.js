@@ -37,6 +37,15 @@ router.get('/daoInfo', async (req, res) => {
   return res.json({ result: info });
 });
 
+router.get('/daoConfigs', async (req, res) => {
+  return res.json({
+    result: {
+      CONFIG_MINIMUM_DGD_FOR_MODERATOR: '100.0',
+      CONFIG_MINIMUM_REPUTATION_FOR_MODERATOR: '100.0',
+    },
+  });
+});
+
 router.get('/address/:address', async (req, res) => {
   const details = deserializeAddress(await getAddressDetails(req.params.address.toLowerCase()));
   return res.json({ result: details || 'notFound' });
