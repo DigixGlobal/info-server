@@ -22,14 +22,21 @@ const initDao = async () => {
     .totalModeratorLockedDGDStake
     .call();
   // don't need to wait for this to be completed
+
+  const dgxDistributionDay = (await getContracts().daoRewardsStorage.readDgxDistributionDay.call(daoInfo[0])).toNumber();
+  const currentQuarter = daoInfo[0].toNumber();
+
+  console.log('dgxDistributionDay = ', dgxDistributionDay);
+
   await updateDao({
     $set: {
-      currentQuarter: daoInfo[0].toNumber(),
+      currentQuarter,
       startOfQuarter: daoInfo[1].toNumber(),
       startOfMainphase: daoInfo[2].toNumber(),
       startOfNextQuarter: daoInfo[3].toNumber(),
       totalLockedDgds: totalLockedDgds.toNumber(),
       totalModeratorLockedDgds: totalModeratorLockedDgds.toNumber(),
+      isGlobalRewardsSet: currentQuarter > 1 ? dgxDistributionDay > 0 : true,
     },
   }, { upsert: true });
 };

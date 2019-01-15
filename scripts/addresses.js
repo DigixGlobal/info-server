@@ -120,6 +120,10 @@ const refreshAddress = async (res) => {
   // get address details from db and contract
   const addressDetails = await getAddressDetails(user);
   const userInfo = await getContracts().daoInformation.readUserInfo.call(user);
+  const moreInfo = {};
+  moreInfo.redeemedBadge = await getContracts().daoStakeStorage.redeemedBadge.call(user);
+  moreInfo.claimableDgx = (await getContracts().daoRewardsStorage.claimableDGXs.call(user)).toString();
+  moreInfo.lastQuarterThatReputationWasUpdated = (await getContracts().daoRewardsStorage.lastQuarterThatReputationWasUpdated.call(user)).toString();
 
   if (addressDetails) {
     await _updateProposalVoteWeightages(serializeAddress(addressDetails), userInfo);
@@ -128,12 +132,16 @@ const refreshAddress = async (res) => {
   // update user itself
   if (addressDetails) {
     await updateAddress(user, {
-      $set: _getAddressObject(userInfo),
+      $set: {
+        ..._getAddressObject(userInfo),
+        ...moreInfo,
+      },
     }, { upsert: true });
   } else {
     await insertAddress({
       ..._getAddressObject(userInfo),
       ..._getInsertAddressObj(user),
+      ...moreInfo,
     });
     // new address, tell dao-server about new address
     notifyDaoServer({
