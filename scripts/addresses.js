@@ -35,14 +35,15 @@ const getAddressObject = (userInfo) => {
   return {
     isParticipant: userInfo[0],
     isModerator: userInfo[1],
-    redeemedBadge: userInfo[2],
-    lastParticipatedQuarter: userInfo[3].toNumber(),
-    lastQuarterThatReputationWasUpdated: userInfo[4].toNumber(),
-    lockedDgdStake: userInfo[5].toString(),
-    lockedDgd: userInfo[6].toString(),
-    reputationPoint: userInfo[7].toString(),
-    quarterPoint: userInfo[8].toString(),
-    claimableDgx: userInfo[9].toString(),
+    isDigix: userInfo[2],
+    redeemedBadge: userInfo[3],
+    lastParticipatedQuarter: userInfo[4].toNumber(),
+    lastQuarterThatReputationWasUpdated: userInfo[5].toNumber(),
+    lockedDgdStake: userInfo[6].toString(),
+    lockedDgd: userInfo[7].toString(),
+    reputationPoint: userInfo[8].toString(),
+    quarterPoint: userInfo[9].toString(),
+    claimableDgx: userInfo[10].toString(),
   };
 };
 
