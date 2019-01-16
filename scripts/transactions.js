@@ -215,7 +215,7 @@ const processTransactions = async () => {
   for (const transaction of transactions) {
     const res = _formEventObj(transaction);
     try {
-      await watchedFunctionsMap[transaction.decodedInputs.name](res);
+      await watchedFunctionsMap[transaction.decodedInputs.name](res, transaction.tx.blockNumber);
       await incrementLastProcessed(counters.TRANSACTIONS, 1);
     } catch (e) {
       console.log('\n\nERROR = ', e, '\n\n');

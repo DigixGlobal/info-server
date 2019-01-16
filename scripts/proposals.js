@@ -12,6 +12,8 @@ const {
   serializeAddress,
   serializeProposal,
   serializeProposalVotingRound,
+  getOriginalFundings,
+  getUpdatedFundings,
 } = require('../helpers/utils');
 
 const {
@@ -76,6 +78,7 @@ const refreshProposalNew = async (res) => {
   proposal.isDigix = proposalDetails[readProposalIndices.isDigix];
   proposal.claimableFunding = 0;
   proposal.currentMilestone = -1;
+  proposal.isFundingChanged = false;
 
   const nVersions = proposalDetails[readProposalIndices.nVersions];
   proposal.proposalVersions = [];
@@ -175,11 +178,17 @@ const refreshProposalEndorseProposal = async (res) => {
 };
 
 // DONE
-const refreshProposalFinalizeProposal = async (res) => {
+const refreshProposalFinalizeProposal = async (res, blockNumber) => {
   // read current proposal from DB
   const proposal = await getProposal(res._proposalId);
   const proposalDetails = await getContracts().daoStorage.readProposal.call(res._proposalId);
   proposal.finalVersionIpfsDoc = proposalDetails[readProposalIndices.finalVersionIpfsDoc];
+  const proposalFinalVersion = await getContracts().daoStorage.readProposalVersion.call(res._proposalId, proposal.finalVersionIpfsDoc, {}, blockNumber);
+  const proposalFundings = proposalFinalVersion[readProposalVersionIndices.milestoneFundings];
+  const proposalFinalReward = proposalFinalVersion[readProposalVersionIndices.finalReward];
+
+  // set the original funding values
+  proposal.changedFundings = getOriginalFundings(proposalFundings, proposalFinalReward);
 
   const draftVotingPhase = (await getContracts().daoConfigsStorage.uintConfigs.call(daoConfigsKeys.CONFIG_DRAFT_VOTING_PHASE)).toNumber();
   const draftQuotaNumerator = await getContracts().daoConfigsStorage.uintConfigs.call(daoConfigsKeys.CONFIG_DRAFT_QUOTA_NUMERATOR);
@@ -428,6 +437,7 @@ const refreshProposalVotingClaim = async (res) => {
     const milestoneFunding = await getContracts().daoStorage.readProposalMilestone.call(res._proposalId, new BigNumber(index));
     proposal.claimableFunding = ((new BigNumber(proposal.claimableFunding)).plus(milestoneFunding)).toString();
     proposal.currentMilestone = parseInt(index, 10) + 1;
+    proposal.currentMilestoneIndex = parseInt(index, 10);
     proposal.currentMilestoneStart = proposal.votingRounds[index].revealDeadline;
   }
 
@@ -504,7 +514,27 @@ const refreshProposalFinishMilestone = async (res) => {
   console.log('INSERTED refreshProposalFinishMilestone');
 };
 
-// TO BE TESTED
+// DONE
+const refreshProposalChangeFundings = async (res) => {
+  const proposal = await getProposal(res._proposalId);
+  const proposalDetails = await getContracts().daoStorage.readProposal(res._proposalId);
+  const finalVersion = proposalDetails[readProposalIndices.finalVersionIpfsDoc];
+  const proposalFinalVersion = await getContracts().daoStorage.readProposalVersion(res._proposalId, finalVersion);
+  const finalFundings = proposalFinalVersion[readProposalVersionIndices.milestoneFundings];
+  const finalReward = proposalFinalVersion[readProposalVersionIndices.finalReward];
+
+  proposal.changedFundings = getUpdatedFundings(proposal.changedFundings, finalFundings, finalReward);
+
+  await updateProposal(res._proposalId, {
+    $set: {
+      isFundingChanged: true,
+      changedFundings: proposal.changedFundings,
+    },
+  });
+  console.log('INSERTED refreshProposalChangeFundings');
+};
+
+// DONE
 const refreshProposalClose = async (res) => {
   await updateProposal(res._proposalId, {
     $set: {
@@ -613,6 +643,7 @@ module.exports = {
   refreshProposalVotingClaim,
   refreshProposalClaimFunding,
   refreshProposalFinishMilestone,
+  refreshProposalChangeFundings,
   refreshProposalClose,
   refreshProposalsFounderClose,
   refreshProposalPRLAction,

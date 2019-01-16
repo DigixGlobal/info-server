@@ -191,6 +191,30 @@ const deserializeDaoConfigs = function (daoConfigs) {
   return daoConfigs;
 };
 
+const getOriginalFundings = function (fundings, finalReward) {
+  const originalFundings = {
+    milestones: [],
+    finalReward: {},
+  };
+  fundings.forEach(function (funding) {
+    originalFundings.milestones.push({
+      original: ofOne(funding.toString(), denominators.ETH),
+    });
+  });
+  originalFundings.finalReward.original = ofOne(finalReward.toString(), denominators.ETH);
+
+  return originalFundings;
+};
+
+const getUpdatedFundings = function (changedFundings, finalFundings, finalReward) {
+  finalFundings.forEach(function (funding, index) {
+    changedFundings.milestones[index].updated = ofOne(funding.toString(), denominators.ETH);
+  });
+  changedFundings.finalReward.updated = ofOne(finalReward.toString(), denominators.ETH);
+
+  return changedFundings;
+};
+
 module.exports = {
   sumArray,
   sumArrayBN,
@@ -208,4 +232,6 @@ module.exports = {
   deserializeDaoInfo,
   deserializeDaoConfigs,
   readConfig,
+  getOriginalFundings,
+  getUpdatedFundings,
 };
