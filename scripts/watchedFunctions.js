@@ -32,6 +32,7 @@ const watchedFunctionsMap = {
   withdrawDGD: refreshAddress,
   confirmContinueParticipation: refreshAddress,
   redeemBadge: refreshAddress,
+  claimRewards: refreshAddress,
   submitPreproposal: refreshProposalNew,
   modifyProposal: refreshProposalDetails,
   endorseProposal: refreshProposalEndorseProposal,
