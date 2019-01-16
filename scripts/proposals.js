@@ -46,6 +46,10 @@ const {
   notifyDaoServer,
 } = require('./notifier');
 
+const {
+  getAddressObject,
+} = require('./addresses');
+
 // TODO: proposal.votingStage does not change
 // from COMMIT to REVEAL automatically
 // check all proposals in votingStage === COMMIT (in cron)
@@ -258,13 +262,7 @@ const refreshProposalDraftVote = async (res) => {
   await updateAddress(res._from, {
     $set: {
       votes,
-      isParticipant: userInfo[0],
-      isModerator: userInfo[1],
-      lastParticipatedQuarter: userInfo[2].toNumber(),
-      lockedDgdStake: userInfo[3].toString(),
-      lockedDgd: userInfo[4].toString(),
-      reputationPoint: userInfo[5].toString(),
-      quarterPoint: userInfo[6].toString(),
+      ...getAddressObject(userInfo),
     },
   }, {});
   console.log('INSERTED refreshProposalDraftVote');
@@ -390,13 +388,7 @@ const refreshProposalRevealVote = async (res) => {
   await updateAddress(res._from, {
     $set: {
       votes,
-      isParticipant: userInfo[0],
-      isModerator: userInfo[1],
-      lastParticipatedQuarter: userInfo[2].toNumber(),
-      lockedDgdStake: userInfo[3].toString(),
-      lockedDgd: userInfo[4].toString(),
-      reputationPoint: userInfo[5].toString(),
-      quarterPoint: userInfo[6].toString(),
+      ...getAddressObject(userInfo),
     },
   });
 
@@ -444,13 +436,7 @@ const refreshProposalVotingClaim = async (res) => {
   const userInfo = await getContracts().daoInformation.readUserInfo.call(proposal.proposer);
   await updateAddress(proposal.proposer, {
     $set: {
-      isParticipant: userInfo[0],
-      isModerator: userInfo[1],
-      lastParticipatedQuarter: userInfo[2].toNumber(),
-      lockedDgdStake: userInfo[3].toString(),
-      lockedDgd: userInfo[4].toString(),
-      reputationPoint: userInfo[5].toString(),
-      quarterPoint: userInfo[6].toString(),
+      ...getAddressObject(userInfo),
     },
   });
 
