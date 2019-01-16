@@ -236,7 +236,7 @@ const daoConfigsKeys = {
   CONFIG_MAX_FUNDING_FOR_NON_DIGIX: 'config_max_funding_nonDigix',
   CONFIG_MAX_MILESTONES_FOR_NON_DIGIX: 'config_max_milestones_nonDigix',
   CONFIG_PROPOSAL_DEAD_DURATION: 'config_dead_duration',
-  CONFIG_PREPROPOSAL_DEPOSIT: 'config_preproposal_deposit',
+  CONFIG_PREPROPOSAL_COLLATERAL: 'config_preproposal_collateral',
 };
 
 module.exports = {
