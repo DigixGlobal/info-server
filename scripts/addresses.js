@@ -65,6 +65,7 @@ const _getUser = (res) => {
       }
     }
   }
+  if (user === null || user === undefined) user = res._from;
   return user;
 };
 
@@ -120,6 +121,7 @@ const _updateProposalVoteWeightages = async function (addressDetails, userInfo) 
 
 const refreshAddress = async (res) => {
   const user = _getUser(res);
+  if (user === null || user === undefined) return;
 
   // get address details from db and contract
   const addressDetails = await getAddressDetails(user);
