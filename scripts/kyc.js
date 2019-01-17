@@ -34,7 +34,7 @@ const _getCallData = (entry) => {
     .updateKyc
     .request(
       entry.address,
-      encodeHash(entry.doc_hash),
+      '', // empty doc hash
       entry.id_expiration,
     )
     .params[0]

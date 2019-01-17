@@ -5,6 +5,7 @@ const {
 } = require('../helpers/constants');
 
 const addPendingKycApproval = async (approval) => {
+  approval.status = 'pending';
   await mongoUtil.getDB()
     .collection(collections.KYC_APPROVALS)
     .insertOne(approval);
