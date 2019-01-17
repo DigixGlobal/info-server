@@ -110,11 +110,13 @@ const collections = {
   ADDRESSES: 'addresses',
   DAO: 'daoInfo',
   DAO_CONFIGS: 'daoConfigs',
+  KYC_APPROVALS: 'kycApprovals',
 };
 
 const counters = {
   TRANSACTIONS: 'allTransactions',
   NONCE: 'nonce',
+  KYC_APPROVALS: 'kycApprovals',
 };
 
 const denominators = {

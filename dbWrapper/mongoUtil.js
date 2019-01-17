@@ -48,6 +48,7 @@ const initFreshDb = async () => {
     last_processed: 0,
     last_processed_block: 0,
   });
+  await _db.createCollection(collections.KYC_APPROVALS);
   await _db.collection(collections.COUNTERS).insertOne({ name: 'nonce', daoServer: nonces.daoServer, self: nonces.self });
   await _db.collection(collections.COUNTERS).createIndex('name', { unique: true });
   await _db.collection(collections.DAO).createIndex('index');

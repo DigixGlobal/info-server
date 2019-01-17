@@ -54,6 +54,7 @@ const initCron = async () => {
     // So, only need to refreshDao when a new quarter begins
     scripts.refreshDao();
     scripts.refreshDaoConfigs();
+    scripts.processPendingKycs();
   });
 };
 

@@ -1,8 +1,21 @@
 const BigNumber = require('bignumber.js');
+const crypto = require('crypto');
 
 const {
   denominators,
 } = require('./constants');
+
+const getServerSignatures = function (req) {
+  const retrievedSig = req.headers['access-sign'];
+  const retrievedNonce = parseInt(req.headers['access-nonce'], 10);
+  const message = req.method + req.originalUrl + JSON.stringify(req.body.payload) + retrievedNonce;
+  const computedSig = crypto
+    .createHmac('sha256', process.env.SERVER_SECRET)
+    .update(message)
+    .digest('hex');
+
+  return { retrievedSig, retrievedNonce, computedSig };
+};
 
 const readConfig = function () {
   return {
@@ -234,4 +247,5 @@ module.exports = {
   readConfig,
   getOriginalFundings,
   getUpdatedFundings,
+  getServerSignatures,
 };

@@ -22,7 +22,7 @@ const getDaoConfigs = async () => {
     .findOne({}, { _id: 0 });
   if (daoConfigs && daoConfigs._id) delete daoConfigs._id;
   return daoConfigs;
-}
+};
 
 const getDaoInfo = async () => {
   const info = await mongoUtil.getDB()

@@ -42,6 +42,10 @@ const {
   watchedFunctionsMap,
 } = require('./watchedFunctions');
 
+const {
+  updateKycApprovals,
+} = require('./kyc');
+
 const _formEventObj = (transaction) => {
   const res = {
     _from: transaction.tx.from,
@@ -87,6 +91,11 @@ const _formTxnDocument = async (web3, txns) => {
         ) { // if we are already watching this txn
           transaction.txhash = txn.hash;
           filteredTxns.push(transaction);
+        } else if (
+          transaction.decodedInputs
+          && transaction.decodedInputs.name === 'updateKyc'
+        ) {
+          await updateKycApprovals(transaction.tx.hash);
         } else if (
           await isExistPendingTransaction(transaction.tx.hash)
         ) { // if this was in pending txn, but not a watched function

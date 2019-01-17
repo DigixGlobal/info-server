@@ -2,6 +2,7 @@ const express = require('express');
 
 const proposalRoutes = require('./proposals');
 const transactionRoutes = require('./transactions');
+const kycRoutes = require('./kyc');
 
 const {
   getCounter,
@@ -33,6 +34,8 @@ const router = express.Router();
 router.use('/proposals', proposalRoutes);
 
 router.use('/transactions', transactionRoutes);
+
+router.use('/kyc', kycRoutes);
 
 router.get('/daoInfo', async (req, res) => {
   const info = deserializeDaoInfo(await getDaoInfo());

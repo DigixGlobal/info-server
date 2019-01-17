@@ -1,5 +1,8 @@
 const express = require('express');
-const crypto = require('crypto');
+
+const {
+  getServerSignatures,
+} = require('../helpers/utils');
 
 const {
   getTransaction,
@@ -49,14 +52,7 @@ router.get('/users/:address', async (req, res) => {
 });
 
 router.post('/watch', async (req, res) => {
-  const retrievedSig = req.headers['access-sign'];
-  const retrievedNonce = parseInt(req.headers['access-nonce'], 10);
-  const message = req.method + req.originalUrl + JSON.stringify(req.body.payload) + retrievedNonce;
-  const computedSig = crypto
-    .createHmac('sha256', process.env.SERVER_SECRET)
-    .update(message)
-    .digest('hex');
-
+  const { retrievedSig, retrievedNonce, computedSig } = getServerSignatures(req);
   const currentDaoServerNonce = await getDaoServerNonce();
 
   if (
