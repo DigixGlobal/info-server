@@ -23,7 +23,7 @@
     "body-parser": "^1.18.2",
     "cors": "^2.8.4",
     "crypto": "^1.0.1",
-    "dijix": "0.0.15",
+    "@digix/dijix": "0.0.16",
     "dijix-attestation": "0.0.9",
     "dijix-image": "0.0.10",
     "dijix-pdf": "0.0.8",
