@@ -94,10 +94,10 @@ const refreshProposalNew = async (res) => {
       finalReward: proposalVersion[readProposalVersionIndices.finalReward].toString(),
       moreDocs: [],
       totalFunding: proposalVersion[readProposalVersionIndices.finalReward].plus(sumArrayBN(proposalVersion[readProposalVersionIndices.milestoneFundings])).toString(),
-      dijixObject: {
+      dijixObject: ipfsDoc.data ? {
         ...ipfsDoc.data.attestation,
         images: ipfsDoc.data.proofs,
-      },
+      } : {},
     });
     currentVersion = await getContracts().daoStorage.getNextProposalVersion.call(_proposalId, currentVersion);
   }
@@ -150,10 +150,10 @@ const refreshProposalDetails = async (res) => {
       finalReward: proposalVersion[readProposalVersionIndices.finalReward].toString(),
       moreDocs: proposalDocs,
       totalFunding: proposalVersion[readProposalVersionIndices.finalReward].plus(sumArrayBN(proposalVersion[readProposalVersionIndices.milestoneFundings])).toString(),
-      dijixObject: {
+      dijixObject: ipfsDoc.data ? {
         ...ipfsDoc.data.attestation,
         images: ipfsDoc.data.proofs,
-      },
+      } : {},
     });
     currentVersion = await getContracts().daoStorage.getNextProposalVersion.call(res._proposalId, currentVersion);
   }
