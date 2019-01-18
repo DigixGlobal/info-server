@@ -31,15 +31,19 @@ const {
   notifyDaoServer,
 } = require('./notifier');
 
-const _getAddressObject = (userInfo) => {
+const getAddressObject = (userInfo) => {
   return {
     isParticipant: userInfo[0],
     isModerator: userInfo[1],
-    lastParticipatedQuarter: userInfo[2].toNumber(),
-    lockedDgdStake: userInfo[3].toString(),
-    lockedDgd: userInfo[4].toString(),
-    reputationPoint: userInfo[5].toString(),
-    quarterPoint: userInfo[6].toString(),
+    isDigix: userInfo[2],
+    redeemedBadge: userInfo[3],
+    lastParticipatedQuarter: userInfo[4].toNumber(),
+    lastQuarterThatReputationWasUpdated: userInfo[5].toNumber(),
+    lockedDgdStake: userInfo[6].toString(),
+    lockedDgd: userInfo[7].toString(),
+    reputationPoint: userInfo[8].toString(),
+    quarterPoint: userInfo[9].toString(),
+    claimableDgx: userInfo[10].toString(),
   };
 };
 
@@ -61,6 +65,7 @@ const _getUser = (res) => {
       }
     }
   }
+  if (user === null || user === undefined) user = res._from;
   return user;
 };
 
@@ -116,6 +121,7 @@ const _updateProposalVoteWeightages = async function (addressDetails, userInfo) 
 
 const refreshAddress = async (res) => {
   const user = _getUser(res);
+  if (user === null || user === undefined) return;
 
   // get address details from db and contract
   const addressDetails = await getAddressDetails(user);
@@ -128,11 +134,13 @@ const refreshAddress = async (res) => {
   // update user itself
   if (addressDetails) {
     await updateAddress(user, {
-      $set: _getAddressObject(userInfo),
+      $set: {
+        ...getAddressObject(userInfo),
+      },
     }, { upsert: true });
   } else {
     await insertAddress({
-      ..._getAddressObject(userInfo),
+      ...getAddressObject(userInfo),
       ..._getInsertAddressObj(user),
     });
     // new address, tell dao-server about new address
@@ -166,4 +174,5 @@ const refreshAddress = async (res) => {
 
 module.exports = {
   refreshAddress,
+  getAddressObject,
 };

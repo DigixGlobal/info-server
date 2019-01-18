@@ -1,4 +1,4 @@
-const Dijix = require('dijix').default;
+const Dijix = require('@digix/dijix').default;
 const DijixImage = require('dijix-image').default;
 const DijixPDF = require('dijix-pdf').default;
 const DijixAttestation = require('dijix-attestation').default;
@@ -11,6 +11,7 @@ const init = (ipfsEndpoint, httpEndpoint) => {
     httpEndpoint,
     cache: true,
     concurrency: 10,
+    requestTimeout: 5000,
     types: [
       new DijixImage(),
       new DijixPDF(),

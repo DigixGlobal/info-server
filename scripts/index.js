@@ -9,11 +9,18 @@ const {
 
 const {
   refreshDao,
+  refreshDaoConfigs,
 } = require('./dao');
+
+const {
+  processPendingKycs,
+} = require('./kyc');
 
 module.exports = {
   syncAndProcessToLatestBlock,
   watchNewBlocks,
   processTransactions,
   refreshDao,
+  refreshDaoConfigs,
+  processPendingKycs,
 };

@@ -2,6 +2,7 @@ const express = require('express');
 
 const proposalRoutes = require('./proposals');
 const transactionRoutes = require('./transactions');
+const kycRoutes = require('./kyc');
 
 const {
   getCounter,
@@ -9,6 +10,7 @@ const {
 
 const {
   getDaoInfo,
+  getDaoConfigs,
 } = require('../dbWrapper/dao');
 
 const {
@@ -18,6 +20,7 @@ const {
 
 const {
   deserializeDaoInfo,
+  deserializeDaoConfigs,
   deserializeAddress,
   readConfig,
 } = require('../helpers/utils');
@@ -32,9 +35,18 @@ router.use('/proposals', proposalRoutes);
 
 router.use('/transactions', transactionRoutes);
 
+router.use('/kyc', kycRoutes);
+
 router.get('/daoInfo', async (req, res) => {
   const info = deserializeDaoInfo(await getDaoInfo());
   return res.json({ result: info });
+});
+
+router.get('/daoConfigs', async (req, res) => {
+  const daoConfigs = deserializeDaoConfigs(await getDaoConfigs());
+  return res.json({
+    result: daoConfigs,
+  });
 });
 
 router.get('/address/:address', async (req, res) => {

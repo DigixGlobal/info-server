@@ -1,10 +1,15 @@
 const {
   updateDao,
+  updateDaoConfigs,
 } = require('../dbWrapper/dao');
 
 const {
   getContracts,
 } = require('../helpers/contracts');
+
+const {
+  daoConfigsIndices,
+} = require('../helpers/constants');
 
 const initDao = async () => {
   const daoInfo = await getContracts().daoInformation.readDaoInfo.call();
@@ -17,6 +22,7 @@ const initDao = async () => {
     .totalModeratorLockedDGDStake
     .call();
   // don't need to wait for this to be completed
+
   await updateDao({
     $set: {
       currentQuarter: daoInfo[0].toNumber(),
@@ -25,7 +31,19 @@ const initDao = async () => {
       startOfNextQuarter: daoInfo[3].toNumber(),
       totalLockedDgds: totalLockedDgds.toNumber(),
       totalModeratorLockedDgds: totalModeratorLockedDgds.toNumber(),
+      isGlobalRewardsSet: daoInfo[5],
     },
+  }, { upsert: true });
+};
+
+const refreshDaoConfigs = async () => {
+  const readDaoConfigs = await getContracts().daoConfigsStorage.readUintConfigs.call();
+  const daoConfigs = {};
+  for (const k in daoConfigsIndices) {
+    daoConfigs[k] = readDaoConfigs[daoConfigsIndices[k]].toString();
+  }
+  await updateDaoConfigs({
+    $set: daoConfigs,
   }, { upsert: true });
 };
 
@@ -42,6 +60,7 @@ const refreshDao = async () => {
       startOfQuarter: daoInfo[1].toNumber(),
       startOfMainphase: daoInfo[2].toNumber(),
       startOfNextQuarter: daoInfo[3].toNumber(),
+      isGlobalRewardsSet: daoInfo[5],
     },
   });
 };
@@ -49,4 +68,5 @@ const refreshDao = async () => {
 module.exports = {
   initDao,
   refreshDao,
+  refreshDaoConfigs,
 };

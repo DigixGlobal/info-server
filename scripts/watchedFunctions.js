@@ -10,6 +10,7 @@ const {
   refreshProposalVotingClaim,
   refreshProposalClaimFunding,
   refreshProposalFinishMilestone,
+  refreshProposalChangeFundings,
   refreshProposalClose,
   refreshProposalsFounderClose,
   refreshProposalPRLAction,
@@ -27,10 +28,12 @@ const {
 
 const watchedFunctionsMap = {
   setStartOfFirstQuarter: initDao,
+  calculateGlobalRewardsBeforeNewQuarter: initDao,
   lockDGD: refreshAddress,
   withdrawDGD: refreshAddress,
   confirmContinueParticipation: refreshAddress,
   redeemBadge: refreshAddress,
+  claimRewards: refreshAddress,
   submitPreproposal: refreshProposalNew,
   modifyProposal: refreshProposalDetails,
   endorseProposal: refreshProposalEndorseProposal,
@@ -42,6 +45,7 @@ const watchedFunctionsMap = {
   claimProposalVotingResult: refreshProposalVotingClaim,
   claimFunding: refreshProposalClaimFunding,
   finishMilestone: refreshProposalFinishMilestone,
+  changeFundings: refreshProposalChangeFundings,
   closeProposal: refreshProposalClose,
   founderCloseProposals: refreshProposalsFounderClose,
   updatePRL: refreshProposalPRLAction,

@@ -1,8 +1,21 @@
 const BigNumber = require('bignumber.js');
+const crypto = require('crypto');
 
 const {
   denominators,
 } = require('./constants');
+
+const getServerSignatures = function (req) {
+  const retrievedSig = req.headers['access-sign'];
+  const retrievedNonce = parseInt(req.headers['access-nonce'], 10);
+  const message = req.method + req.originalUrl + JSON.stringify(req.body.payload) + retrievedNonce;
+  const computedSig = crypto
+    .createHmac('sha256', process.env.SERVER_SECRET)
+    .update(message)
+    .digest('hex');
+
+  return { retrievedSig, retrievedNonce, computedSig };
+};
 
 const readConfig = function () {
   return {
@@ -183,6 +196,37 @@ const deserializeDaoInfo = function (daoInfo) {
   return daoInfo;
 };
 
+const deserializeDaoConfigs = function (daoConfigs) {
+  daoConfigs.CONFIG_MINIMUM_DGD_FOR_MODERATOR = ofOne(daoConfigs.CONFIG_MINIMUM_DGD_FOR_MODERATOR, denominators.DGD);
+  daoConfigs.CONFIG_PREPROPOSAL_COLLATERAL = ofOne(daoConfigs.CONFIG_PREPROPOSAL_COLLATERAL, denominators.ETH);
+
+  return daoConfigs;
+};
+
+const getOriginalFundings = function (fundings, finalReward) {
+  const originalFundings = {
+    milestones: [],
+    finalReward: {},
+  };
+  fundings.forEach(function (funding) {
+    originalFundings.milestones.push({
+      original: ofOne(funding.toString(), denominators.ETH),
+    });
+  });
+  originalFundings.finalReward.original = ofOne(finalReward.toString(), denominators.ETH);
+
+  return originalFundings;
+};
+
+const getUpdatedFundings = function (changedFundings, finalFundings, finalReward) {
+  finalFundings.forEach(function (funding, index) {
+    changedFundings.milestones[index].updated = ofOne(funding.toString(), denominators.ETH);
+  });
+  changedFundings.finalReward.updated = ofOne(finalReward.toString(), denominators.ETH);
+
+  return changedFundings;
+};
+
 module.exports = {
   sumArray,
   sumArrayBN,
@@ -198,5 +242,9 @@ module.exports = {
   deserializeProposal,
   deserializeAddress,
   deserializeDaoInfo,
+  deserializeDaoConfigs,
   readConfig,
+  getOriginalFundings,
+  getUpdatedFundings,
+  getServerSignatures,
 };

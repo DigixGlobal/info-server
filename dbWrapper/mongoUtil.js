@@ -34,15 +34,12 @@ const initFreshDb = async () => {
     self: 0,
     daoServer: 0,
   };
-  try {
-    const oldNonce = await _db
-      .collection(collections.COUNTERS)
-      .findOne({ name: 'nonce' });
+  const oldNonce = await _db
+    .collection(collections.COUNTERS)
+    .findOne({ name: 'nonce' });
+  if (oldNonce !== null) {
     nonces.self = oldNonce.self;
     nonces.daoServer = oldNonce.daoServer;
-  } catch (e) {
-    console.log('no DB');
-    console.log(e);
   }
   await _db.dropDatabase();
   await _db.collection(collections.COUNTERS).insertOne({
@@ -51,9 +48,11 @@ const initFreshDb = async () => {
     last_processed: 0,
     last_processed_block: 0,
   });
+  await _db.createCollection(collections.KYC_APPROVALS);
   await _db.collection(collections.COUNTERS).insertOne({ name: 'nonce', daoServer: nonces.daoServer, self: nonces.self });
   await _db.collection(collections.COUNTERS).createIndex('name', { unique: true });
   await _db.collection(collections.DAO).createIndex('index');
+  await _db.collection(collections.DAO_CONFIGS).createIndex('index');
   await _db.collection(collections.PROPOSALS).createIndex('proposalId', { unique: true });
   await _db.collection(collections.ADDRESSES).createIndex('address', { unique: true });
   await _db.createCollection(collections.PENDING_TRANSACTIONS);
