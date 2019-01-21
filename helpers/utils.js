@@ -199,6 +199,9 @@ const deserializeDaoInfo = function (daoInfo) {
 const deserializeDaoConfigs = function (daoConfigs) {
   daoConfigs.CONFIG_MINIMUM_DGD_FOR_MODERATOR = ofOne(daoConfigs.CONFIG_MINIMUM_DGD_FOR_MODERATOR, denominators.DGD);
   daoConfigs.CONFIG_PREPROPOSAL_COLLATERAL = ofOne(daoConfigs.CONFIG_PREPROPOSAL_COLLATERAL, denominators.ETH);
+  daoConfigs.CONFIG_MINIMUM_LOCKED_DGD = ofOne(daoConfigs.CONFIG_MINIMUM_LOCKED_DGD, denominators.DGD);
+  daoConfigs.CONFIG_MAX_FUNDING_FOR_NON_DIGIX = ofOne(daoConfigs.CONFIG_MAX_FUNDING_FOR_NON_DIGIX, denominators.ETH);
+  daoConfigs.CONFIG_MINIMUM_REPUTATION_FOR_MODERATOR = ofOne(daoConfigs.CONFIG_MINIMUM_REPUTATION_FOR_MODERATOR, denominators.REPUTATION_POINT);
 
   return daoConfigs;
 };
