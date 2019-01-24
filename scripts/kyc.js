@@ -1,12 +1,8 @@
 const EthereumTx = require('ethereumjs-tx');
 
 const {
-  encodeHash,
-} = require('@digix/helpers/lib/helpers');
-
-const {
   getPendingKycApprovals,
-  setKycProcessed,
+  setManyKycProcessed,
   setKycSuccess,
 } = require('../dbWrapper/kyc');
 
@@ -28,26 +24,33 @@ const {
   notifyDaoServer,
 } = require('./notifier');
 
-const _getCallData = (entry) => {
+const _getField = (entries, fieldName) => {
+  const fields = [];
+  entries.forEach((entry) => {
+    fields.push(entry[fieldName]);
+  });
+  return fields;
+};
+
+const _getCallData = (entries) => {
   return getContracts()
     .daoIdentity
-    .updateKyc
+    .bulkUpdateKyc
     .request(
-      entry.address,
-      '', // empty doc hash
-      entry.id_expiration,
+      _getField(entries, 'address'), '',
+      _getField(entries, 'id_expiration'),
     )
     .params[0]
     .data;
 };
 
-const _txnObject = (entry, kycAdmin, nonce) => {
+const _txnObject = (entries, kycAdmin, nonce) => {
   return {
     from: kycAdmin,
     to: getContracts().daoIdentity.address,
     gas: 300000,
     gasPrice: 40 * (10 ** 9),
-    data: _getCallData(entry),
+    data: _getCallData(entries),
     nonce,
   };
 };
@@ -69,14 +72,12 @@ const approveKyc = async (entry) => {
 const processPendingKycs = async () => {
   const pendingKycApprovals = await getPendingKycApprovals({ status: 'pending' }, 10);
   if (pendingKycApprovals.length <= 0) return;
-  for (const entry of pendingKycApprovals) {
-    try {
-      const txnId = await approveKyc(entry);
-      await setKycProcessed(entry._id, txnId);
-      await insertPendingTransactions([{ txhash: txnId }]);
-    } catch (e) {
-      console.log('[ERROR] ', e);
-    }
+  try {
+    const txnId = await approveKyc(pendingKycApprovals);
+    await setManyKycProcessed(_getField(pendingKycApprovals, '_id'), txnId);
+    await insertPendingTransactions([{ txhash: txnId }]);
+  } catch (e) {
+    console.log('[ERROR] ', e);
   }
 };
 
