@@ -23,10 +23,10 @@ const getPendingKycApprovals = async (filter, limit = 10) => {
   return pendingApprovals;
 };
 
-const setKycProcessed = async (id, txnId) => {
+const setManyKycProcessed = async (ids, txnId) => {
   await mongoUtil.getDB()
     .collection(collections.KYC_APPROVALS)
-    .updateOne({ _id: id }, {
+    .update({ _id: { $in: ids } }, {
       $set: {
         status: 'processed',
         txhash: txnId,
@@ -56,6 +56,6 @@ const setKycSuccess = async (txhash) => {
 module.exports = {
   addPendingKycApproval,
   getPendingKycApprovals,
-  setKycProcessed,
+  setManyKycProcessed,
   setKycSuccess,
 };
