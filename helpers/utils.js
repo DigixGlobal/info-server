@@ -180,6 +180,7 @@ const deserializeProposal = function (proposal) {
 
 const deserializeAddress = function (address) {
   if (address) {
+    if (address.isKycOfficer === true) return address;
     address.lockedDgdStake = ofOne(address.lockedDgdStake, denominators.DGD);
     address.lockedDgd = ofOne(address.lockedDgd, denominators.DGD);
     address.reputationPoint = ofOne(address.reputationPoint, denominators.REPUTATION_POINT);
