@@ -57,6 +57,13 @@ const initFreshDb = async () => {
   await _db.collection(collections.ADDRESSES).createIndex('address', { unique: true });
   await _db.createCollection(collections.PENDING_TRANSACTIONS);
   await _db.collection(collections.TRANSACTIONS).createIndex('txhash', { unique: true });
+
+  // add KYC admin to the addresses table
+  const kycOfficerJson = JSON.parse(process.env.KYC_ADMIN_KEYSTORE);
+  await _db.collection(collections.ADDRESSES).insertOne({
+    address: '0x'.concat(kycOfficerJson.address),
+    isKycOfficer: true,
+  });
   console.log('Initialized a fresh database');
 };
 
