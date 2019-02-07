@@ -29,7 +29,7 @@ router.post('/approve', async (req, res) => {
     && (retrievedNonce > currentDaoServerNonce)
   ) {
     await setDaoServerNonce(parseInt(retrievedNonce, 10));
-    const approval = req.body.kyc_info;
+    const approval = req.body.payload;
     await addPendingKycApproval(approval);
     await incrementMaxValue(counters.KYC_APPROVALS, 1);
     res.status(200).json({ result: 'done' });
