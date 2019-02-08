@@ -218,16 +218,16 @@ const updateTransactionsDatabase = async (lastProcessedBlock) => {
 const processTransactions = async () => {
   const counter = await getCounter(counters.TRANSACTIONS);
   console.log(`\tProcessing transactions, last_processed = ${counter.last_processed}, max_value = ${counter.max_value}`);
-  if (counter.last_processed === counter.max_value) return;
+  if (counter.last_processed >= counter.max_value) return;
   const transactions = await getTransactions({}, counter.last_processed);
   if (transactions.length <= 0) return;
   for (const transaction of transactions) {
     const res = _formEventObj(transaction);
+    await incrementLastProcessed(counters.TRANSACTIONS, 1);
     try {
       await watchedFunctionsMap[transaction.decodedInputs.name](res, transaction.tx.blockNumber);
-      await incrementLastProcessed(counters.TRANSACTIONS, 1);
     } catch (e) {
-      console.log('\n\nERROR = ', e, '\n\n');
+      console.log('\n\nERROR (processTransactions) = ', e, '\n\n');
     }
   }
   console.log(`\tDone processing transactions until max_value = ${counter.max_value}`);
