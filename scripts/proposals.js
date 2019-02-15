@@ -205,6 +205,7 @@ const refreshProposalFinalizeProposal = async (res, blockNumber) => {
   proposal.draftVoting.claimed = false;
   proposal.draftVoting.passed = false;
   proposal.draftVoting.funded = false;
+  proposal.draftVoting.currentClaimStep = 1;
   proposal.currentVotingRound = -1;
   proposal.votingStage = proposalVotingStages.DRAFT;
 
@@ -277,10 +278,20 @@ const refreshProposalDraftVote = async (res) => {
   console.log('INSERTED refreshProposalDraftVote');
 };
 
+// TO BE TESTED
+const refreshProposalPartialDraftVotingClaim = async (res) => {
+  const proposal = await getProposal(res._proposalId);
+  proposal.draftVoting.currentClaimStep = proposal.draftVoting.currentClaimStep + 1;
+  await updateProposal(res._proposalId, {
+    $set: proposal,
+  });
+  console.log('refresh proposal partial draft voting claim');
+};
+
 // DONE
 const refreshProposalDraftVotingClaim = async (res) => {
   const isClaimed = await getContracts().daoStorage.isDraftClaimed.call(res._proposalId);
-  if (isClaimed === false) return;
+  if (isClaimed === false) await refreshProposalPartialDraftVotingClaim(res);
   const proposal = await getProposal(res._proposalId);
   proposal.draftVoting.claimed = true;
   proposal.draftVoting.passed = await getContracts().daoStorage.readProposalDraftVotingResult.call(res._proposalId);
@@ -314,6 +325,7 @@ const refreshProposalDraftVotingClaim = async (res) => {
       claimed: false,
       passed: false,
       funded: false,
+      currentClaimStep: 1,
     });
   }
 
@@ -404,6 +416,17 @@ const refreshProposalRevealVote = async (res) => {
   console.log('INSERTED refreshProposalRevealVote');
 };
 
+// TO BE TESTED
+const refreshProposalPartialVotingClaim = async (res) => {
+  const proposal = await getProposal(res._proposalId);
+  const index = res._index;
+  proposal.votingRounds[index].currentClaimStep = proposal.votingRounds[index].currentClaimStep + 1;
+  await updateProposal(res._proposalId, {
+    $set: proposal,
+  });
+  console.log('refresh proposal partial voting claim');
+};
+
 // DONE
 // TODO: if this is the final voting round, i.e. `index === milestoneFundings.length`
 // 1. claimableFunding will be the finalReward (this has been taken care of)
@@ -415,7 +438,7 @@ const refreshProposalVotingClaim = async (res) => {
   // if there were no event logs, it is only an intermediate step
   // consider this fn call only if event logs were present
   const isClaimed = await getContracts().daoStorage.isClaimed.call(res._proposalId, res._index);
-  if (isClaimed === false) return;
+  if (isClaimed === false) await refreshProposalPartialVotingClaim(res);
 
   // get the current proposal info
   const proposal = await getProposal(res._proposalId);
