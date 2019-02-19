@@ -14,8 +14,12 @@ const {
   refreshProposalClose,
   refreshProposalsFounderClose,
   refreshProposalPRLAction,
-  // refreshProposalCommitVoteOnSpecial,
-  // refreshProposalRevealVoteOnSpecial,
+  // special
+  refreshProposalSpecialNew,
+  refreshProposalSpecial,
+  refreshProposalCommitVoteOnSpecial,
+  refreshProposalRevealVoteOnSpecial,
+  refreshProposalSpecialVotingClaim,
 } = require('./proposals');
 
 const {
@@ -49,8 +53,12 @@ const watchedFunctionsMap = {
   closeProposal: refreshProposalClose,
   founderCloseProposals: refreshProposalsFounderClose,
   updatePRL: refreshProposalPRLAction,
-  // commitVoteOnSpecialProposal: refreshProposalCommitVoteOnSpecial,
-  // revealVoteOnSpecialProposal: refreshProposalRevealVoteOnSpecial,
+  // special proposal
+  createSpecialProposal: refreshProposalSpecialNew,
+  startSpecialProposalVoting: refreshProposalSpecial,
+  commitVoteOnSpecialProposal: refreshProposalCommitVoteOnSpecial,
+  revealVoteOnSpecialProposal: refreshProposalRevealVoteOnSpecial,
+  claimSpecialProposalVotingResult: refreshProposalSpecialVotingClaim,
 };
 
 module.exports = {
