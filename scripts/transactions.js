@@ -159,18 +159,19 @@ const checkAndNotify = async (transactions, failedTransactions) => {
 const filterAndInsertTxns = async (web3, txns) => {
   const filteredTxnObject = await _formTxnDocument(web3, txns);
   const { filteredTxns, otherWatchedTxns, failedTxns } = filteredTxnObject;
-  if (filteredTxns.length > 0 || otherWatchedTxns.length > 0 || failedTxns.length > 0) {
-    if (filteredTxns.length > 0) {
-      for (const entry of filteredTxns) {
-        try {
-          await insertTransaction(entry);
-          await incrementMaxValue(counters.TRANSACTIONS, 1);
-        } catch (e) {
-          console.log('\n\nERROR = ', e, '\n\n');
-        }
+  if (filteredTxns.length > 0) {
+    for (const entry of filteredTxns) {
+      try {
+        await insertTransaction(entry);
+        await incrementMaxValue(counters.TRANSACTIONS, 1);
+      } catch (e) {
+        console.log('\n\nERROR = ', e, '\n\n');
       }
     }
-    await checkAndNotify(filteredTxns.concat(otherWatchedTxns), failedTxns);
+  }
+
+  if (otherWatchedTxns.length > 0 || failedTxns.length > 0) {
+    await checkAndNotify(otherWatchedTxns, failedTxns);
   }
 };
 
@@ -183,6 +184,8 @@ const fetchBlock = async (blockNumber) => {
   });
 };
 
+// - Update our transaction database, given that our database has been updated to lastProcessedBlock
+// - Save all the relevant transactions from block lastProcessedBlock + 1, to the lastest block (subject to BLOCK_CONFIRMATIONS requirement)
 const updateTransactionsDatabase = async (lastProcessedBlock) => {
   const web3 = getWeb3();
   const startBlock = (lastProcessedBlock === 0) ? parseInt(process.env.START_BLOCK, 10)
@@ -194,7 +197,7 @@ const updateTransactionsDatabase = async (lastProcessedBlock) => {
 
   if (startBlock > endBlock) return;
 
-  const totalSteps = Math.floor((endBlock - startBlock) / blocksInBucket) + 1;
+  const totalSteps = Math.floor((endBlock - startBlock - 1) / blocksInBucket) + 1;
   const blocksMap = new Map();
   for (const step of indexRange(0, totalSteps)) {
     const tempStartBlock = startBlock + (step * blocksInBucket);

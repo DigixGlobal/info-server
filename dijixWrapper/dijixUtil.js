@@ -11,7 +11,7 @@ const init = (ipfsEndpoint, httpEndpoint) => {
     httpEndpoint,
     cache: true,
     concurrency: 10,
-    requestTimeout: 5000,
+    requestTimeout: 30000,
     types: [
       new DijixImage(),
       new DijixPDF(),

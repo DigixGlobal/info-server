@@ -15,6 +15,7 @@ const decryptKycAdminKey = (keystore, password) => {
 };
 
 const initWeb3 = (provider) => {
+  console.log('INFOLOG: initWeb3');
   _web3 = new Web3(new Web3.providers.HttpProvider(provider));
   decryptKycAdminKey(process.env.KYC_ADMIN_KEYSTORE, process.env.KYC_ADMIN_PASSWORD);
 };

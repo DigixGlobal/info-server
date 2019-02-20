@@ -43,10 +43,10 @@ const initIpfs = async () => {
 const initCron = async () => {
   cron.schedule('* * * * *', async () => {
     // schedule a script to run every min
-    console.log('\tIn cron.schedule');
+    console.log('INFOLOG: running the 1min cron job');
 
     // process the pending transactions
-    scripts.processTransactions();
+    // scripts.processTransactions();
 
     // TODO: remove this part
     // don't need to refresh dao every minute
@@ -59,21 +59,23 @@ const initCron = async () => {
 };
 
 const init = async () => {
+  console.log('INFOLOG: init');
   await initDB();
   await initIpfs();
 
   // TODO: no need to do this (ask @vu)
   // middleware to inject db object // not sure if is a good practice
-  app.use((req, res, next) => {
-    req.db = mongoUtil.getDB();
-    next();
-  });
+  // app.use((req, res, next) => {
+  //   req.db = mongoUtil.getDB();
+  //   next();
+  // });
   app.use('/', routes);
 
   const defaultLimiter = rateLimit({
     windowMs: process.env.RATE_LIMIT_WINDOW_MS, // 1 minute
     max: process.env.RATE_LIMIT_PER_WINDOW, // limit each IP to 10 requests per minute
   });
+
   //  apply to all requests
   app.use(defaultLimiter);
 
