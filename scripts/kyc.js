@@ -1,10 +1,6 @@
 const EthereumTx = require('ethereumjs-tx');
 
 const {
-  encodeHash,
-} = require('@digix/helpers/lib/helpers');
-
-const {
   getPendingKycApprovals,
   setKycProcessed,
   setKycSuccess,

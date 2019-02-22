@@ -11,6 +11,13 @@ const readProposalIndices = {
   isDigix: 9,
 };
 
+const readSpecialProposalIndices = {
+  proposalId: 0,
+  proposer: 1,
+  timeCreated: 2,
+  timeVotingStarted: 3,
+};
+
 const daoConfigsIndices = {
   CONFIG_LOCKING_PHASE_DURATION: 0,
   CONFIG_QUARTER_DURATION: 1,
@@ -107,6 +114,7 @@ const collections = {
   TRANSACTIONS: 'allTransactions',
   PENDING_TRANSACTIONS: 'pendingTransactions',
   PROPOSALS: 'proposals',
+  SPECIAL_PROPOSALS: 'specialProposals',
   ADDRESSES: 'addresses',
   DAO: 'daoInfo',
   DAO_CONFIGS: 'daoConfigs',
@@ -150,8 +158,12 @@ const watchedFunctionNames = {
   CLOSE_PROPOSAL: 'closeProposal',
   FOUNDER_CLOSE_PROPOSALS: 'founderCloseProposals',
   PRL_ACTION: 'updatePRL',
-  // COMMIT_VOTE_SPECIAL: 'commitVoteOnSpecialProposal',
-  // REVEAL_VOTE_SPECIAL: 'revealVoteOnSpecialProposal',
+  // special proposal
+  SPECIAL_PROPOSAL_NEW: 'createSpecialProposal',
+  SPECIAL_PROPOSAL_START: 'startSpecialProposalVoting',
+  COMMIT_VOTE_SPECIAL: 'commitVoteOnSpecialProposal',
+  REVEAL_VOTE_SPECIAL: 'revealVoteOnSpecialProposal',
+  SPECIAL_PROPOSAL_CLAIM: 'claimSpecialProposalVotingResult',
 };
 
 const watchedFunctionsList = [
@@ -177,8 +189,12 @@ const watchedFunctionsList = [
   watchedFunctionNames.CLOSE_PROPOSAL,
   watchedFunctionNames.FOUNDER_CLOSE_PROPOSALS,
   watchedFunctionNames.PRL_ACTION,
-  // watchedFunctionNames.COMMIT_VOTE_SPECIAL,
-  // watchedFunctionNames.REVEAL_VOTE_SPECIAL,
+  // special proposal
+  watchedFunctionNames.SPECIAL_PROPOSAL_NEW,
+  watchedFunctionNames.SPECIAL_PROPOSAL_START,
+  watchedFunctionNames.COMMIT_VOTE_SPECIAL,
+  watchedFunctionNames.REVEAL_VOTE_SPECIAL,
+  watchedFunctionNames.SPECIAL_PROPOSAL_CLAIM,
 ];
 
 const daoConfigsKeys = {
@@ -245,6 +261,7 @@ const daoConfigsKeys = {
 
 module.exports = {
   readProposalIndices,
+  readSpecialProposalIndices,
   daoConfigsIndices,
   readProposalVersionIndices,
   daoConfigsKeys,

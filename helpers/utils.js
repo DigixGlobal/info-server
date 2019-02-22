@@ -131,6 +131,16 @@ const serializeProposalVotingRound = function (proposal, index) {
   return proposal;
 };
 
+const serializeSpecialProposal = function (proposal) {
+  if (proposal.voting) {
+    proposal.voting.totalVoterStake = new BigNumber(proposal.voting.totalVoterStake);
+    proposal.voting.totalVoterCount = new BigNumber(proposal.voting.totalVoterCount);
+    proposal.voting.yes = new BigNumber(proposal.voting.yes);
+    proposal.voting.no = new BigNumber(proposal.voting.no);
+  }
+  return proposal;
+};
+
 const serializeAddress = function (address) {
   address.lockedDgdStake = new BigNumber(address.lockedDgdStake);
   address.lockedDgd = new BigNumber(address.lockedDgd);
@@ -176,6 +186,17 @@ const deserializeProposal = function (proposal) {
   }
 
   return proposal;
+};
+
+const deserializeSpecialProposal = function (proposal) {
+  if (proposal.voting) {
+    proposal.voting.totalVoterStake = ofOne(proposal.voting.totalVoterStake, denominators.DGD);
+    proposal.voting.yes = ofOne(proposal.voting.yes, denominators.DGD);
+    proposal.voting.no = ofOne(proposal.voting.no, denominators.DGD);
+    proposal.voting.totalVoterCount = ofOne(proposal.voting.totalVoterCount, 1);
+    proposal.voting.quorum = ofOne(proposal.voting.quorum, denominators.DGD);
+    proposal.voting.quota = ofOne(proposal.voting.quota, 1);
+  }
 };
 
 const deserializeAddress = function (address) {
@@ -241,9 +262,11 @@ module.exports = {
   ofMany,
   ofOne,
   serializeProposal,
+  serializeSpecialProposal,
   serializeProposalVotingRound,
   serializeAddress,
   deserializeProposal,
+  deserializeSpecialProposal,
   deserializeAddress,
   deserializeDaoInfo,
   deserializeDaoConfigs,
