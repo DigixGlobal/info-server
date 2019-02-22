@@ -297,7 +297,10 @@ const refreshProposalPartialDraftVotingClaim = async (res) => {
 // DONE
 const refreshProposalDraftVotingClaim = async (res) => {
   const isClaimed = await getContracts().daoStorage.isDraftClaimed.call(res._proposalId);
-  if (isClaimed === false) await refreshProposalPartialDraftVotingClaim(res);
+  if (isClaimed === false) {
+    await refreshProposalPartialDraftVotingClaim(res);
+    return;
+  }
   const proposal = await getProposal(res._proposalId);
   proposal.draftVoting.claimed = true;
   proposal.draftVoting.passed = await getContracts().daoStorage.readProposalDraftVotingResult.call(res._proposalId);
@@ -444,7 +447,10 @@ const refreshProposalVotingClaim = async (res) => {
   // if there were no event logs, it is only an intermediate step
   // consider this fn call only if event logs were present
   const isClaimed = await getContracts().daoStorage.isClaimed.call(res._proposalId, res._index);
-  if (isClaimed === false) await refreshProposalPartialVotingClaim(res);
+  if (isClaimed === false) {
+    await refreshProposalPartialVotingClaim(res);
+    return;
+  }
 
   // get the current proposal info
   const proposal = await getProposal(res._proposalId);
