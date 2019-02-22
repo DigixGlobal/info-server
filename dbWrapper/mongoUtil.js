@@ -54,6 +54,7 @@ const initFreshDb = async () => {
   await _db.collection(collections.DAO).createIndex('index');
   await _db.collection(collections.DAO_CONFIGS).createIndex('index');
   await _db.collection(collections.PROPOSALS).createIndex('proposalId', { unique: true });
+  await _db.collection(collections.SPECIAL_PROPOSALS).createIndex('proposalId', { unique: true });
   await _db.collection(collections.ADDRESSES).createIndex('address', { unique: true });
   await _db.createCollection(collections.PENDING_TRANSACTIONS);
   await _db.collection(collections.TRANSACTIONS).createIndex('txhash', { unique: true });
