@@ -1,5 +1,6 @@
 const Web3 = require('web3');
 const Wallet = require('ethereumjs-wallet');
+const keystore = require('../keystore/kyc-admin.json');
 
 let _web3;
 let _bufferPK;
@@ -16,7 +17,7 @@ const decryptKycAdminKey = (keystore, password) => {
 
 const initWeb3 = (provider) => {
   _web3 = new Web3(new Web3.providers.HttpProvider(provider));
-  decryptKycAdminKey(process.env.KYC_ADMIN_KEYSTORE, process.env.KYC_ADMIN_PASSWORD);
+  decryptKycAdminKey(keystore, process.env.KYC_ADMIN_PASSWORD);
 };
 
 const getWeb3 = () => {
