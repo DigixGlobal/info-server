@@ -77,13 +77,13 @@ const _updateProposalVoteWeightages = async function (addressDetails, userInfo) 
     if (userVote && userVote.draftVoting) {
       const proposal = serializeProposal(p);
       if (userVote.draftVoting.vote === true) {
-        proposal.draftVoting.yes = proposal.draftVoting.yes.minus(addressDetails.lockedDgdStake).plus(userInfo[3]).toString();
+        proposal.draftVoting.yes = proposal.draftVoting.yes.minus(addressDetails.lockedDgdStake).plus(userInfo[6]).toString();
         proposal.draftVoting.no = proposal.draftVoting.no.toString();
-        proposal.draftVoting.totalVoterStake = proposal.draftVoting.totalVoterStake.minus(addressDetails.lockedDgdStake).plus(userInfo[3]).toString();
+        proposal.draftVoting.totalVoterStake = proposal.draftVoting.totalVoterStake.minus(addressDetails.lockedDgdStake).plus(userInfo[6]).toString();
       } else if (userVote.draftVoting.vote === false) {
-        proposal.draftVoting.no = proposal.draftVoting.no.minus(addressDetails.lockedDgdStake).plus(userInfo[3]).toString();
+        proposal.draftVoting.no = proposal.draftVoting.no.minus(addressDetails.lockedDgdStake).plus(userInfo[6]).toString();
         proposal.draftVoting.yes = proposal.draftVoting.yes.toString();
-        proposal.draftVoting.totalVoterStake = proposal.draftVoting.totalVoterStake.minus(addressDetails.lockedDgdStake).plus(userInfo[3]).toString();
+        proposal.draftVoting.totalVoterStake = proposal.draftVoting.totalVoterStake.minus(addressDetails.lockedDgdStake).plus(userInfo[6]).toString();
       }
       proposal.draftVoting.totalVoterCount = proposal.draftVoting.totalVoterCount.toString();
       proposal.draftVoting.quorum = proposal.draftVoting.quorum.toString();
@@ -104,13 +104,13 @@ const _updateProposalVoteWeightages = async function (addressDetails, userInfo) 
     if (userVote && userVote.votingRound[votingRoundIndex] && userVote.votingRound[votingRoundIndex].reveal === true) {
       const proposal = serializeProposalVotingRound(p, votingRoundIndex);
       if (userVote.votingRound[votingRoundIndex].vote === true) {
-        proposal.votingRounds[votingRoundIndex].yes = proposal.votingRounds[votingRoundIndex].yes.minus(addressDetails.lockedDgdStake).plus(userInfo[3]).toString();
+        proposal.votingRounds[votingRoundIndex].yes = proposal.votingRounds[votingRoundIndex].yes.minus(addressDetails.lockedDgdStake).plus(userInfo[6]).toString();
         proposal.votingRounds[votingRoundIndex].no = proposal.votingRounds[votingRoundIndex].no.toString();
       } else {
-        proposal.votingRounds[votingRoundIndex].no = proposal.votingRounds[votingRoundIndex].no.minus(addressDetails.lockedDgdStake).plus(userInfo[3]).toString();
+        proposal.votingRounds[votingRoundIndex].no = proposal.votingRounds[votingRoundIndex].no.minus(addressDetails.lockedDgdStake).plus(userInfo[6]).toString();
         proposal.votingRounds[votingRoundIndex].yes = proposal.votingRounds[votingRoundIndex].yes.toString();
       }
-      proposal.votingRounds[votingRoundIndex].totalVoterStake = proposal.votingRounds[votingRoundIndex].totalVoterStake.minus(addressDetails.lockedDgdStake).plus(userInfo[3]).toString();
+      proposal.votingRounds[votingRoundIndex].totalVoterStake = proposal.votingRounds[votingRoundIndex].totalVoterStake.minus(addressDetails.lockedDgdStake).plus(userInfo[6]).toString();
       proposal.votingRounds[votingRoundIndex].totalVoterCount = proposal.votingRounds[votingRoundIndex].totalVoterCount.toString();
       await updateProposal(p.proposalId, {
         $set: proposal,

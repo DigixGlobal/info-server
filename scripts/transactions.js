@@ -185,6 +185,10 @@ const fetchBlock = async (blockNumber) => {
 
 const updateTransactionsDatabase = async (lastProcessedBlock) => {
   const web3 = getWeb3();
+
+  // startBlock is included in the blocks to be fetched
+  // endBlock is not included in the blocks to be fetched
+  // effectively [startBlock, endBlock-1]
   const startBlock = (lastProcessedBlock === 0) ? parseInt(process.env.START_BLOCK, 10)
     : (lastProcessedBlock + 1);
   const endBlock = (web3.eth.blockNumber + 1) - parseInt(process.env.BLOCK_CONFIRMATIONS, 10);
@@ -194,7 +198,7 @@ const updateTransactionsDatabase = async (lastProcessedBlock) => {
 
   if (startBlock > endBlock) return;
 
-  const totalSteps = Math.floor((endBlock - startBlock) / blocksInBucket) + 1;
+  const totalSteps = Math.floor((endBlock - startBlock - 1) / blocksInBucket) + 1;
   const blocksMap = new Map();
   for (const step of indexRange(0, totalSteps)) {
     const tempStartBlock = startBlock + (step * blocksInBucket);
@@ -228,6 +232,7 @@ const processTransactions = async () => {
       await watchedFunctionsMap[transaction.decodedInputs.name](res, transaction.tx.blockNumber);
     } catch (e) {
       console.log('\n\nERROR (processTransactions) = ', e, '\n\n');
+      await incrementLastProcessed(counters.TRANSACTIONS, -1);
     }
   }
   console.log(`\tDone processing transactions until max_value = ${counter.max_value}`);

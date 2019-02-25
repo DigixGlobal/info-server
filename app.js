@@ -45,9 +45,6 @@ const initCron = async () => {
     // schedule a script to run every min
     console.log('\tIn cron.schedule');
 
-    // process the pending transactions
-    scripts.processTransactions();
-
     // TODO: remove this part
     // don't need to refresh dao every minute
     // the values stay the same in the same quarter
@@ -62,12 +59,6 @@ const init = async () => {
   await initDB();
   await initIpfs();
 
-  // TODO: no need to do this (ask @vu)
-  // middleware to inject db object // not sure if is a good practice
-  app.use((req, res, next) => {
-    req.db = mongoUtil.getDB();
-    next();
-  });
   app.use('/', routes);
 
   const defaultLimiter = rateLimit({
