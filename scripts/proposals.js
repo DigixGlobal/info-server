@@ -281,7 +281,7 @@ const refreshProposalDraftVote = async (res) => {
 // TO BE TESTED
 const refreshProposalPartialDraftVotingClaim = async (res) => {
   const proposal = await getProposal(res._proposalId);
-  proposal.draftVoting.currentClaimStep = proposal.draftVoting.currentClaimStep + 1;
+  proposal.draftVoting.currentClaimStep += 1;
   await updateProposal(res._proposalId, {
     $set: proposal,
   });
@@ -420,7 +420,7 @@ const refreshProposalRevealVote = async (res) => {
 const refreshProposalPartialVotingClaim = async (res) => {
   const proposal = await getProposal(res._proposalId);
   const index = res._index;
-  proposal.votingRounds[index].currentClaimStep = proposal.votingRounds[index].currentClaimStep + 1;
+  proposal.votingRounds[index].currentClaimStep += 1;
   await updateProposal(res._proposalId, {
     $set: proposal,
   });
