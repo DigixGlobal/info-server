@@ -53,6 +53,8 @@ const _formEventObj = (transaction) => {
     _index: getFromFunctionArg(transaction, '_index'),
     _vote: getFromFunctionArg(transaction, '_vote'),
     _events: [],
+    _milestonesFundings: getFromFunctionArg(transaction, '_milestonesFundings'),
+    _finalReward: getFromFunctionArg(transaction, '_finalReward'),
   };
   for (const eventLog of transaction.decodedEvents) {
     // only consider the event if it from the contract we were watching
