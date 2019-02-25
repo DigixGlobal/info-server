@@ -6,9 +6,8 @@ const {
 } = require('@digix/helpers/lib/helpers');
 
 const {
-  sumArrayBN,
+  sumArrayString,
   getFromEventLog,
-  bNArrayToString,
   serializeAddress,
   serializeProposal,
   serializeSpecialProposal,
@@ -96,10 +95,10 @@ const refreshProposalNew = async (res) => {
     proposal.proposalVersions.push({
       docIpfsHash: proposalVersion[readProposalVersionIndices.docIpfsHash],
       created: proposalVersion[readProposalVersionIndices.created].toNumber(),
-      milestoneFundings: bNArrayToString(proposalVersion[readProposalVersionIndices.milestoneFundings]),
-      finalReward: proposalVersion[readProposalVersionIndices.finalReward].toString(),
+      milestoneFundings: res._milestonesFundings,
+      finalReward: res._finalReward.toString(),
       moreDocs: [],
-      totalFunding: proposalVersion[readProposalVersionIndices.finalReward].plus(sumArrayBN(proposalVersion[readProposalVersionIndices.milestoneFundings])).toString(),
+      totalFunding: (new BigNumber(res._finalReward)).plus(sumArrayString(res._milestonesFundings)).toString(),
       dijixObject: ipfsDoc.data ? {
         ...ipfsDoc.data.attestation,
         images: ipfsDoc.data.proofs,
@@ -152,10 +151,10 @@ const refreshProposalDetails = async (res) => {
     proposal.proposalVersions.push({
       docIpfsHash: proposalVersion[readProposalVersionIndices.docIpfsHash],
       created: proposalVersion[readProposalVersionIndices.created].toNumber(),
-      milestoneFundings: bNArrayToString(proposalVersion[readProposalVersionIndices.milestoneFundings]),
-      finalReward: proposalVersion[readProposalVersionIndices.finalReward].toString(),
+      milestoneFundings: res._milestonesFundings,
+      finalReward: res._finalReward.toString(),
       moreDocs: proposalDocs,
-      totalFunding: proposalVersion[readProposalVersionIndices.finalReward].plus(sumArrayBN(proposalVersion[readProposalVersionIndices.milestoneFundings])).toString(),
+      totalFunding: res._finalReward.plus(sumArrayString(res._milestonesFundings)).toString(),
       dijixObject: ipfsDoc.data ? {
         ...ipfsDoc.data.attestation,
         images: ipfsDoc.data.proofs,
@@ -184,14 +183,16 @@ const refreshProposalEndorseProposal = async (res) => {
 };
 
 // DONE
-const refreshProposalFinalizeProposal = async (res, blockNumber) => {
+const refreshProposalFinalizeProposal = async (res) => {
   // read current proposal from DB
   const proposal = await getProposal(res._proposalId);
   const proposalDetails = await getContracts().daoStorage.readProposal.call(res._proposalId);
   proposal.finalVersionIpfsDoc = proposalDetails[readProposalIndices.finalVersionIpfsDoc];
-  const proposalFinalVersion = await getContracts().daoStorage.readProposalVersion.call(res._proposalId, proposal.finalVersionIpfsDoc, {}, blockNumber);
-  const proposalFundings = proposalFinalVersion[readProposalVersionIndices.milestoneFundings];
-  const proposalFinalReward = proposalFinalVersion[readProposalVersionIndices.finalReward];
+
+  // fetch the proposalFundings and proposalFinalReward from what is already there in MongoDB
+  const finalIndex = proposal.proposalVersions.length - 1;
+  const proposalFundings = proposal.proposalVersions[finalIndex].milestoneFundings;
+  const proposalFinalReward = proposal.proposalVersions[finalIndex].finalReward;
 
   // set the original funding values
   proposal.changedFundings = getOriginalFundings(proposalFundings, proposalFinalReward);
@@ -552,13 +553,8 @@ const refreshProposalFinishMilestone = async (res) => {
 // DONE
 const refreshProposalChangeFundings = async (res) => {
   const proposal = await getProposal(res._proposalId);
-  const proposalDetails = await getContracts().daoStorage.readProposal(res._proposalId);
-  const finalVersion = proposalDetails[readProposalIndices.finalVersionIpfsDoc];
-  const proposalFinalVersion = await getContracts().daoStorage.readProposalVersion(res._proposalId, finalVersion);
-  const finalFundings = proposalFinalVersion[readProposalVersionIndices.milestoneFundings];
-  const finalReward = proposalFinalVersion[readProposalVersionIndices.finalReward];
 
-  proposal.changedFundings = getUpdatedFundings(proposal.changedFundings, finalFundings, finalReward);
+  proposal.changedFundings = getUpdatedFundings(proposal.changedFundings, res._milestonesFundings, res._finalReward.toString());
 
   await updateProposal(res._proposalId, {
     $set: {
