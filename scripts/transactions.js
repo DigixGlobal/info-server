@@ -171,9 +171,9 @@ const filterAndInsertTxns = async (web3, txns) => {
     }
   }
 
-  if (otherWatchedTxns.length > 0 || failedTxns.length > 0) {
+  if (filteredTxns.length > 0 || otherWatchedTxns.length > 0 || failedTxns.length > 0) {
     console.log('INFOLOG: calling checkAndNotify');
-    await checkAndNotify(otherWatchedTxns, failedTxns);
+    await checkAndNotify(filteredTxns.concat(otherWatchedTxns), failedTxns);
   }
 };
 
