@@ -19,6 +19,7 @@ const {
 
 const {
   proposalVotingStages,
+  daoServerEndpoints,
 } = require('../helpers/constants');
 
 const {
@@ -146,7 +147,7 @@ const refreshAddress = async (res) => {
     // new address, tell dao-server about new address
     notifyDaoServer({
       method: 'POST',
-      path: '/user',
+      path: daoServerEndpoints.NEW_USER,
       body: {
         payload: {
           address: user,

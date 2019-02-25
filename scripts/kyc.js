@@ -16,6 +16,10 @@ const {
 } = require('../helpers/contracts');
 
 const {
+  daoServerEndpoints,
+} = require('../helpers/constants');
+
+const {
   signTxn,
   getWeb3,
 } = require('../web3Wrapper/web3Util');
@@ -84,7 +88,7 @@ const updateKycApprovals = async (txhash) => {
   if (approvedKycs.length > 0) {
     notifyDaoServer({
       method: 'POST',
-      path: '/admin/kyc_approval_update',
+      path: daoServerEndpoints.KYC_UPDATE,
       body: {
         payload: {
           approved: approvedKycs,
