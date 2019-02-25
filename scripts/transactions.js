@@ -159,6 +159,7 @@ const checkAndNotify = async (transactions, failedTransactions) => {
 const filterAndInsertTxns = async (web3, txns) => {
   const filteredTxnObject = await _formTxnDocument(web3, txns);
   const { filteredTxns, otherWatchedTxns, failedTxns } = filteredTxnObject;
+  console.log(`INFOLOG: got ${filteredTxns.length} filteredTxns, ${otherWatchedTxns.length} otherWatchedTxns, ${failedTxns.length} failedTxns,`);
   if (filteredTxns.length > 0) {
     for (const entry of filteredTxns) {
       try {
@@ -171,6 +172,7 @@ const filterAndInsertTxns = async (web3, txns) => {
   }
 
   if (otherWatchedTxns.length > 0 || failedTxns.length > 0) {
+    console.log('INFOLOG: calling checkAndNotify');
     await checkAndNotify(otherWatchedTxns, failedTxns);
   }
 };
