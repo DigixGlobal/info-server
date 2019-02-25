@@ -151,6 +151,8 @@ const serializeAddress = function (address) {
 };
 
 const deserializeProposal = function (proposal) {
+  if (proposal === null) return proposal;
+
   // resolve proposal version
   for (const version of proposal.proposalVersions) {
     version.milestoneFundings = ofMany(version.milestoneFundings, denominators.ETH);
@@ -189,6 +191,8 @@ const deserializeProposal = function (proposal) {
 };
 
 const deserializeSpecialProposal = function (proposal) {
+  if (proposal === null) return proposal;
+
   if (proposal.voting) {
     proposal.voting.totalVoterStake = ofOne(proposal.voting.totalVoterStake, denominators.DGD);
     proposal.voting.yes = ofOne(proposal.voting.yes, denominators.DGD);
