@@ -618,6 +618,7 @@ const refreshProposalSpecialNew = async (res) => {
   const readProposal = await getContracts().daoSpecialStorage.readProposal.call(_proposalId);
   const readProposalConfigs = await getContracts().daoSpecialStorage.readConfigs.call(_proposalId);
   proposal.proposalId = readProposal[readSpecialProposalIndices.proposalId];
+  proposal.title = 'Configuration Change';
   proposal.proposer = readProposal[readSpecialProposalIndices.proposer];
   proposal.timeCreated = readProposal[readSpecialProposalIndices.timeCreated].toNumber();
   proposal.isActive = false;
