@@ -201,6 +201,8 @@ const deserializeSpecialProposal = function (proposal) {
     proposal.voting.quorum = ofOne(proposal.voting.quorum, denominators.DGD);
     proposal.voting.quota = ofOne(proposal.voting.quota, 1);
   }
+
+  return proposal;
 };
 
 const deserializeAddress = function (address) {
