@@ -31,6 +31,14 @@ const sumArray = function (array) {
   return sum;
 };
 
+const sumArrayString = function (array) {
+  let sum = new BigNumber(0);
+  for (const item of array) {
+    sum = sum.plus(new BigNumber(item));
+  }
+  return sum;
+};
+
 const bNArrayToDecimal = function (array) {
   return array.map(a => a.toNumber());
 };
@@ -241,19 +249,19 @@ const getOriginalFundings = function (fundings, finalReward) {
   };
   fundings.forEach(function (funding) {
     originalFundings.milestones.push({
-      original: ofOne(funding.toString(), denominators.ETH),
+      original: ofOne(funding, denominators.ETH),
     });
   });
-  originalFundings.finalReward.original = ofOne(finalReward.toString(), denominators.ETH);
+  originalFundings.finalReward.original = ofOne(finalReward, denominators.ETH);
 
   return originalFundings;
 };
 
 const getUpdatedFundings = function (changedFundings, finalFundings, finalReward) {
   finalFundings.forEach(function (funding, index) {
-    changedFundings.milestones[index].updated = ofOne(funding.toString(), denominators.ETH);
+    changedFundings.milestones[index].updated = ofOne(funding, denominators.ETH);
   });
-  changedFundings.finalReward.updated = ofOne(finalReward.toString(), denominators.ETH);
+  changedFundings.finalReward.updated = ofOne(finalReward, denominators.ETH);
 
   return changedFundings;
 };
@@ -261,6 +269,7 @@ const getUpdatedFundings = function (changedFundings, finalFundings, finalReward
 module.exports = {
   sumArray,
   sumArrayBN,
+  sumArrayString,
   getFromFunctionArg,
   getFromEventLog,
   bNArrayToDecimal,
