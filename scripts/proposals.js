@@ -154,7 +154,7 @@ const refreshProposalDetails = async (res) => {
       milestoneFundings: res._milestonesFundings,
       finalReward: res._finalReward.toString(),
       moreDocs: proposalDocs,
-      totalFunding: res._finalReward.plus(sumArrayString(res._milestonesFundings)).toString(),
+      totalFunding: (new BigNumber(res._finalReward)).plus(sumArrayString(res._milestonesFundings)).toString(),
       dijixObject: ipfsDoc.data ? {
         ...ipfsDoc.data.attestation,
         images: ipfsDoc.data.proofs,
