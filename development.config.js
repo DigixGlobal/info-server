@@ -45,6 +45,7 @@ module.exports = {
         version: 3,
       },
       KYC_ADMIN_PASSWORD: 'digixdao',
+      FORUM_ADMIN_ADDRESS: '0x52a9d38687a0c2d5e1645f91733ffab3bbd29b06',
     },
   }],
 };
