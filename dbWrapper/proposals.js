@@ -10,9 +10,21 @@ const insertProposal = async (proposal) => {
     .insertOne(proposal);
 };
 
+const insertSpecialProposal = async (proposal) => {
+  await mongoUtil.getDB()
+    .collection(collections.SPECIAL_PROPOSALS)
+    .insertOne(proposal);
+};
+
 const updateProposal = async (proposalId, update, moreOptions = {}) => {
   await mongoUtil.getDB()
     .collection(collections.PROPOSALS)
+    .updateOne({ proposalId }, update, moreOptions);
+};
+
+const updateSpecialProposal = async (proposalId, update, moreOptions = {}) => {
+  await mongoUtil.getDB()
+    .collection(collections.SPECIAL_PROPOSALS)
     .updateOne({ proposalId }, update, moreOptions);
 };
 
@@ -31,11 +43,31 @@ const getProposal = async (proposalId) => {
   return proposal;
 };
 
+const getSpecialProposal = async (proposalId) => {
+  const proposal = await mongoUtil.getDB()
+    .collection(collections.SPECIAL_PROPOSALS)
+    .findOne({ proposalId });
+  if (proposal && proposal._id) delete proposal._id;
+  return proposal;
+};
+
 const getProposals = async (filter) => {
   const proposals = [];
   const cursor = mongoUtil.getDB()
     .collection(collections.PROPOSALS)
     .find(filter);
+  for (let proposal = await cursor.next(); proposal != null; proposal = await cursor.next()) {
+    if (proposal && proposal._id) delete proposal._id;
+    proposals.push(proposal);
+  }
+  return proposals;
+};
+
+const getSpecialProposals = async () => {
+  const proposals = [];
+  const cursor = mongoUtil.getDB()
+    .collection(collections.SPECIAL_PROPOSALS)
+    .find({ isActive: true });
   for (let proposal = await cursor.next(); proposal != null; proposal = await cursor.next()) {
     if (proposal && proposal._id) delete proposal._id;
     proposals.push(proposal);
@@ -53,9 +85,13 @@ const getProposalsCount = async (filter) => {
 
 module.exports = {
   insertProposal,
+  insertSpecialProposal,
   updateProposal,
+  updateSpecialProposal,
   getProposalsCursor,
   getProposal,
+  getSpecialProposal,
   getProposals,
+  getSpecialProposals,
   getProposalsCount,
 };

@@ -2,13 +2,20 @@ const express = require('express');
 
 const {
   getProposalsCursor,
+  getSpecialProposal,
   getProposal,
   getProposals,
+  getSpecialProposals,
 } = require('../dbWrapper/proposals');
 
 const {
   deserializeProposal,
+  deserializeSpecialProposal,
 } = require('../helpers/utils');
+
+const {
+  proposalStages,
+} = require('../helpers/constants');
 
 const router = express.Router();
 
@@ -30,13 +37,18 @@ router.get('/count', async (req, res) => {
 
 router.get('/details/:id', async (req, res) => {
   const details = deserializeProposal(await getProposal(req.params.id));
-  return res.json({ result: details || 'notFound' });
+  const specialProposalDetails = deserializeSpecialProposal(await getSpecialProposal(req.params.id));
+  return res.json({ result: details || specialProposalDetails || 'notFound' });
 });
 
 router.get('/:stage', async (req, res) => {
   const filter = (req.params.stage === 'all') ? {} : { stage: req.params.stage };
   const proposals = await getProposals(filter);
-  return res.json({ result: proposals });
+  let specialProposals = [];
+  if (req.params.stage === proposalStages.PROPOSAL) {
+    specialProposals = await getSpecialProposals();
+  }
+  return res.json({ result: specialProposals.concat(proposals) });
 });
 
 module.exports = router;
