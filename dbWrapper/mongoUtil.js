@@ -62,10 +62,11 @@ const initFreshDb = async () => {
 
   // add KYC admin and forum admin to the addresses table
   // make sure they return valid json, so that they can be authenticated from DAO server
+  const kycOfficerJson = JSON.parse(process.env.KYC_ADMIN_KEYSTORE);
   const forumAdminAddress = process.env.FORUM_ADMIN_ADDRESS;
   await _db.collection(collections.ADDRESSES).insertMany([
     {
-      address: '0x'.concat(keystore.address),
+      address: '0x'.concat(kycOfficerJson.address),
       isKycOfficer: true,
     },
     {
