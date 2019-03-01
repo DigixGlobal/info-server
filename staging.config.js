@@ -14,6 +14,8 @@ module.exports = {
       BLOCK_CONFIRMATIONS: 2,
       START_BLOCK: 0,
       FORCE_REFRESH_DB: 'false',
+      RESYNC: 'false',
+      REPROCESS_ONLY: 'false',
       SYNC_REPORT_FREQUENCY: 10,
       WEB3_HTTP_PROVIDER: 'https://kovan.infura.io',
       IPFS_ENDPOINT: 'https://ipfs-api.digix.global',
