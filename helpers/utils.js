@@ -31,6 +31,14 @@ const sumArray = function (array) {
   return sum;
 };
 
+const sumArrayString = function (array) {
+  let sum = new BigNumber(0);
+  for (const item of array) {
+    sum = sum.plus(new BigNumber(item));
+  }
+  return sum;
+};
+
 const bNArrayToDecimal = function (array) {
   return array.map(a => a.toNumber());
 };
@@ -131,6 +139,16 @@ const serializeProposalVotingRound = function (proposal, index) {
   return proposal;
 };
 
+const serializeSpecialProposal = function (proposal) {
+  if (proposal.voting) {
+    proposal.voting.totalVoterStake = new BigNumber(proposal.voting.totalVoterStake);
+    proposal.voting.totalVoterCount = new BigNumber(proposal.voting.totalVoterCount);
+    proposal.voting.yes = new BigNumber(proposal.voting.yes);
+    proposal.voting.no = new BigNumber(proposal.voting.no);
+  }
+  return proposal;
+};
+
 const serializeAddress = function (address) {
   address.lockedDgdStake = new BigNumber(address.lockedDgdStake);
   address.lockedDgd = new BigNumber(address.lockedDgd);
@@ -141,6 +159,8 @@ const serializeAddress = function (address) {
 };
 
 const deserializeProposal = function (proposal) {
+  if (proposal === null) return proposal;
+
   // resolve proposal version
   for (const version of proposal.proposalVersions) {
     version.milestoneFundings = ofMany(version.milestoneFundings, denominators.ETH);
@@ -173,6 +193,21 @@ const deserializeProposal = function (proposal) {
   // resolve funding
   if (proposal.claimableFunding !== null) {
     proposal.claimableFunding = ofOne(proposal.claimableFunding, denominators.ETH);
+  }
+
+  return proposal;
+};
+
+const deserializeSpecialProposal = function (proposal) {
+  if (proposal === null) return proposal;
+
+  if (proposal.voting) {
+    proposal.voting.totalVoterStake = ofOne(proposal.voting.totalVoterStake, denominators.DGD);
+    proposal.voting.yes = ofOne(proposal.voting.yes, denominators.DGD);
+    proposal.voting.no = ofOne(proposal.voting.no, denominators.DGD);
+    proposal.voting.totalVoterCount = ofOne(proposal.voting.totalVoterCount, 1);
+    proposal.voting.quorum = ofOne(proposal.voting.quorum, denominators.DGD);
+    proposal.voting.quota = ofOne(proposal.voting.quota, 1);
   }
 
   return proposal;
@@ -214,19 +249,19 @@ const getOriginalFundings = function (fundings, finalReward) {
   };
   fundings.forEach(function (funding) {
     originalFundings.milestones.push({
-      original: ofOne(funding.toString(), denominators.ETH),
+      original: ofOne(funding, denominators.ETH),
     });
   });
-  originalFundings.finalReward.original = ofOne(finalReward.toString(), denominators.ETH);
+  originalFundings.finalReward.original = ofOne(finalReward, denominators.ETH);
 
   return originalFundings;
 };
 
 const getUpdatedFundings = function (changedFundings, finalFundings, finalReward) {
   finalFundings.forEach(function (funding, index) {
-    changedFundings.milestones[index].updated = ofOne(funding.toString(), denominators.ETH);
+    changedFundings.milestones[index].updated = ofOne(funding, denominators.ETH);
   });
-  changedFundings.finalReward.updated = ofOne(finalReward.toString(), denominators.ETH);
+  changedFundings.finalReward.updated = ofOne(finalReward, denominators.ETH);
 
   return changedFundings;
 };
@@ -234,6 +269,7 @@ const getUpdatedFundings = function (changedFundings, finalFundings, finalReward
 module.exports = {
   sumArray,
   sumArrayBN,
+  sumArrayString,
   getFromFunctionArg,
   getFromEventLog,
   bNArrayToDecimal,
@@ -241,9 +277,11 @@ module.exports = {
   ofMany,
   ofOne,
   serializeProposal,
+  serializeSpecialProposal,
   serializeProposalVotingRound,
   serializeAddress,
   deserializeProposal,
+  deserializeSpecialProposal,
   deserializeAddress,
   deserializeDaoInfo,
   deserializeDaoConfigs,

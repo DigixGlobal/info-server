@@ -52,7 +52,10 @@ const _formEventObj = (transaction) => {
     _proposalId: getFromFunctionArg(transaction, '_proposalId'),
     _index: getFromFunctionArg(transaction, '_index'),
     _vote: getFromFunctionArg(transaction, '_vote'),
+    _doc: getFromFunctionArg(transaction, '_doc'),
     _events: [],
+    _milestonesFundings: getFromFunctionArg(transaction, '_milestonesFundings'),
+    _finalReward: getFromFunctionArg(transaction, '_finalReward'),
   };
   for (const eventLog of transaction.decodedEvents) {
     // only consider the event if it from the contract we were watching
@@ -190,6 +193,10 @@ const fetchBlock = async (blockNumber) => {
 // - Save all the relevant transactions from block lastProcessedBlock + 1, to the lastest block (subject to BLOCK_CONFIRMATIONS requirement)
 const updateTransactionsDatabase = async (lastProcessedBlock) => {
   const web3 = getWeb3();
+
+  // startBlock is included in the blocks to be fetched
+  // endBlock is not included in the blocks to be fetched
+  // effectively [startBlock, endBlock-1]
   const startBlock = (lastProcessedBlock === 0) ? parseInt(process.env.START_BLOCK, 10)
     : (lastProcessedBlock + 1);
   const endBlock = (web3.eth.blockNumber + 1) - parseInt(process.env.BLOCK_CONFIRMATIONS, 10);
@@ -233,6 +240,7 @@ const processTransactions = async () => {
       await watchedFunctionsMap[transaction.decodedInputs.name](res, transaction.tx.blockNumber);
     } catch (e) {
       console.log('\n\nERROR (processTransactions) = ', e, '\n\n');
+      await incrementLastProcessed(counters.TRANSACTIONS, -1);
     }
   }
   console.log(`\tDone processing transactions until max_value = ${counter.max_value}`);

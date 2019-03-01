@@ -32,6 +32,8 @@ const initDao = async () => {
       totalLockedDgds: totalLockedDgds.toNumber(),
       totalModeratorLockedDgds: totalModeratorLockedDgds.toNumber(),
       isGlobalRewardsSet: daoInfo[5],
+      nModerators: daoInfo[6].toNumber(),
+      nParticipants: daoInfo[7].toNumber(),
     },
   }, { upsert: true });
 };
@@ -61,6 +63,8 @@ const refreshDao = async () => {
       startOfMainphase: daoInfo[2].toNumber(),
       startOfNextQuarter: daoInfo[3].toNumber(),
       isGlobalRewardsSet: daoInfo[5],
+      nModerators: daoInfo[6].toNumber(),
+      nParticipants: daoInfo[7].toNumber(),
     },
   });
 };
