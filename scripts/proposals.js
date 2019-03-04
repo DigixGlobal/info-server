@@ -719,7 +719,6 @@ const refreshProposalRevealVoteOnSpecial = async (res) => {
   if (
     addressDetails.votes[res._proposalId]
     && addressDetails.votes[res._proposalId].votingRound
-    && addressDetails.votes[res._proposalId].votingRound.length > 0
     && addressDetails.votes[res._proposalId].votingRound[0].reveal === false
   ) {
     // revealing vote
