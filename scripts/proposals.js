@@ -650,19 +650,23 @@ const refreshProposalSpecial = async (res) => {
   const totalPhase = (await getContracts().daoConfigsStorage.uintConfigs.call(daoConfigsKeys.CONFIG_SPECIAL_PROPOSAL_PHASE_TOTAL)).toNumber();
   const quotaNumerator = await getContracts().daoConfigsStorage.uintConfigs.call(daoConfigsKeys.CONFIG_SPECIAL_QUOTA_NUMERATOR);
   const quotaDenominator = await getContracts().daoConfigsStorage.uintConfigs.call(daoConfigsKeys.CONFIG_SPECIAL_QUOTA_DENOMINATOR);
-  proposal.voting = {};
-  proposal.voting.startTime = (await getContracts().daoSpecialStorage.readVotingTime.call(res._proposalId)).toNumber();
-  proposal.voting.commitDeadline = proposal.voting.startTime + commitPhase;
-  proposal.voting.revealDeadline = proposal.voting.startTime + totalPhase;
-  proposal.voting.totalVoterStake = '0';
-  proposal.voting.totalVoterCount = '0';
-  proposal.voting.yes = '0';
-  proposal.voting.no = '0';
-  proposal.voting.quorum = (await getContracts().daoCalculatorService.minimumVotingQuorumForSpecial.call()).toString();
-  proposal.voting.quota = quotaNumerator.div(quotaDenominator).toString();
-  proposal.voting.claimed = false;
-  proposal.voting.passed = false;
-  proposal.voting.currentClaimStep = 1;
+  proposal.votingRounds = [];
+  const votingStruct = {};
+  votingStruct.startTime = (await getContracts().daoSpecialStorage.readVotingTime.call(res._proposalId)).toNumber();
+  votingStruct.commitDeadline = votingStruct.startTime + commitPhase;
+  votingStruct.revealDeadline = votingStruct.startTime + totalPhase;
+  votingStruct.totalCommitCount = '0';
+  votingStruct.totalVoterStake = '0';
+  votingStruct.totalVoterCount = '0';
+  votingStruct.yes = '0';
+  votingStruct.no = '0';
+  votingStruct.quorum = (await getContracts().daoCalculatorService.minimumVotingQuorumForSpecial.call()).toString();
+  votingStruct.quota = quotaNumerator.div(quotaDenominator).toString();
+  votingStruct.claimed = false;
+  votingStruct.passed = false;
+  votingStruct.currentClaimStep = 1;
+  proposal.votingRounds.push(votingStruct);
+
   proposal.isActive = true;
 
   await updateSpecialProposal(res._proposalId, {
@@ -684,13 +688,13 @@ const refreshProposalCommitVoteOnSpecial = async (res) => {
 
   // increment totalCommitCount if this user is committing
   // vote for the first time for this voting round
-  if (votes[res._proposalId] === undefined) {
+  if (votes[res._proposalId].votingRound[0] === undefined) {
     // first time committing in this round
-    proposal.voting.totalCommitCount = (new BigNumber(proposal.voting.totalCommitCount)).plus(1).toString();
+    proposal.votingRounds[0].totalCommitCount = (new BigNumber(proposal.votingRounds[0].totalCommitCount)).plus(1).toString();
   }
 
   // set commit to true
-  votes[res._proposalId] = {
+  votes[res._proposalId].votingRound[0] = {
     commit: true,
     reveal: false,
   };
@@ -712,21 +716,27 @@ const refreshProposalRevealVoteOnSpecial = async (res) => {
   const vote = res._vote;
 
   // vote can be revealed only once, so this condition has to be satisied if revealing
-  if (addressDetails.votes[res._proposalId].reveal === false) {
+  if (
+    addressDetails.votes[res._proposalId]
+    && addressDetails.votes[res._proposalId].votingRound
+    && addressDetails.votes[res._proposalId].votingRound.length > 0
+    && addressDetails.votes[res._proposalId].votingRound[0].reveal === false
+  ) {
     // revealing vote
-    proposal.voting.totalVoterCount = proposal.voting.totalVoterCount.plus(1);
-    proposal.voting.totalVoterStake = proposal.voting.totalVoterStake.plus(addressDetails.lockedDgdStake);
-    let currentYes = proposal.voting.yes;
-    let currentNo = proposal.voting.no;
+    proposal.votingRounds[0].totalVoterCount = proposal.votingRounds[0].totalVoterCount.plus(1);
+    proposal.votingRounds[0].totalVoterStake = proposal.votingRounds[0].totalVoterStake.plus(addressDetails.lockedDgdStake);
+    let currentYes = proposal.votingRounds[0].yes;
+    let currentNo = proposal.votingRounds[0].no;
     if (vote === true) {
       currentYes = currentYes.plus(addressDetails.lockedDgdStake);
     } else {
       currentNo = currentNo.plus(addressDetails.lockedDgdStake);
     }
-    proposal.voting.yes = currentYes.toString();
-    proposal.voting.no = currentNo.toString();
-    proposal.voting.totalVoterCount = proposal.voting.totalVoterCount.toString();
-    proposal.voting.totalVoterStake = proposal.voting.totalVoterStake.toString();
+    proposal.votingRounds[0].yes = currentYes.toString();
+    proposal.votingRounds[0].no = currentNo.toString();
+    proposal.votingRounds[0].totalVoterCount = proposal.votingRounds[0].totalVoterCount.toString();
+    proposal.votingRounds[0].totalVoterStake = proposal.votingRounds[0].totalVoterStake.toString();
+    proposal.votingRounds[0].totalCommitCount = proposal.votingRounds[0].totalCommitCount.toString();
 
     await updateSpecialProposal(res._proposalId, {
       $set: proposal,
@@ -736,8 +746,8 @@ const refreshProposalRevealVoteOnSpecial = async (res) => {
   // update the vote info for this address
   const userInfo = await getContracts().daoInformation.readUserInfo.call(res._from);
   const { votes } = addressDetails;
-  votes[res._proposalId].reveal = true;
-  votes[res._proposalId].vote = vote;
+  votes[res._proposalId].votingRound[0].reveal = true;
+  votes[res._proposalId].votingRound[0].vote = vote;
 
   await updateAddress(res._from, {
     $set: {
@@ -752,7 +762,7 @@ const refreshProposalRevealVoteOnSpecial = async (res) => {
 // TO BE TESTED
 const refreshProposalSpecialPartialVotingClaim = async (res) => {
   const proposal = await getSpecialProposal(res._proposalId);
-  proposal.voting.currentClaimStep++;
+  proposal.votingRounds[0].currentClaimStep += 1;
   await updateSpecialProposal(res._proposalId, {
     $set: proposal,
   });
@@ -767,8 +777,8 @@ const refreshProposalSpecialVotingClaim = async (res) => {
   // get the current proposal info
   const proposal = await getSpecialProposal(res._proposalId);
   const result = await getContracts().daoSpecialStorage.readVotingResult.call(res._proposalId);
-  proposal.voting.claimed = true;
-  proposal.voting.passed = result;
+  proposal.votingRounds[0].claimed = true;
+  proposal.votingRounds[0].passed = result;
 
   // update proposal
   await updateSpecialProposal(res._proposalId, {
