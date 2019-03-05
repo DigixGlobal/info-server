@@ -131,8 +131,8 @@ const denominators = {
   DGD: 1e9,
   DGX: 1e9,
   ETH: 1e18,
-  REPUTATION_POINT: 1,
-  QUARTER_POINT: 1,
+  REPUTATION_POINT: 1e9,
+  QUARTER_POINT: 1e9,
 };
 
 const watchedFunctionNames = {
