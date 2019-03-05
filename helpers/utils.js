@@ -140,20 +140,28 @@ const serializeProposalVotingRound = function (proposal, index) {
 };
 
 const serializeSpecialProposal = function (proposal) {
-  if (proposal.voting) {
-    proposal.voting.totalVoterStake = new BigNumber(proposal.voting.totalVoterStake);
-    proposal.voting.totalVoterCount = new BigNumber(proposal.voting.totalVoterCount);
-    proposal.voting.yes = new BigNumber(proposal.voting.yes);
-    proposal.voting.no = new BigNumber(proposal.voting.no);
+  if (proposal.votingRounds && proposal.votingRounds.length > 0) {
+    proposal.votingRounds[0].totalCommitCount = new BigNumber(proposal.votingRounds[0].totalCommitCount);
+    proposal.votingRounds[0].totalVoterStake = new BigNumber(proposal.votingRounds[0].totalVoterStake);
+    proposal.votingRounds[0].totalVoterCount = new BigNumber(proposal.votingRounds[0].totalVoterCount);
+    proposal.votingRounds[0].yes = new BigNumber(proposal.votingRounds[0].yes);
+    proposal.votingRounds[0].no = new BigNumber(proposal.votingRounds[0].no);
   }
   return proposal;
 };
 
 const serializeAddress = function (address) {
-  address.lockedDgdStake = new BigNumber(address.lockedDgdStake);
-  address.lockedDgd = new BigNumber(address.lockedDgd);
-  address.reputationPoint = new BigNumber(address.reputationPoint);
-  address.quarterPoint = new BigNumber(address.quarterPoint);
+  if (address) {
+    if (
+      address.isKycOfficer === true
+      || address.isForumAdmin === true
+    ) return address;
+
+    address.lockedDgdStake = new BigNumber(address.lockedDgdStake);
+    address.lockedDgd = new BigNumber(address.lockedDgd);
+    address.reputationPoint = new BigNumber(address.reputationPoint);
+    address.quarterPoint = new BigNumber(address.quarterPoint);
+  }
 
   return address;
 };
@@ -201,13 +209,14 @@ const deserializeProposal = function (proposal) {
 const deserializeSpecialProposal = function (proposal) {
   if (proposal === null) return proposal;
 
-  if (proposal.voting) {
-    proposal.voting.totalVoterStake = ofOne(proposal.voting.totalVoterStake, denominators.DGD);
-    proposal.voting.yes = ofOne(proposal.voting.yes, denominators.DGD);
-    proposal.voting.no = ofOne(proposal.voting.no, denominators.DGD);
-    proposal.voting.totalVoterCount = ofOne(proposal.voting.totalVoterCount, 1);
-    proposal.voting.quorum = ofOne(proposal.voting.quorum, denominators.DGD);
-    proposal.voting.quota = ofOne(proposal.voting.quota, 1);
+  if (proposal.votingRounds && proposal.votingRounds.length > 0) {
+    proposal.votingRounds[0].totalVoterStake = ofOne(proposal.votingRounds[0].totalVoterStake, denominators.DGD);
+    proposal.votingRounds[0].yes = ofOne(proposal.votingRounds[0].yes, denominators.DGD);
+    proposal.votingRounds[0].no = ofOne(proposal.votingRounds[0].no, denominators.DGD);
+    proposal.votingRounds[0].totalVoterCount = ofOne(proposal.votingRounds[0].totalVoterCount, 1);
+    proposal.votingRounds[0].totalCommitCount = ofOne(proposal.votingRounds[0].totalCommitCount, 1);
+    proposal.votingRounds[0].quorum = ofOne(proposal.votingRounds[0].quorum, denominators.DGD);
+    proposal.votingRounds[0].quota = ofOne(proposal.votingRounds[0].quota, 1);
   }
 
   return proposal;
@@ -215,7 +224,10 @@ const deserializeSpecialProposal = function (proposal) {
 
 const deserializeAddress = function (address) {
   if (address) {
-    if (address.isKycOfficer === true) return address;
+    if (
+      address.isKycOfficer === true
+      || address.isForumAdmin === true
+    ) return address;
     address.lockedDgdStake = ofOne(address.lockedDgdStake, denominators.DGD);
     address.lockedDgd = ofOne(address.lockedDgd, denominators.DGD);
     address.reputationPoint = ofOne(address.reputationPoint, denominators.REPUTATION_POINT);
