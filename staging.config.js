@@ -14,7 +14,7 @@ module.exports = {
       RATE_LIMIT_WINDOW_MS: 60 * 1000,
       RATE_LIMIT_PER_WINDOW: 10,
       BLOCK_CONFIRMATIONS: 3,
-      START_BLOCK: 10110500,
+      START_BLOCK: 10483600,
       N_BLOCKS_BUCKET: 200,
       N_BLOCKS_CONCURRENT: 100,
       FORCE_REFRESH_DB: 'false',
@@ -23,7 +23,7 @@ module.exports = {
       IPFS_ENDPOINT: 'https://ipfs-api.digix.global',
       HTTP_ENDPOINT: 'https://ipfs.digix.global/ipfs',
       KYC_ADMIN_PASSWORD: 'digixdao-kovan',
-      FORUM_ADMIN_ADDRESS: '0x7a461ba86f317274e692e8e0933d244356ee18be'
+      FORUM_ADMIN_ADDRESS: '0x369d674039d64519af688f4c6f9608552207bdab',
     },
   }],
 };
