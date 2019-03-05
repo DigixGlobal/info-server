@@ -126,6 +126,8 @@ const refreshProposalNew = async (res) => {
       },
     },
   });
+
+    return Promise.resolve(proposal);
 };
 
 // DONE
@@ -172,6 +174,8 @@ const refreshProposalDetails = async (res) => {
     $set: proposal,
   });
   console.log('INSERTED refreshProposalDetails');
+
+return Promise.resolve(proposal);
 };
 
 // DONE
@@ -184,6 +188,8 @@ const refreshProposalEndorseProposal = async (res) => {
     },
   });
   console.log('INSERTED refreshProposalEndorseProposal');
+
+    return await getProposal(res._proposalId);
 };
 
 // DONE
@@ -225,6 +231,8 @@ const refreshProposalFinalizeProposal = async (res) => {
     $set: proposal,
   });
   console.log('INSERTED refreshProposalFinalizeProposal');
+
+    return Promise.resolve(proposal);
 };
 
 // DONE
@@ -286,7 +294,9 @@ const refreshProposalDraftVote = async (res) => {
       ...getAddressObject(userInfo),
     },
   }, {});
-  console.log('INSERTED refreshProposalDraftVote');
+    console.log('INSERTED refreshProposalDraftVote');
+
+    return await getProposal(res._proposalId);
 };
 
 // TO BE TESTED
@@ -296,7 +306,9 @@ const refreshProposalPartialDraftVotingClaim = async (res) => {
   await updateProposal(res._proposalId, {
     $set: proposal,
   });
-  console.log('refresh proposal partial draft voting claim');
+    console.log('refresh proposal partial draft voting claim');
+
+    return Promise.resolve(proposal);
 };
 
 // DONE
@@ -347,7 +359,9 @@ const refreshProposalDraftVotingClaim = async (res) => {
   await updateProposal(res._proposalId, {
     $set: proposal,
   }, { upsert: true });
-  console.log('INSERTED refreshProposalDraftVotingClaim');
+    console.log('INSERTED refreshProposalDraftVotingClaim');
+
+    return Promise.resolve(proposal);
 };
 
 // DONE
@@ -382,7 +396,9 @@ const refreshProposalCommitVote = async (res) => {
   await updateAddress(res._from, {
     $set: { votes },
   });
-  console.log('INSERTED refreshProposalCommitVote');
+    console.log('INSERTED refreshProposalCommitVote');
+
+    return Promise.resolve(proposal);
 };
 
 // DONE
@@ -428,6 +444,8 @@ const refreshProposalRevealVote = async (res) => {
   });
 
   console.log('INSERTED refreshProposalRevealVote');
+
+    return Promise.resolve(proposal);
 };
 
 // TO BE TESTED
@@ -439,6 +457,8 @@ const refreshProposalPartialVotingClaim = async (res) => {
     $set: proposal,
   });
   console.log('refresh proposal partial voting claim');
+
+    return Promise.resolve(proposal);
 };
 
 // DONE
@@ -494,7 +514,9 @@ const refreshProposalVotingClaim = async (res) => {
   await updateProposal(res._proposalId, {
     $set: proposal,
   });
-  console.log('INSERTED refreshProposalVotingClaim');
+    console.log('INSERTED refreshProposalVotingClaim');
+
+    return Promise.resolve(proposal);
 };
 
 // DONE
@@ -511,6 +533,8 @@ const refreshProposalClaimFunding = async (res) => {
     $set: { claimableFunding: claimableFunding.toString() },
   });
   console.log('INSERTED refreshProposalClaimFunding');
+
+    return Promise.resolve(proposal);
 };
 
 // DONE
@@ -553,6 +577,8 @@ const refreshProposalFinishMilestone = async (res) => {
     $set: proposal,
   });
   console.log('INSERTED refreshProposalFinishMilestone');
+
+    return Promise.resolve(proposal);
 };
 
 // DONE
@@ -568,6 +594,8 @@ const refreshProposalChangeFundings = async (res) => {
     },
   });
   console.log('INSERTED refreshProposalChangeFundings');
+
+    return Promise.resolve(proposal);
 };
 
 // DONE
@@ -579,6 +607,8 @@ const refreshProposalClose = async (res) => {
     },
   });
   console.log('INSERTED refreshProposalClose');
+
+    return Promise.resolve(proposal);
 };
 
 // TO BE TESTED
@@ -610,6 +640,8 @@ const refreshProposalPRLAction = async (res) => {
   await updateProposal(res._proposalId, {
     $set: updateObj,
   });
+
+    return await getProposal(res._proposalId)
 };
 
 // TO BE TESTED
