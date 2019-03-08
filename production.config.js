@@ -19,7 +19,7 @@ module.exports = {
       N_BLOCKS_CONCURRENT: 100,
       FORCE_REFRESH_DB: 'false',
       SYNC_REPORT_FREQUENCY: 10,
-      WEB3_HTTP_PROVIDER: 'https://mainnet.digix.global',
+      WEB3_HTTP_PROVIDER: 'https://kovan.digixdev.com',
       IPFS_ENDPOINT: 'https://ipfs-api.digix.global',
       HTTP_ENDPOINT: 'https://ipfs.digix.global/ipfs',
       KYC_ADMIN_PASSWORD: process.env.KYC_ADMIN_PASSWORD,
