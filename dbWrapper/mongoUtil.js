@@ -41,7 +41,6 @@ const initFreshDb = async () => {
     .findOne({ name: 'nonce' });
   if (oldNonce !== null) {
     nonces.self = oldNonce.self;
-    nonces.daoServer = oldNonce.daoServer;
   }
   await _db.dropDatabase();
   await _db.collection(collections.COUNTERS).insertOne({
