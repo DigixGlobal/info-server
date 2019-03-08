@@ -57,6 +57,10 @@ const {
   getAddressObject,
 } = require('./addresses');
 
+const {
+  refreshDaoConfigs,
+} = require('./dao');
+
 // TODO: proposal.votingStage does not change
 // from COMMIT to REVEAL automatically
 // check all proposals in votingStage === COMMIT (in cron)
@@ -783,6 +787,8 @@ const refreshProposalSpecialVotingClaim = async (res) => {
   await updateSpecialProposal(res._proposalId, {
     $set: proposal,
   });
+
+  await refreshDaoConfigs();
   console.log('updated special proposal after voting claim');
 };
 
