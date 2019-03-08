@@ -23,7 +23,9 @@ const {
   counters,
 } = require('../helpers/constants');
 
+
 const syncAndProcessToLatestBlock = async () => {
+  console.log('INFOLOG: syncAndProcessToLatestBlock');
   const lastProcessedBlock = (await getCounter(counters.TRANSACTIONS)).last_processed_block;
   await updateTransactionsDatabase(lastProcessedBlock);
   await processTransactions();
@@ -55,7 +57,9 @@ const updateLatestTxns = async () => {
 
 const watchNewBlocks = async () => {
   const filter = getWeb3().eth.filter('latest');
-  filter.watch(async () => {
+  filter.watch(async (err, block) => {
+    console.log('INFOLOG: got a new block from filter("latest"):', block);
+    console.log('\tweb3.eth.blockNumber = ', getWeb3().eth.blockNumber);
     syncAndProcessToLatestBlock();
     updateLatestTxns();
   });

@@ -43,7 +43,7 @@ const initIpfs = async () => {
 const initCron = async () => {
   cron.schedule('* * * * *', async () => {
     // schedule a script to run every min
-    console.log('\tIn cron.schedule');
+    console.log('INFOLOG: running the 1min cron job');
 
     // TODO: remove this part
     // don't need to refresh dao every minute
@@ -56,6 +56,7 @@ const initCron = async () => {
 };
 
 const init = async () => {
+  console.log('INFOLOG: init');
   await initDB();
   await initIpfs();
 
@@ -65,6 +66,7 @@ const init = async () => {
     windowMs: process.env.RATE_LIMIT_WINDOW_MS, // 1 minute
     max: process.env.RATE_LIMIT_PER_WINDOW, // limit each IP to 10 requests per minute
   });
+
   //  apply to all requests
   app.use(defaultLimiter);
 
