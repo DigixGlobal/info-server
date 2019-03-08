@@ -162,20 +162,17 @@ const checkAndNotify = async (transactions, failedTransactions) => {
 const filterAndInsertTxns = async (web3, txns) => {
   const filteredTxnObject = await _formTxnDocument(web3, txns);
   const { filteredTxns, otherWatchedTxns, failedTxns } = filteredTxnObject;
-  console.log(`INFOLOG: got ${filteredTxns.length} filteredTxns, ${otherWatchedTxns.length} otherWatchedTxns, ${failedTxns.length} failedTxns,`);
-  if (filteredTxns.length > 0) {
-    for (const entry of filteredTxns) {
-      try {
-        await insertTransaction(entry);
-        await incrementMaxValue(counters.TRANSACTIONS, 1);
-      } catch (e) {
-        console.log('\n\nERROR = ', e, '\n\n');
+  if (filteredTxns.length > 0 || otherWatchedTxns.length > 0 || failedTxns.length > 0) {
+    if (filteredTxns.length > 0) {
+      for (const entry of filteredTxns) {
+        try {
+          await insertTransaction(entry);
+          await incrementMaxValue(counters.TRANSACTIONS, 1);
+        } catch (e) {
+          console.log('\n\nERROR = ', e, '\n\n');
+        }
       }
     }
-  }
-
-  if (filteredTxns.length > 0 || otherWatchedTxns.length > 0 || failedTxns.length > 0) {
-    console.log('INFOLOG: calling checkAndNotify');
     await checkAndNotify(filteredTxns.concat(otherWatchedTxns), failedTxns);
   }
 };
@@ -189,8 +186,6 @@ const fetchBlock = async (blockNumber) => {
   });
 };
 
-// - Update our transaction database, given that our database has been updated to lastProcessedBlock
-// - Save all the relevant transactions from block lastProcessedBlock + 1, to the lastest block (subject to BLOCK_CONFIRMATIONS requirement)
 const updateTransactionsDatabase = async (lastProcessedBlock) => {
   const web3 = getWeb3();
 
