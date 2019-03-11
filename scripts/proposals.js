@@ -545,6 +545,7 @@ const refreshProposalFinishMilestone = async (res) => {
     claimed: false,
     passed: false,
     funded: false,
+    currentClaimStep: 1,
   });
 
   // update proposal
