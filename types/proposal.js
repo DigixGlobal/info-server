@@ -1,22 +1,41 @@
 const { gql } = require('apollo-server-express');
 const BigNumber = require('bignumber.js');
 
+const { ofOne } = require('../helpers/utils');
+const { denominators } = require('../helpers/constants');
+
 const typeDef = gql`
   # Phases or stages for a proposal
   enum ProposalStageEnum {
+    # Proposal was archived
     ARCHIVED
-    DRAFT
+
+    # Proposal is waiting to be endorsed
     IDEA
+
+    # Proposal was endorsed by a moderator
+    ENDORSED
+
+    # Proposal is being drafted an finalized
+    DRAFT
+
+    # Proposal is now a valid proposal
     PROPOSAL
+
+    # Proposal is now funded and ongoing
+    ONGOING
+
+    # Proposal is being reviewed after a milestone
+    REVIEW
   }
 
   # Voting rounds for proposal voting
   type Milestone {
     # Description of the milestone
-    description: String!
+    description: String
 
     # Title of the milestone
-    title: String!
+    title: String
   }
 
   type VotingRound {
@@ -63,6 +82,23 @@ const typeDef = gql`
     isFunded: Boolean
   }
 
+  type ProposalDetail {
+    # Detail title
+    title: String
+
+    # Detail short description
+    description: String
+
+    # Detail longer description or details
+    details: String
+
+    # Detail milestones
+    milestones: [Milestone]
+
+    # Detail images
+    images: [String]
+  }
+
   type ProposalVersion {
     # The hash of the proposal document
     docIpfsHash: String
@@ -70,24 +106,39 @@ const typeDef = gql`
     # Date the document is created
     created: Timestamp
 
+    # Milestone fundings
+    milestoneFundings: [BigNumber]
+
     # Expected reward on the completion of the proposal
     finalReward: BigNumber
 
-    # Version title
+    # More docs(?)
+    moreDocs: [String]
+
+    # Version total funding
+    totalFunding: BigNumber
+
+    # Proposal details
+    dijixObject: ProposalDetail
+
+    # See 'ProposalDetail.title'
     title: String
 
-    # Version short description
+    # See 'ProposalDetail.description'
     description: String
 
-    # Version longer description or details
+    # See 'ProposalDetail.details'
     details: String
 
-    # Version milestones
+    # See 'ProposalDetail.milestones'
     milestones: [Milestone]
   }
 
   type Proposal {
-    # The Eth addrress of the proposal
+    # Make 'proposalId' as the 'id'
+    id: EthAddress!
+
+    # The Eth address of the proposal
     proposalId: EthAddress!
 
     # The Eth address of the proposer
@@ -114,7 +165,7 @@ const typeDef = gql`
     # Milestone fundings
     milestoneFundings: [BigNumber]
 
-    # Total funding for the proposal
+    # See 'ProposalVersion.totalFunding'
     totalFunding: BigNumber
 
     # A flag indicating if the proposal is PRL'ed(?)
@@ -139,15 +190,29 @@ const typeDef = gql`
     milestones: [Milestone]
 
     # Proposal's current milestone
-    currentMilestone: Milestone
+    currentMilestoneDetails: Milestone
 
     # Proposal's current milestone index
-    currentMilestoneIndex: Int
+    currentMilestone: Int
 
     # Proposal's prior versions
     proposalVersions: [ProposalVersion]
+
+    # See 'ProposalVersion.created'
+    timeCreated: Timestamp
+
+    # See 'ProposalVersion.docIpfsHash'
+    finalVersionIpfsDoc: String
+
+    # See 'Proposal.isPrl'
+    prl: Boolean
+
+    # Proposal's claimable funding
+    claimableFunding: BigNumber
   }
 `;
+
+const dgd = value => (value === null || value === undefined ? null : ofOne(value, denominators.DGD));
 
 const resolvers = {
   Milestone: {},
@@ -162,12 +227,21 @@ const resolvers = {
       return round.funded;
     },
   },
+  ProposalVersion: {
+    milestoneFundings(version) {
+      return version.milestoneFundings
+        .map(funding => new BigNumber(funding));
+    },
+  },
   Proposal: {
     stage(proposal) {
       return proposal.stage.toUpperCase();
     },
-    currentMilestone(proposal) {
-      return proposal.milestones[proposal.currentMilestoneIndex];
+    isPrl(proposal) {
+      return proposal.prl;
+    },
+    currentMilestoneDetails(proposal) {
+      return proposal.milestones[proposal.currentMilestone];
     },
     currentVotingRound(proposal) {
       return proposal.votingRounds
@@ -176,6 +250,9 @@ const resolvers = {
     milestoneFundings(proposal) {
       return proposal.milestoneFundings
         ? proposal.milestoneFundings.map(funding => new BigNumber(funding)) : [];
+    },
+    claimableFunding(proposal) {
+      return dgd(proposal.claimableFunding);
     },
   },
 

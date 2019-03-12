@@ -28,6 +28,9 @@ rules:
   no-unused-vars:
   - "error"
   - argsIgnorePattern: "^_"
+  no-restricted-globals:
+  - 0
+  - "isNaN"
 
 parserOptions:
   ecmaVersion: 2018

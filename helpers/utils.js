@@ -130,8 +130,6 @@ const proposalToType = function (proposal) {
   const { dijixObject: proposalDetails, totalFunding } = currentVersion;
 
   const {
-    prl: isPrl,
-    currentMilestone: currentMilestoneIndex,
     currentVotingRound: currentVotingRoundIndex,
     proposalVersions,
     ...baseProposal
@@ -139,13 +137,12 @@ const proposalToType = function (proposal) {
 
   return {
     ...baseProposal,
-    isPrl,
-    currentMilestoneIndex,
     currentVotingRoundIndex,
     proposalVersions: proposalVersions
       .map(({ dijixObject, ...baseVersion }) => ({
         ...baseVersion,
         ...dijixObject,
+        dijixObject,
       })),
     totalFunding,
     ...proposalDetails,

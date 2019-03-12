@@ -31,14 +31,14 @@ const typeDef = gql`
   }
 `;
 
-const dgd = value => (value ? ofOne(value, denominators.DGD) : null);
+const dgd = value => (value === null || value === undefined ? null : ofOne(value, denominators.DGD));
 const reputation = value => (value ? ofOne(value, denominators.REPUTATION_POINT) : null);
 
 const resolvers = {
   User: {
-      id(user) {
-          return user.address;
-      },
+    id(user) {
+      return user.address;
+    },
     lockedDgdStake(user) {
       return dgd(user.lockedDgdStake);
     },

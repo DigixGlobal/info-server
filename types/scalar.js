@@ -47,7 +47,12 @@ const resolvers = {
     name: 'Timestamp',
     description: 'Unix epoch timestamp as a `Integer`',
     serialize(date) {
-      return (date instanceof Date) ? date.getTime() : null;
+      if (date instanceof Date) {
+        return date.getTime();
+      } if (!isNaN(date)) {
+        return date;
+      }
+      return null;
     },
     parseValue(value) {
       try {
