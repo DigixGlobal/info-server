@@ -125,6 +125,33 @@ const serializeProposal = function (proposal) {
   return proposal;
 };
 
+const proposalToType = function (proposal) {
+  const currentVersion = proposal.proposalVersions.slice(-1)[0];
+  const { dijixObject: proposalDetails, totalFunding } = currentVersion;
+
+  const {
+    prl: isPrl,
+    currentMilestone: currentMilestoneIndex,
+    currentVotingRound: currentVotingRoundIndex,
+    proposalVersions,
+    ...baseProposal
+  } = proposal;
+
+  return {
+    ...baseProposal,
+    isPrl,
+    currentMilestoneIndex,
+    currentVotingRoundIndex,
+    proposalVersions: proposalVersions
+      .map(({ dijixObject, ...baseVersion }) => ({
+        ...baseVersion,
+        ...dijixObject,
+      })),
+    totalFunding,
+    ...proposalDetails,
+  };
+};
+
 const serializeProposalVotingRound = function (proposal, index) {
   if (proposal.votingRounds) {
     const round = proposal.votingRounds[index];
@@ -289,6 +316,7 @@ module.exports = {
   ofMany,
   ofOne,
   serializeProposal,
+  proposalToType,
   serializeSpecialProposal,
   serializeProposalVotingRound,
   serializeAddress,

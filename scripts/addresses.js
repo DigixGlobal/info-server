@@ -1,5 +1,3 @@
-const {pubsub} = require("../pubsub");
-
 const {
   getAddressDetails,
   updateAddress,
@@ -123,8 +121,7 @@ const _updateProposalVoteWeightages = async function (addressDetails, userInfo) 
 
 const refreshAddress = async (res) => {
   const user = _getUser(res);
-    if (user === null || user === undefined)
-        return Promise.reject();
+  if (user === null || user === undefined) return Promise.reject();
 
   // get address details from db and contract
   const addressDetails = await getAddressDetails(user);
@@ -174,7 +171,7 @@ const refreshAddress = async (res) => {
     },
   });
 
-    return Promise.resolve({address: user, ...getAddressObject(userInfo)})
+  return Promise.resolve({ address: user, ...getAddressObject(userInfo) });
 };
 
 module.exports = {

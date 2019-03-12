@@ -1,7 +1,5 @@
 const { gql } = require('apollo-server-express');
-
-const { ofOne } = require('../helpers/utils');
-const { denominators } = require('../helpers/constants');
+const BigNumber = require('bignumber.js');
 
 const typeDef = gql`
   # Phases or stages for a proposal
@@ -113,6 +111,9 @@ const typeDef = gql`
     # Proposal's longer description or details
     details: String
 
+    # Milestone fundings
+    milestoneFundings: [BigNumber]
+
     # Total funding for the proposal
     totalFunding: BigNumber
 
@@ -149,30 +150,34 @@ const typeDef = gql`
 `;
 
 const resolvers = {
-    Milestone: {},
-    VotingRound: {
-        isClaimed(round) {
-            return round.claimed
-        },
-        isPassed(round) {
-            return round.passed
-        },
-        isFunded(round) {
-            return round.funded
-        }
+  Milestone: {},
+  VotingRound: {
+    isClaimed(round) {
+      return round.claimed;
     },
-    Proposal: {
-        stage(proposal) {
-            return proposal.stage.toUpperCase();
-        },
-        currentMilestone(proposal) {
-            return proposal.milestones[proposal.currentMilestoneIndex];
-        },
-        currentVotingRound(proposal) {
-            return proposal.votingRounds ?
-                proposal.votingRounds[proposal.currentVotingRoundIndex] : null;
-        }
-    }
+    isPassed(round) {
+      return round.passed;
+    },
+    isFunded(round) {
+      return round.funded;
+    },
+  },
+  Proposal: {
+    stage(proposal) {
+      return proposal.stage.toUpperCase();
+    },
+    currentMilestone(proposal) {
+      return proposal.milestones[proposal.currentMilestoneIndex];
+    },
+    currentVotingRound(proposal) {
+      return proposal.votingRounds
+        ? proposal.votingRounds[proposal.currentVotingRoundIndex] : null;
+    },
+    milestoneFundings(proposal) {
+      return proposal.milestoneFundings
+        ? proposal.milestoneFundings.map(funding => new BigNumber(funding)) : [];
+    },
+  },
 
 };
 

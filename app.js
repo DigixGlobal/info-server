@@ -85,13 +85,13 @@ const init = async () => {
 init();
 
 server.applyMiddleware({
-    app,
-    path: '/api'
+  app,
+  path: '/api',
 });
 
 const httpServer = http.createServer(app);
 server.installSubscriptionHandlers(httpServer);
 
 httpServer.listen(process.env.PORT, () => {
-    console.log('Info server running on port.', process.env.PORT);
+  console.log('Info server running on port.', process.env.PORT);
 });

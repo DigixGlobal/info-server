@@ -28,24 +28,24 @@ const typeDef = gql`
   }
 `;
 
-const dgd = (value) => value ? ofOne(value, denominators.DGD) : null;
-const reputation = (value) => value ?  ofOne(value, denominators.REPUTATION_POINT) : null;
+const dgd = value => (value ? ofOne(value, denominators.DGD) : null);
+const reputation = value => (value ? ofOne(value, denominators.REPUTATION_POINT) : null);
 
 const resolvers = {
-    User: {
-        lockedDgdStake(user) {
-            return dgd(user.lockedDgdStake);
-        },
-        lockedDgd(user) {
-            return dgd(user.lockedDgd);
-        },
-        reputationPoint(user) {
-            return reputation(user.reputationPoint);
-        },
-        quarterPoint(user) {
-            return reputation(user.quarterPoint);
-        }
-    }
+  User: {
+    lockedDgdStake(user) {
+      return dgd(user.lockedDgdStake);
+    },
+    lockedDgd(user) {
+      return dgd(user.lockedDgd);
+    },
+    reputationPoint(user) {
+      return reputation(user.reputationPoint);
+    },
+    quarterPoint(user) {
+      return reputation(user.quarterPoint);
+    },
+  },
 };
 
 module.exports = { resolvers, typeDef };
