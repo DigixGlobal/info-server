@@ -5,30 +5,6 @@ const { ofOne } = require('../helpers/utils');
 const { denominators } = require('../helpers/constants');
 
 const typeDef = gql`
-  # Phases or stages for a proposal
-  enum ProposalStageEnum {
-    # Proposal was archived
-    ARCHIVED
-
-    # Proposal is waiting to be endorsed
-    IDEA
-
-    # Proposal was endorsed by a moderator
-    ENDORSED
-
-    # Proposal is being drafted an finalized
-    DRAFT
-
-    # Proposal is now a valid proposal
-    PROPOSAL
-
-    # Proposal is now funded and ongoing
-    ONGOING
-
-    # Proposal is being reviewed after a milestone
-    REVIEW
-  }
-
   # Voting rounds for proposal voting
   type Milestone {
     # Description of the milestone
@@ -36,6 +12,24 @@ const typeDef = gql`
 
     # Title of the milestone
     title: String
+  }
+
+  # Changes in milestone
+  type MilestoneChange {
+    # Original value
+    original: BigNumber
+
+    # Updated value
+    updated: BigNumber
+  }
+
+  # Milestone fundings
+  type MilestoneFunding {
+    # Milestone changes
+    milestones: [MilestoneChange]
+
+    # Milestone reward
+    finalReward: MilestoneChange
   }
 
   type VotingRound {
@@ -53,6 +47,9 @@ const typeDef = gql`
 
     # Draft voting stage deadline
     votingDeadline: Timestamp
+
+    # The total number of commits for this round
+    totalCommitCount: BigNumber
 
     # The total number of voters for this round
     totalVoterCount: BigNumber
@@ -73,13 +70,13 @@ const typeDef = gql`
     quota: BigNumber
 
     # A flag to indicate if the proposal was claimed
-    isClaimed: Boolean
+    claimed: Boolean
 
     # A flag to indicate if the proposal was passed
-    isPassed: Boolean
+    passed: Boolean
 
     # A flag to indicate if the proposal was funded
-    isFunded: Boolean
+    funded: Boolean
   }
 
   type ProposalDetail {
@@ -148,7 +145,7 @@ const typeDef = gql`
     endorser: EthAddress
 
     # The current stage of the proposal
-    stage: ProposalStageEnum
+    stage: String
 
     # A flag to indicate the proposal is by the Digix
     isDigix: Boolean
@@ -173,6 +170,9 @@ const typeDef = gql`
 
      # A flag indicating if the funding changed
     isFundingChanged: Boolean
+
+    # Changes in milestone funding
+    changedFundings: MilestoneFunding
 
     # Proposal's current voting round index
     currentVotingRoundIndex: Int
@@ -209,6 +209,9 @@ const typeDef = gql`
 
     # Proposal's claimable funding
     claimableFunding: BigNumber
+
+    # Current voting stage
+    votingStage: String
   }
 `;
 
@@ -216,17 +219,7 @@ const dgd = value => (value === null || value === undefined ? null : ofOne(value
 
 const resolvers = {
   Milestone: {},
-  VotingRound: {
-    isClaimed(round) {
-      return round.claimed;
-    },
-    isPassed(round) {
-      return round.passed;
-    },
-    isFunded(round) {
-      return round.funded;
-    },
-  },
+  VotingRound: { },
   ProposalVersion: {
     milestoneFundings(version) {
       return version.milestoneFundings
@@ -234,9 +227,6 @@ const resolvers = {
     },
   },
   Proposal: {
-    stage(proposal) {
-      return proposal.stage.toUpperCase();
-    },
     isPrl(proposal) {
       return proposal.prl;
     },
