@@ -126,26 +126,8 @@ const serializeProposal = function (proposal) {
 };
 
 const proposalToType = function (proposal) {
-  const currentVersion = proposal.proposalVersions.slice(-1)[0];
-  const { dijixObject: proposalDetails, totalFunding } = currentVersion;
-
-  const {
-    currentVotingRound: currentVotingRoundIndex,
-    proposalVersions,
-    ...baseProposal
-  } = proposal;
-
   return {
-    ...baseProposal,
-    currentVotingRoundIndex,
-    proposalVersions: proposalVersions
-      .map(({ dijixObject, ...baseVersion }) => ({
-        ...baseVersion,
-        ...dijixObject,
-        dijixObject,
-      })),
-    totalFunding,
-    ...proposalDetails,
+    ...proposal,
   };
 };
 

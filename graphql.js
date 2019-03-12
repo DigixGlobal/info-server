@@ -8,7 +8,7 @@ const { getAddressDetails } = require('./dbWrapper/addresses');
 
 const { pubsub } = require('./pubsub');
 
-const { getProposal } = require('./dbWrapper/proposals');
+const { getProposal, getSpecialProposal } = require('./dbWrapper/proposals');
 
 const { typeDef: scalarType, resolvers: scalarResolvers } = require('./types/scalar.js');
 const { typeDef: userType, resolvers: userResolvers } = require('./types/user.js');
@@ -58,7 +58,10 @@ const resolvers = {
     fetchProposal: async (obj, args, _context, _info) => {
       const { proposalId } = args;
 
-      const proposal = await getProposal(proposalId);
+      let proposal = await getProposal(proposalId);
+      if (!proposal) {
+        proposal = await getSpecialProposal(proposalId);
+      }
 
       return proposal ? proposalToType(proposal) : null;
     },

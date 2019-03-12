@@ -131,6 +131,69 @@ const typeDef = gql`
     milestones: [Milestone]
   }
 
+  # Speical proposal configurations
+  type UintConfig {
+    CONFIG_LOCKING_PHASE_DURATION: String
+    CONFIG_QUARTER_DURATION: String
+    CONFIG_VOTING_COMMIT_PHASE: String
+    CONFIG_VOTING_PHASE_TOTAL: String
+    CONFIG_INTERIM_COMMIT_PHASE: String
+    CONFIG_INTERIM_PHASE_TOTAL: String
+    CONFIG_DRAFT_QUORUM_FIXED_PORTION_NUMERATOR: String
+    CONFIG_DRAFT_QUORUM_FIXED_PORTION_DENOMINATOR: String
+    CONFIG_DRAFT_QUORUM_SCALING_FACTOR_NUMERATOR: String
+    CONFIG_DRAFT_QUORUM_SCALING_FACTOR_DENOMINATOR: String
+    CONFIG_VOTING_QUORUM_FIXED_PORTION_NUMERATOR: String
+    CONFIG_VOTING_QUORUM_FIXED_PORTION_DENOMINATOR: String
+    CONFIG_VOTING_QUORUM_SCALING_FACTOR_NUMERATOR: String
+    CONFIG_VOTING_QUORUM_SCALING_FACTOR_DENOMINATOR: String
+    CONFIG_DRAFT_QUOTA_NUMERATOR: String
+    CONFIG_DRAFT_QUOTA_DENOMINATOR: String
+    CONFIG_VOTING_QUOTA_NUMERATOR: String
+    CONFIG_VOTING_QUOTA_DENOMINATOR: String
+    CONFIG_QUARTER_POINT_DRAFT_VOTE: String
+    CONFIG_QUARTER_POINT_VOTE: String
+    CONFIG_QUARTER_POINT_INTERIM_VOTE: String
+    CONFIG_MINIMAL_QUARTER_POINT: String
+    CONFIG_QUARTER_POINT_MILESTONE_COMPLETION_PER_10000ETH: String
+    CONFIG_BONUS_REPUTATION_NUMERATOR: String
+    CONFIG_BONUS_REPUTATION_DENOMINATOR: String
+    CONFIG_SPECIAL_PROPOSAL_COMMIT_PHASE: String
+    CONFIG_SPECIAL_PROPOSAL_PHASE_TOTAL: String
+    CONFIG_SPECIAL_QUOTA_NUMERATOR: String
+    CONFIG_SPECIAL_QUOTA_DENOMINATOR: String
+    CONFIG_SPECIAL_PROPOSAL_QUORUM_NUMERATOR: String
+    CONFIG_SPECIAL_PROPOSAL_QUORUM_DENOMINATOR: String
+    CONFIG_MAXIMUM_REPUTATION_DEDUCTION: String
+    CONFIG_PUNISHMENT_FOR_NOT_LOCKING: String
+    CONFIG_REPUTATION_PER_EXTRA_QP_NUM: String
+    CONFIG_REPUTATION_PER_EXTRA_QP_DEN: String
+    CONFIG_QUARTER_POINT_SCALING_FACTOR: String
+    CONFIG_REPUTATION_POINT_SCALING_FACTOR: String
+    CONFIG_MODERATOR_MINIMAL_QUARTER_POINT: String
+    CONFIG_MODERATOR_QUARTER_POINT_SCALING_FACTOR: String
+    CONFIG_MODERATOR_REPUTATION_POINT_SCALING_FACTOR: String
+    CONFIG_PORTION_TO_MODERATORS_NUM: String
+    CONFIG_PORTION_TO_MODERATORS_DEN: String
+    CONFIG_DRAFT_VOTING_PHASE: String
+    CONFIG_REPUTATION_POINT_BOOST_FOR_BADGE: String
+    CONFIG_FINAL_REWARD_SCALING_FACTOR_NUMERATOR: String
+    CONFIG_FINAL_REWARD_SCALING_FACTOR_DENOMINATOR: String
+    CONFIG_MAXIMUM_MODERATOR_REPUTATION_DEDUCTION: String
+    CONFIG_REPUTATION_PER_EXTRA_MODERATOR_QP_NUM: String
+    CONFIG_REPUTATION_PER_EXTRA_MODERATOR_QP_DEN: String
+    CONFIG_VOTE_CLAIMING_DEADLINE: String
+    CONFIG_MINIMUM_LOCKED_DGD: String
+    CONFIG_MINIMUM_DGD_FOR_MODERATOR: String
+    CONFIG_MINIMUM_REPUTATION_FOR_MODERATOR: String
+    CONFIG_PREPROPOSAL_COLLATERAL: String
+    CONFIG_MAX_FUNDING_FOR_NON_DIGIX: String
+    CONFIG_MAX_MILESTONES_FOR_NON_DIGIX: String
+    CONFIG_NON_DIGIX_PROPOSAL_CAP_PER_QUARTER: String
+    CONFIG_PROPOSAL_DEAD_DURATION: String
+    CONFIG_CARBON_VOTE_REPUTATION_BONUS: String
+  }
+
   type Proposal {
     # Make 'proposalId' as the 'id'
     id: EthAddress!
@@ -150,23 +213,8 @@ const typeDef = gql`
     # A flag to indicate the proposal is by the Digix
     isDigix: Boolean
 
-    # Proposal's title
-    title: String
-
-    # Proposal's short description
-    description: String
-
-    # Proposal's longer description or details
-    details: String
-
     # Milestone fundings
     milestoneFundings: [BigNumber]
-
-    # See 'ProposalVersion.totalFunding'
-    totalFunding: BigNumber
-
-    # A flag indicating if the proposal is PRL'ed(?)
-    isPrl: Boolean
 
      # A flag indicating if the funding changed
     isFundingChanged: Boolean
@@ -212,6 +260,18 @@ const typeDef = gql`
 
     # Current voting stage
     votingStage: String
+
+    # For special proposals, the title of the proposal
+    title: String
+
+    # A flag indicating if the proposal is active
+    isActive: Boolean
+
+    # A flag indicating if the proposal is special
+    isSpecial: Boolean
+
+    # Special proposal config changes
+    uintConfigs: UintConfig
   }
 `;
 
@@ -227,16 +287,6 @@ const resolvers = {
     },
   },
   Proposal: {
-    isPrl(proposal) {
-      return proposal.prl;
-    },
-    currentMilestoneDetails(proposal) {
-      return proposal.milestones[proposal.currentMilestone];
-    },
-    currentVotingRound(proposal) {
-      return proposal.votingRounds
-        ? proposal.votingRounds[proposal.currentVotingRoundIndex] : null;
-    },
     milestoneFundings(proposal) {
       return proposal.milestoneFundings
         ? proposal.milestoneFundings.map(funding => new BigNumber(funding)) : [];
