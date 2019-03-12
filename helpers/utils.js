@@ -126,9 +126,7 @@ const serializeProposal = function (proposal) {
 };
 
 const proposalToType = function (proposal) {
-  return {
-    ...proposal,
-  };
+  return proposal;
 };
 
 const serializeProposalVotingRound = function (proposal, index) {

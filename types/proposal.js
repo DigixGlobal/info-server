@@ -223,10 +223,7 @@ const typeDef = gql`
     changedFundings: MilestoneFunding
 
     # Proposal's current voting round index
-    currentVotingRoundIndex: Int
-
-    # Proposal's current voting round index
-    currentVotingRound: VotingRound
+    currentVotingRound: Int
 
     # Proposal's voting round
     draftVoting: VotingRound
