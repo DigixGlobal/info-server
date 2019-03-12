@@ -5,6 +5,9 @@ const { denominators } = require('../helpers/constants');
 
 const typeDef = gql`
   type User {
+    # User's id
+    id: String!
+
     # User's ethereum address
     address: EthAddress!
 
@@ -33,6 +36,9 @@ const reputation = value => (value ? ofOne(value, denominators.REPUTATION_POINT)
 
 const resolvers = {
   User: {
+      id(user) {
+          return user.address;
+      },
     lockedDgdStake(user) {
       return dgd(user.lockedDgdStake);
     },
