@@ -6,7 +6,7 @@ const pubsub = new PubSub();
 
 const broadcast = {
   userUpdated(user) {
-    pubsub.publish(
+    return pubsub.publish(
       'userUpdated',
       { userUpdated: user },
     );
@@ -14,13 +14,12 @@ const broadcast = {
   proposalUpdated(proposal) {
     const proposalObject = proposalToType(proposal);
 
-    pubsub.publish(
+    return pubsub.publish(
       'proposalUpdated',
       { proposalUpdated: proposalObject },
     );
   },
 };
-
 
 module.exports = {
   pubsub,

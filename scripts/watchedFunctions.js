@@ -6,7 +6,6 @@ const {
   refreshProposalEndorseProposal,
   refreshProposalFinalizeProposal,
   refreshProposalDraftVote,
-  refreshProposalPartialDraftVotingClaim,
   refreshProposalDraftVotingClaim,
   refreshProposalCommitVote,
   refreshProposalRevealVote,

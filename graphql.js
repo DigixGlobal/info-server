@@ -51,7 +51,8 @@ const subscriptionType = gql`
   }
 `;
 
-const filterByCurrentAddress = f => (payload, _variables, context, _operation) => context.address === f(payload);
+const filterByCurrentAddress = f => (payload, _variables, context, _operation) => (payload
+  ? context.address === f(payload) : false);
 
 const resolvers = {
   Query: {
