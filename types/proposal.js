@@ -1,5 +1,4 @@
 const { gql } = require('apollo-server-express');
-const BigNumber = require('bignumber.js');
 
 const { ofOne } = require('../helpers/utils');
 const { denominators } = require('../helpers/constants');
@@ -279,12 +278,24 @@ const typeDef = gql`
 `;
 
 const dgd = value => (value === null || value === undefined ? null : ofOne(value, denominators.DGD));
+const eth = value => (value === null || value === undefined ? null : ofOne(value, denominators.ETH));
 
 const resolvers = {
+  VotingRound: {
+    quorum(round) {
+      return dgd(round.quorum);
+    },
+  },
   ProposalVersion: {
     milestoneFundings(version) {
       return version.milestoneFundings
-        .map(funding => new BigNumber(funding));
+        .map(eth);
+    },
+    finalReward(round) {
+      return eth(round.finalReward);
+    },
+    totalFunding(round) {
+      return eth(round.totalFunding);
     },
   },
   Proposal: {
