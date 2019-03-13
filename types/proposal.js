@@ -7,11 +7,14 @@ const { denominators } = require('../helpers/constants');
 const typeDef = gql`
   # Voting rounds for proposal voting
   type Milestone {
+    # Title of the milestone
+    title: String
+
     # Description of the milestone
     description: String
 
-    # Title of the milestone
-    title: String
+    # Fund of the milestone
+    fund: String
   }
 
   # Changes in milestone
