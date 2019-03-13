@@ -62,7 +62,6 @@ const watchedFunctionsMap = {
   endorseProposal: broadcastUpdatedProposal(refreshProposalEndorseProposal),
   finalizeProposal: broadcastUpdatedProposal(refreshProposalFinalizeProposal),
   voteOnDraft: broadcastUpdatedProposal(refreshProposalDraftVote),
-  claimPartialDraftVotingResult: broadcastUpdatedProposal(refreshProposalPartialDraftVotingClaim),
   claimDraftVotingResult: broadcastUpdatedProposal(refreshProposalDraftVotingClaim),
   commitVoteOnProposal: broadcastUpdatedProposal(refreshProposalCommitVote),
   revealVoteOnProposal: broadcastUpdatedProposal(refreshProposalRevealVote),

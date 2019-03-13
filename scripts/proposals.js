@@ -315,8 +315,7 @@ const refreshProposalPartialDraftVotingClaim = async (res) => {
 const refreshProposalDraftVotingClaim = async (res) => {
   const isClaimed = await getContracts().daoStorage.isDraftClaimed.call(res._proposalId);
   if (isClaimed === false) {
-    await refreshProposalPartialDraftVotingClaim(res);
-    return;
+    return refreshProposalPartialDraftVotingClaim(res);
   }
   const proposal = await getProposal(res._proposalId);
   proposal.draftVoting.claimed = true;
