@@ -305,6 +305,9 @@ const resolvers = {
     },
   },
   Proposal: {
+    id(proposal) {
+      return proposal.proposalId;
+    },
     claimableFunding(proposal) {
       return dgd(proposal.claimableFunding);
     },
