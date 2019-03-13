@@ -472,8 +472,7 @@ const refreshProposalVotingClaim = async (res) => {
   // consider this fn call only if event logs were present
   const isClaimed = await getContracts().daoStorage.isClaimed.call(res._proposalId, res._index);
   if (isClaimed === false) {
-    await refreshProposalPartialVotingClaim(res);
-    return;
+    return refreshProposalPartialVotingClaim(res);
   }
 
   // get the current proposal info
@@ -819,7 +818,9 @@ const refreshProposalSpecialPartialVotingClaim = async (res) => {
 // TO BE TESTED
 const refreshProposalSpecialVotingClaim = async (res) => {
   const isClaimed = await getContracts().daoSpecialStorage.isClaimed.call(res._proposalId);
-  if (isClaimed === false) await refreshProposalSpecialPartialVotingClaim(res);
+  if (isClaimed === false) {
+    return refreshProposalSpecialPartialVotingClaim(res);
+  }
 
   // get the current proposal info
   const proposal = await getSpecialProposal(res._proposalId);
