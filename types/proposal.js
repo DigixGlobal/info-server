@@ -245,6 +245,12 @@ const typeDef = gql`
     # Proposal's current milestone index
     currentMilestone: Int
 
+    # Proposal's milestone index
+    currentMilestoneIndex: Int
+
+    # Proposal's milestone start
+    currentMilestoneStart: Int
+
     # Proposal's prior versions
     proposalVersions: [ProposalVersion]
 
