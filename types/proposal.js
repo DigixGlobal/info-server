@@ -95,6 +95,9 @@ const typeDef = gql`
     # Detail milestones
     milestones: [Milestone]
 
+    # Expected reward on the completion of the proposal
+    finalReward: String
+
     # Detail images
     images: [String]
   }
@@ -278,8 +281,6 @@ const typeDef = gql`
 const dgd = value => (value === null || value === undefined ? null : ofOne(value, denominators.DGD));
 
 const resolvers = {
-  Milestone: {},
-  VotingRound: { },
   ProposalVersion: {
     milestoneFundings(version) {
       return version.milestoneFundings
@@ -287,10 +288,6 @@ const resolvers = {
     },
   },
   Proposal: {
-    milestoneFundings(proposal) {
-      return proposal.milestoneFundings
-        ? proposal.milestoneFundings.map(funding => new BigNumber(funding)) : [];
-    },
     claimableFunding(proposal) {
       return dgd(proposal.claimableFunding);
     },
