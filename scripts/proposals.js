@@ -678,6 +678,8 @@ const refreshProposalSpecialNew = async (res) => {
       },
     },
   });
+
+  return Promise.resolve(proposal);
 };
 
 // TO BE TESTED
@@ -709,7 +711,10 @@ const refreshProposalSpecial = async (res) => {
   await updateSpecialProposal(res._proposalId, {
     $set: proposal,
   });
+
   console.log('updated special proposal');
+
+  return Promise.resolve(proposal);
 };
 
 // TO BE TESTED
@@ -743,12 +748,15 @@ const refreshProposalCommitVoteOnSpecial = async (res) => {
   await updateAddress(res._from, {
     $set: { votes },
   });
+
   console.log('committed vote for special proposal');
+
+  return Promise.resolve(proposal);
 };
 
 // TO BE TESTED
 const refreshProposalRevealVoteOnSpecial = async (res) => {
-  const proposal = serializeSpecialProposal(await getSpecialProposal(res._proposalId));
+  const proposal = serializeSpecialProposal(getSpecialProposal(res._proposalId));
   const addressDetails = serializeAddress(await getAddressDetails(res._from));
   const vote = res._vote;
 
@@ -793,6 +801,8 @@ const refreshProposalRevealVoteOnSpecial = async (res) => {
   });
 
   console.log('reveal vote for special proposal');
+
+  return getSpecialProposal(res._proposalId);
 };
 
 // TO BE TESTED
@@ -803,6 +813,8 @@ const refreshProposalSpecialPartialVotingClaim = async (res) => {
     $set: proposal,
   });
   console.log('refresh special proposal partial voting claim');
+
+  return Promise.resolve(proposal);
 };
 
 // TO BE TESTED
@@ -823,6 +835,8 @@ const refreshProposalSpecialVotingClaim = async (res) => {
 
   await refreshDaoConfigs();
   console.log('updated special proposal after voting claim');
+
+  return Promise.resolve(proposal);
 };
 
 module.exports = {

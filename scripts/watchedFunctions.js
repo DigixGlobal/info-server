@@ -72,11 +72,11 @@ const watchedFunctionsMap = {
   founderCloseProposals: refreshProposalsFounderClose,
   updatePRL: refreshProposalPRLAction,
   // special proposal
-  createSpecialProposal: refreshProposalSpecialNew,
-  startSpecialProposalVoting: refreshProposalSpecial,
-  commitVoteOnSpecialProposal: refreshProposalCommitVoteOnSpecial,
-  revealVoteOnSpecialProposal: refreshProposalRevealVoteOnSpecial,
-  claimSpecialProposalVotingResult: refreshProposalSpecialVotingClaim,
+  createSpecialProposal: broadcastUpdatedProposal(refreshProposalSpecialNew),
+  startSpecialProposalVoting: broadcastUpdatedProposal(refreshProposalSpecial),
+  commitVoteOnSpecialProposal: broadcastUpdatedProposal(refreshProposalCommitVoteOnSpecial),
+  revealVoteOnSpecialProposal: broadcastUpdatedProposal(refreshProposalRevealVoteOnSpecial),
+  claimSpecialProposalVotingResult: broadcastUpdatedProposal(refreshProposalSpecialVotingClaim),
 };
 
 module.exports = {
