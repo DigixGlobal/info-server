@@ -309,7 +309,7 @@ const resolvers = {
       return proposal.proposalId;
     },
     claimableFunding(proposal) {
-      return dgd(proposal.claimableFunding);
+      return eth(proposal.claimableFunding);
     },
   },
 
