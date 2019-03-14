@@ -32,43 +32,44 @@ const {
   initDao,
 } = require('./dao');
 
-const broadcastUpdatedUser = f => (...args) => f(...args).then((user) => {
+const tapPromise = t => f => (...args) => f(...args).then((result) => {
+  t(result);
+
+  return result;
+});
+
+const broadcastUpdatedUser = tapPromise((user) => {
   if (user) {
+    console.log(`BROADCASTING userUpdated for ${user.address}`);
+
     broadcast.userUpdated(user);
   }
-
-  return user;
 });
 
-const broadcastSubmittedProposal = f => (...args) => f(...args).then((proposal) => {
+const broadcastSubmittedProposal = tapPromise((proposal) => {
   if (proposal) {
+    console.log(`BROADCASTING proposalSubmitted for ${proposal.proposalId}`);
+
     broadcast.proposalSubmitted(proposal);
   }
-
-  return proposal;
 });
 
 
-const broadcastUpdatedProposal = f => (...args) => f(...args).then((proposal) => {
+const broadcastUpdatedProposal = tapPromise((proposal) => {
   if (proposal) {
+    console.log(`BROADCASTING proposalUpdated for ${proposal.proposalId}`);
+
     broadcast.proposalUpdated(proposal);
   }
-
-  return proposal;
 });
 
-const multiBroadcast = (splitter, broadcasts) => f => (...args) => {
-  return f(...args)
-    .then((result) => {
-      splitter(result).forEach((value, i) => {
-        const broadcast = broadcasts[i];
+const multiBroadcast = (splitter, broadcasts) => tapPromise((result) => {
+  splitter(result).forEach((value, i) => {
+    const broadcast = broadcasts[i];
 
-        broadcast(v => Promise.resolve(v))(value);
-      });
-
-      return result;
-    });
-};
+    broadcast(v => Promise.resolve(v))(value);
+  });
+});
 
 const watchedFunctionsMap = {
   setStartOfFirstQuarter: initDao,

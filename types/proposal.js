@@ -297,6 +297,9 @@ const resolvers = {
     no(round) {
       return dgd(round.no);
     },
+    totalVoterStake(round) {
+      return dgd(round.totalVoterStake);
+    },
   },
   ProposalVersion: {
     milestoneFundings(version) {
