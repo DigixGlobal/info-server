@@ -444,7 +444,10 @@ const refreshProposalRevealVote = async (res) => {
 
   console.log('INSERTED refreshProposalRevealVote');
 
-  return Promise.resolve(proposal);
+  return Promise.all([
+    getProposal(res._proposalId),
+    getAddressDetails(res._from),
+  ]);
 };
 
 // TO BE TESTED

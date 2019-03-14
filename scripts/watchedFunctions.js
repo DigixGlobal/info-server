@@ -48,6 +48,19 @@ const broadcastUpdatedProposal = f => (...args) => f(...args).then((proposal) =>
   return proposal;
 });
 
+const multiBroadcast = (splitter, broadcasts) => f => (...args) => {
+  return f(...args)
+    .then((result) => {
+      splitter(result).forEach((value, i) => {
+        const broadcast = broadcasts[i];
+
+        broadcast(Promise.resolve)(value);
+      });
+
+      return result;
+    });
+};
+
 const watchedFunctionsMap = {
   setStartOfFirstQuarter: initDao,
   calculateGlobalRewardsBeforeNewQuarter: initDao,
@@ -63,7 +76,10 @@ const watchedFunctionsMap = {
   voteOnDraft: broadcastUpdatedProposal(refreshProposalDraftVote),
   claimDraftVotingResult: broadcastUpdatedProposal(refreshProposalDraftVotingClaim),
   commitVoteOnProposal: broadcastUpdatedProposal(refreshProposalCommitVote),
-  revealVoteOnProposal: broadcastUpdatedProposal(refreshProposalRevealVote),
+  revealVoteOnProposal: multiBroadcast(
+    ([proposal, user]) => [proposal, user],
+    [broadcastUpdatedProposal, broadcastUpdatedUser],
+  )(refreshProposalRevealVote),
   claimProposalVotingResult: broadcastUpdatedProposal(refreshProposalVotingClaim),
   claimFunding: broadcastUpdatedProposal(refreshProposalClaimFunding),
   finishMilestone: broadcastUpdatedProposal(refreshProposalFinishMilestone),
