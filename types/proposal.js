@@ -291,6 +291,12 @@ const resolvers = {
     quorum(round) {
       return dgd(round.quorum);
     },
+    yes(round) {
+      return dgd(round.yes);
+    },
+    no(round) {
+      return dgd(round.no);
+    },
   },
   ProposalVersion: {
     milestoneFundings(version) {
