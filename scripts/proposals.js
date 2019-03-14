@@ -757,7 +757,7 @@ const refreshProposalCommitVoteOnSpecial = async (res) => {
 
 // TO BE TESTED
 const refreshProposalRevealVoteOnSpecial = async (res) => {
-  const proposal = serializeSpecialProposal(getSpecialProposal(res._proposalId));
+  const proposal = serializeSpecialProposal(await getSpecialProposal(res._proposalId));
   const addressDetails = serializeAddress(await getAddressDetails(res._from));
   const vote = res._vote;
 
