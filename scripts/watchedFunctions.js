@@ -40,6 +40,15 @@ const broadcastUpdatedUser = f => (...args) => f(...args).then((user) => {
   return user;
 });
 
+const broadcastSubmittedProposal = f => (...args) => f(...args).then((proposal) => {
+  if (proposal) {
+    broadcast.proposalSubmitted(proposal);
+  }
+
+  return proposal;
+});
+
+
 const broadcastUpdatedProposal = f => (...args) => f(...args).then((proposal) => {
   if (proposal) {
     broadcast.proposalUpdated(proposal);
@@ -54,7 +63,7 @@ const multiBroadcast = (splitter, broadcasts) => f => (...args) => {
       splitter(result).forEach((value, i) => {
         const broadcast = broadcasts[i];
 
-        broadcast(Promise.resolve)(value);
+        broadcast(v => Promise.resolve(v))(value);
       });
 
       return result;
@@ -69,7 +78,7 @@ const watchedFunctionsMap = {
   confirmContinueParticipation: broadcastUpdatedUser(refreshAddress),
   redeemBadge: broadcastUpdatedUser(refreshAddress),
   claimRewards: broadcastUpdatedUser(refreshAddress),
-  submitPreproposal: broadcastUpdatedProposal(refreshProposalNew),
+  submitPreproposal: broadcastSubmittedProposal(refreshProposalNew),
   modifyProposal: broadcastUpdatedProposal(refreshProposalDetails),
   endorseProposal: broadcastUpdatedProposal(refreshProposalEndorseProposal),
   finalizeProposal: broadcastUpdatedProposal(refreshProposalFinalizeProposal),

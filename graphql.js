@@ -16,37 +16,30 @@ const { typeDef: proposalType, resolvers: proposalResolvers } = require('./types
 
 const queryType = gql`
   type Query {
-    """
-    Find a specific proposal by proposal ID.
-    """
+    # Find a specific proposal by proposal ID.
     fetchProposal(proposalId: String!): Proposal
 
-    """
-    Get the current user's information.
-    """
+    # Get the current user's information.
     fetchCurrentUser: User!
   }
 `;
 
 const mutationType = gql`
   type Mutation {
-    """
-    Sample mutation just to get a pong.
-    """
+    # Sample mutation just to get a pong.
     ping: String
   }
 `;
 
 const subscriptionType = gql`
   type Subscription {
-    """
-    Triggers on any update of a proposal.
-    """
+    # Triggers on any submitted proposal.
+    proposalSubmitted: Proposal!
+
+    # Triggers on any updates of a proposal.
     proposalUpdated: Proposal!
 
-    """
-    Triggers on any change of the current user.
-    """
+    # Triggers on any change of the current user.
     userUpdated: User!
   }
 `;
@@ -77,6 +70,9 @@ const resolvers = {
         () => pubsub.asyncIterator('userUpdated'),
         filterByCurrentAddress(payload => payload.userUpdated.address),
       ),
+    },
+    proposalSubmitted: {
+      subscribe: () => pubsub.asyncIterator('proposalSubmitted'),
     },
     proposalUpdated: {
       subscribe: () => pubsub.asyncIterator('proposalUpdated'),
