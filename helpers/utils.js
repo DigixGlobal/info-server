@@ -236,6 +236,7 @@ const deserializeAddress = function (address) {
     address.lockedDgd = ofOne(address.lockedDgd, denominators.DGD);
     address.reputationPoint = ofOne(address.reputationPoint, denominators.REPUTATION_POINT);
     address.quarterPoint = ofOne(address.quarterPoint, denominators.QUARTER_POINT);
+    address.claimableDgx = ofOne(address.claimableDgx, denominators.DGX);
   }
 
   return address;
