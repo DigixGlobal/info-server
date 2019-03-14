@@ -43,9 +43,6 @@ const resolvers = {
     id(user) {
       return user.address;
     },
-    claimableDgx(user) {
-      return dgx(user.claimableDgx);
-    },
     lockedDgdStake(user) {
       return dgd(user.lockedDgdStake);
     },
