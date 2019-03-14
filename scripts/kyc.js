@@ -24,6 +24,8 @@ const {
   notifyDaoServer,
 } = require('./notifier');
 
+const keystore = require('../keystore/kyc-admin.json');
+
 const _getCallData = (entry) => {
   return getContracts()
     .daoIdentity
@@ -53,7 +55,7 @@ const _rawTxn = (signedTxn) => {
 };
 
 const approveKyc = async (entry) => {
-  const kycAdmin = '0x'.concat(JSON.parse(process.env.KYC_ADMIN_KEYSTORE).address);
+  const kycAdmin = '0x'.concat(keystore.address);
   const nonce = await getWeb3().eth.getTransactionCount(kycAdmin);
   const txnObj = _txnObject(entry, kycAdmin, nonce);
   const txn = new EthereumTx(txnObj);
