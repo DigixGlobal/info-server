@@ -223,6 +223,7 @@ const refreshProposalFinalizeProposal = async (res) => {
   proposal.draftVoting.passed = false;
   proposal.draftVoting.funded = false;
   proposal.draftVoting.currentClaimStep = 1;
+  proposal.draftVoting.isProcessed = false;
   proposal.currentVotingRound = -1;
   proposal.votingStage = proposalVotingStages.DRAFT;
 
@@ -318,8 +319,10 @@ const refreshProposalDraftVotingClaim = async (res) => {
     return refreshProposalPartialDraftVotingClaim(res);
   }
   const proposal = await getProposal(res._proposalId);
+  if (proposal.draftVoting.isProcessed === true) return;
   proposal.draftVoting.claimed = true;
   proposal.draftVoting.passed = await getContracts().daoStorage.readProposalDraftVotingResult.call(res._proposalId);
+  proposal.draftVoting.isProcessed = true;
 
   // if the draft voting has failed
   proposal.stage = proposalStages.ARCHIVED;
@@ -351,6 +354,7 @@ const refreshProposalDraftVotingClaim = async (res) => {
       passed: false,
       funded: false,
       currentClaimStep: 1,
+      isProcessed: false,
     });
   }
 
@@ -477,13 +481,15 @@ const refreshProposalVotingClaim = async (res) => {
   if (isClaimed === false) {
     return refreshProposalPartialVotingClaim(res);
   }
-
   // get the current proposal info
   const proposal = await getProposal(res._proposalId);
   const index = res._index;
+  if (proposal.votingRounds[index].isProcessed === true) return;
+
   const result = await getContracts().daoStorage.readProposalVotingResult.call(res._proposalId, index);
   proposal.votingRounds[index].claimed = true;
   proposal.votingRounds[index].passed = result;
+  proposal.votingRounds[index].isProcessed = true;
 
   // result === false take care here
   // if it was last review voting round, take care here
@@ -571,6 +577,7 @@ const refreshProposalFinishMilestone = async (res) => {
     passed: false,
     funded: false,
     currentClaimStep: 1,
+    isProcessed: false,
   });
 
   // update proposal
@@ -705,6 +712,7 @@ const refreshProposalSpecial = async (res) => {
   votingStruct.claimed = false;
   votingStruct.passed = false;
   votingStruct.currentClaimStep = 1;
+  votingStruct.isProcessed = false;
   proposal.votingRounds.push(votingStruct);
 
   proposal.isActive = true;
@@ -827,9 +835,12 @@ const refreshProposalSpecialVotingClaim = async (res) => {
 
   // get the current proposal info
   const proposal = await getSpecialProposal(res._proposalId);
+  if (proposal.votingRounds[0].isProcessed === true) return;
+
   const result = await getContracts().daoSpecialStorage.readVotingResult.call(res._proposalId);
   proposal.votingRounds[0].claimed = true;
   proposal.votingRounds[0].passed = result;
+  proposal.votingRounds[0].isProcessed = true;
 
   // update proposal
   await updateSpecialProposal(res._proposalId, {
