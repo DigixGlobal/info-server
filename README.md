@@ -27,6 +27,21 @@ npm run dev
 npm run staging
 ```
 
+##### Details
+Note that the `dev` can be replaced by `staging` for the staging environment
+* Forcefully drop database and restart Info-server
+```
+$ npm run dev:force
+```
+* Re-sync all transactions from the blockchain, and then process them
+```
+$ npm run dev:resync
+```
+* Don't re-sync transactions, only process transactions all over again
+```
+$ npm run dev:reprocess
+```
+
 ### Endpoints
 ##### Dao details
 * `/daoInfo`

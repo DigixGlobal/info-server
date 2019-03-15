@@ -33,6 +33,11 @@ const initDB = async () => {
 
   if (process.env.FORCE_REFRESH_DB === 'true') {
     await mongoUtil.initFreshDb();
+  } else if (process.env.RESYNC === 'true') {
+    await mongoUtil.initToResyncDb();
+    await mongoUtil.checkAndInitFreshDb();
+  } else if (process.env.REPROCESS_ONLY === 'true') {
+    await mongoUtil.initToProcessOnlyDb();
   } else {
     await mongoUtil.checkAndInitFreshDb();
   }
