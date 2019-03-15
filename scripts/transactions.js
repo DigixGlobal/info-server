@@ -51,6 +51,7 @@ const _formEventObj = (transaction) => {
   const res = {
     _from: transaction.tx.from,
     _proposalId: getFromFunctionArg(transaction, '_proposalId'),
+    _docIpfsHash: getFromFunctionArg(transaction, '_docIpfsHash'),
     _index: getFromFunctionArg(transaction, '_index'),
     _vote: getFromFunctionArg(transaction, '_vote'),
     _doc: getFromFunctionArg(transaction, '_doc'),

@@ -15,6 +15,7 @@ const {
   getOriginalFundings,
   getUpdatedFundings,
   getDefaultDijixFields,
+  bNArrayToString,
 } = require('../helpers/utils');
 
 const {
@@ -162,6 +163,7 @@ const refreshProposalDetails = async (res) => {
   const nVersions = proposalDetails[readProposalIndices.nVersions];
   proposal.proposalVersions = [];
   let currentVersion = res._proposalId;
+  const latestVersion = res._docIpfsHash;
   for (const v in indexRange(0, nVersions)) {
     console.log('version id : ', v);
     const proposalVersion = await getContracts().daoStorage.readProposalVersion.call(res._proposalId, currentVersion);
@@ -173,8 +175,8 @@ const refreshProposalDetails = async (res) => {
     proposal.proposalVersions.push({
       docIpfsHash: proposalVersion[readProposalVersionIndices.docIpfsHash],
       created: proposalVersion[readProposalVersionIndices.created].toNumber(),
-      milestoneFundings: res._milestonesFundings,
-      finalReward: res._finalReward.toString(),
+      milestoneFundings: (currentVersion === latestVersion) ? res._milestonesFundings : bNArrayToString(proposalVersion[readProposalVersionIndices.milestoneFundings]),
+      finalReward: (currentVersion === latestVersion) ? res._finalReward.toString() : proposalVersion[readProposalVersionIndices.finalReward].toString(),
       moreDocs: proposalDocs,
       totalFunding: (new BigNumber(res._finalReward)).plus(sumArrayString(res._milestonesFundings)).toString(),
       dijixObject: ipfsDoc.data ? {
