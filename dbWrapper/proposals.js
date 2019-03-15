@@ -51,6 +51,14 @@ const getSpecialProposal = async (proposalId) => {
   return proposal;
 };
 
+const getSpecialProposalsCount = async () => {
+  const cursor = mongoUtil.getDB()
+    .collection(collections.SPECIAL_PROPOSALS)
+    .find({});
+  const count = await cursor.count();
+  return count;
+};
+
 const getProposals = async (filter) => {
   const proposals = [];
   const cursor = mongoUtil.getDB()
@@ -93,5 +101,6 @@ module.exports = {
   getSpecialProposal,
   getProposals,
   getSpecialProposals,
+  getSpecialProposalsCount,
   getProposalsCount,
 };

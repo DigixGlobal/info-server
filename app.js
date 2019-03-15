@@ -1,3 +1,4 @@
+const http = require('http');
 const express = require('express');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
@@ -13,6 +14,7 @@ const {
   initContracts,
 } = require('./helpers/contracts');
 
+const server = require('./graphql');
 const routes = require('./routes');
 const scripts = require('./scripts');
 
@@ -31,6 +33,11 @@ const initDB = async () => {
 
   if (process.env.FORCE_REFRESH_DB === 'true') {
     await mongoUtil.initFreshDb();
+  } else if (process.env.RESYNC === 'true') {
+    await mongoUtil.initToResyncDb();
+    await mongoUtil.checkAndInitFreshDb();
+  } else if (process.env.REPROCESS_ONLY === 'true') {
+    await mongoUtil.initToProcessOnlyDb();
   } else {
     await mongoUtil.checkAndInitFreshDb();
   }
@@ -50,7 +57,6 @@ const initCron = async () => {
     // the values stay the same in the same quarter
     // So, only need to refreshDao when a new quarter begins
     scripts.refreshDao();
-    scripts.refreshDaoConfigs();
     scripts.processPendingKycs();
   });
 };
@@ -78,11 +84,21 @@ const init = async () => {
 
   scripts.watchNewBlocks();
 
+  scripts.refreshDaoConfigs();
+
   initCron();
 };
 
 init();
 
-const server = app.listen(process.env.PORT, function () {
-  console.log('Info server running on port.', server.address().port);
+server.applyMiddleware({
+  app,
+  path: '/api',
+});
+
+const httpServer = http.createServer(app);
+server.installSubscriptionHandlers(httpServer);
+
+httpServer.listen(process.env.PORT, () => {
+  console.log('Info server running on port.', process.env.PORT);
 });

@@ -19,6 +19,7 @@ const {
 
 const {
   proposalVotingStages,
+  daoServerEndpoints,
 } = require('../helpers/constants');
 
 const {
@@ -121,7 +122,7 @@ const _updateProposalVoteWeightages = async function (addressDetails, userInfo) 
 
 const refreshAddress = async (res) => {
   const user = _getUser(res);
-  if (user === null || user === undefined) return;
+  if (user === null || user === undefined) return Promise.reject();
 
   // get address details from db and contract
   const addressDetails = await getAddressDetails(user);
@@ -146,7 +147,7 @@ const refreshAddress = async (res) => {
     // new address, tell dao-server about new address
     notifyDaoServer({
       method: 'POST',
-      path: '/user',
+      path: daoServerEndpoints.NEW_USER,
       body: {
         payload: {
           address: user,
@@ -170,6 +171,8 @@ const refreshAddress = async (res) => {
       totalModeratorLockedDgds: totalModeratorLockedDgds.toString(),
     },
   });
+
+  return Promise.resolve({ address: user, ...getAddressObject(userInfo) });
 };
 
 module.exports = {

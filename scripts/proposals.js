@@ -14,6 +14,8 @@ const {
   serializeProposalVotingRound,
   getOriginalFundings,
   getUpdatedFundings,
+  getDefaultDijixFields,
+  bNArrayToString,
 } = require('../helpers/utils');
 
 const {
@@ -25,6 +27,8 @@ const {
   proposalVotingStages,
   readSpecialProposalIndices,
   daoConfigsIndices,
+  daoServerEndpoints,
+  daoServerEventTypes,
 } = require('../helpers/constants');
 
 const {
@@ -56,6 +60,10 @@ const {
 const {
   getAddressObject,
 } = require('./addresses');
+
+const {
+  refreshDaoConfigs,
+} = require('./dao');
 
 // TODO: proposal.votingStage does not change
 // from COMMIT to REVEAL automatically
@@ -102,7 +110,7 @@ const refreshProposalNew = async (res) => {
       dijixObject: ipfsDoc.data ? {
         ...ipfsDoc.data.attestation,
         images: ipfsDoc.data.proofs,
-      } : {},
+      } : getDefaultDijixFields(),
     });
     currentVersion = await getContracts().daoStorage.getNextProposalVersion.call(_proposalId, currentVersion);
   }
@@ -114,7 +122,7 @@ const refreshProposalNew = async (res) => {
   // new proposal, tell dao-server about new proposal
   notifyDaoServer({
     method: 'POST',
-    path: '/proposals',
+    path: daoServerEndpoints.NEW_PROPOSAL,
     body: {
       payload: {
         proposalId: proposal.proposalId,
@@ -122,6 +130,21 @@ const refreshProposalNew = async (res) => {
       },
     },
   });
+
+  // new proposal, tell dao-server about new proposal
+  notifyDaoServer({
+    method: 'POST',
+    path: daoServerEndpoints.NEW_EVENT,
+    body: {
+      payload: {
+        eventType: daoServerEventTypes.NEW_PROPOSAL,
+        proposalId: proposal.proposalId,
+        proposer: proposal.proposer,
+      },
+    },
+  });
+
+  return Promise.resolve(proposal);
 };
 
 // DONE
@@ -140,6 +163,7 @@ const refreshProposalDetails = async (res) => {
   const nVersions = proposalDetails[readProposalIndices.nVersions];
   proposal.proposalVersions = [];
   let currentVersion = res._proposalId;
+  const latestVersion = res._docIpfsHash;
   for (const v in indexRange(0, nVersions)) {
     console.log('version id : ', v);
     const proposalVersion = await getContracts().daoStorage.readProposalVersion.call(res._proposalId, currentVersion);
@@ -151,14 +175,14 @@ const refreshProposalDetails = async (res) => {
     proposal.proposalVersions.push({
       docIpfsHash: proposalVersion[readProposalVersionIndices.docIpfsHash],
       created: proposalVersion[readProposalVersionIndices.created].toNumber(),
-      milestoneFundings: res._milestonesFundings,
-      finalReward: res._finalReward.toString(),
+      milestoneFundings: (currentVersion === latestVersion) ? res._milestonesFundings : bNArrayToString(proposalVersion[readProposalVersionIndices.milestoneFundings]),
+      finalReward: (currentVersion === latestVersion) ? res._finalReward.toString() : proposalVersion[readProposalVersionIndices.finalReward].toString(),
       moreDocs: proposalDocs,
       totalFunding: (new BigNumber(res._finalReward)).plus(sumArrayString(res._milestonesFundings)).toString(),
       dijixObject: ipfsDoc.data ? {
         ...ipfsDoc.data.attestation,
         images: ipfsDoc.data.proofs,
-      } : {},
+      } : getDefaultDijixFields(),
     });
     currentVersion = await getContracts().daoStorage.getNextProposalVersion.call(res._proposalId, currentVersion);
   }
@@ -168,10 +192,14 @@ const refreshProposalDetails = async (res) => {
     $set: proposal,
   });
   console.log('INSERTED refreshProposalDetails');
+
+  return Promise.resolve(proposal);
 };
 
 // DONE
 const refreshProposalEndorseProposal = async (res) => {
+  const proposal = await getProposal(res._proposalId);
+
   // update the database
   await updateProposal(res._proposalId, {
     $set: {
@@ -180,6 +208,21 @@ const refreshProposalEndorseProposal = async (res) => {
     },
   });
   console.log('INSERTED refreshProposalEndorseProposal');
+
+  // tell dao-server about the endorse event
+  notifyDaoServer({
+    method: 'POST',
+    path: daoServerEndpoints.NEW_EVENT,
+    body: {
+      payload: {
+        eventType: daoServerEventTypes.PROPOSAL_ENDORSED,
+        proposalId: proposal.proposalId,
+        proposer: proposal.proposer,
+      },
+    },
+  });
+
+  return getProposal(res._proposalId);
 };
 
 // DONE
@@ -213,6 +256,7 @@ const refreshProposalFinalizeProposal = async (res) => {
   proposal.draftVoting.passed = false;
   proposal.draftVoting.funded = false;
   proposal.draftVoting.currentClaimStep = 1;
+  proposal.draftVoting.isProcessed = false;
   proposal.currentVotingRound = -1;
   proposal.votingStage = proposalVotingStages.DRAFT;
 
@@ -221,6 +265,8 @@ const refreshProposalFinalizeProposal = async (res) => {
     $set: proposal,
   });
   console.log('INSERTED refreshProposalFinalizeProposal');
+
+  return Promise.resolve(proposal);
 };
 
 // DONE
@@ -283,6 +329,8 @@ const refreshProposalDraftVote = async (res) => {
     },
   }, {});
   console.log('INSERTED refreshProposalDraftVote');
+
+  return getProposal(res._proposalId);
 };
 
 // TO BE TESTED
@@ -293,18 +341,21 @@ const refreshProposalPartialDraftVotingClaim = async (res) => {
     $set: proposal,
   });
   console.log('refresh proposal partial draft voting claim');
+
+  return Promise.resolve(proposal);
 };
 
 // DONE
 const refreshProposalDraftVotingClaim = async (res) => {
   const isClaimed = await getContracts().daoStorage.isDraftClaimed.call(res._proposalId);
   if (isClaimed === false) {
-    await refreshProposalPartialDraftVotingClaim(res);
-    return;
+    return refreshProposalPartialDraftVotingClaim(res);
   }
   const proposal = await getProposal(res._proposalId);
+  if (proposal.draftVoting.isProcessed === true) return;
   proposal.draftVoting.claimed = true;
   proposal.draftVoting.passed = await getContracts().daoStorage.readProposalDraftVotingResult.call(res._proposalId);
+  proposal.draftVoting.isProcessed = true;
 
   // if the draft voting has failed
   proposal.stage = proposalStages.ARCHIVED;
@@ -336,6 +387,7 @@ const refreshProposalDraftVotingClaim = async (res) => {
       passed: false,
       funded: false,
       currentClaimStep: 1,
+      isProcessed: false,
     });
   }
 
@@ -344,6 +396,8 @@ const refreshProposalDraftVotingClaim = async (res) => {
     $set: proposal,
   }, { upsert: true });
   console.log('INSERTED refreshProposalDraftVotingClaim');
+
+  return Promise.resolve(proposal);
 };
 
 // DONE
@@ -379,6 +433,8 @@ const refreshProposalCommitVote = async (res) => {
     $set: { votes },
   });
   console.log('INSERTED refreshProposalCommitVote');
+
+  return Promise.resolve(proposal);
 };
 
 // DONE
@@ -424,6 +480,11 @@ const refreshProposalRevealVote = async (res) => {
   });
 
   console.log('INSERTED refreshProposalRevealVote');
+
+  return Promise.all([
+    getProposal(res._proposalId),
+    getAddressDetails(res._from),
+  ]);
 };
 
 // TO BE TESTED
@@ -435,6 +496,8 @@ const refreshProposalPartialVotingClaim = async (res) => {
     $set: proposal,
   });
   console.log('refresh proposal partial voting claim');
+
+  return Promise.resolve(proposal);
 };
 
 // DONE
@@ -449,16 +512,17 @@ const refreshProposalVotingClaim = async (res) => {
   // consider this fn call only if event logs were present
   const isClaimed = await getContracts().daoStorage.isClaimed.call(res._proposalId, res._index);
   if (isClaimed === false) {
-    await refreshProposalPartialVotingClaim(res);
-    return;
+    return refreshProposalPartialVotingClaim(res);
   }
-
   // get the current proposal info
   const proposal = await getProposal(res._proposalId);
   const index = res._index;
+  if (proposal.votingRounds[index].isProcessed === true) return;
+
   const result = await getContracts().daoStorage.readProposalVotingResult.call(res._proposalId, index);
   proposal.votingRounds[index].claimed = true;
   proposal.votingRounds[index].passed = result;
+  proposal.votingRounds[index].isProcessed = true;
 
   // result === false take care here
   // if it was last review voting round, take care here
@@ -491,6 +555,8 @@ const refreshProposalVotingClaim = async (res) => {
     $set: proposal,
   });
   console.log('INSERTED refreshProposalVotingClaim');
+
+  return Promise.resolve(proposal);
 };
 
 // DONE
@@ -507,6 +573,8 @@ const refreshProposalClaimFunding = async (res) => {
     $set: { claimableFunding: claimableFunding.toString() },
   });
   console.log('INSERTED refreshProposalClaimFunding');
+
+  return Promise.resolve(proposal);
 };
 
 // DONE
@@ -541,6 +609,8 @@ const refreshProposalFinishMilestone = async (res) => {
     claimed: false,
     passed: false,
     funded: false,
+    currentClaimStep: 1,
+    isProcessed: false,
   });
 
   // update proposal
@@ -548,6 +618,8 @@ const refreshProposalFinishMilestone = async (res) => {
     $set: proposal,
   });
   console.log('INSERTED refreshProposalFinishMilestone');
+
+  return Promise.resolve(proposal);
 };
 
 // DONE
@@ -563,6 +635,8 @@ const refreshProposalChangeFundings = async (res) => {
     },
   });
   console.log('INSERTED refreshProposalChangeFundings');
+
+  return Promise.resolve(proposal);
 };
 
 // DONE
@@ -574,6 +648,8 @@ const refreshProposalClose = async (res) => {
     },
   });
   console.log('INSERTED refreshProposalClose');
+
+  return getProposal(res._proposalId);
 };
 
 // TO BE TESTED
@@ -605,6 +681,8 @@ const refreshProposalPRLAction = async (res) => {
   await updateProposal(res._proposalId, {
     $set: updateObj,
   });
+
+  return getProposal(res._proposalId);
 };
 
 // TO BE TESTED
@@ -633,7 +711,7 @@ const refreshProposalSpecialNew = async (res) => {
 
   notifyDaoServer({
     method: 'POST',
-    path: '/proposals',
+    path: daoServerEndpoints.NEW_PROPOSAL,
     body: {
       payload: {
         proposalId: proposal.proposalId,
@@ -641,6 +719,8 @@ const refreshProposalSpecialNew = async (res) => {
       },
     },
   });
+
+  return Promise.resolve(proposal);
 };
 
 // TO BE TESTED
@@ -665,6 +745,7 @@ const refreshProposalSpecial = async (res) => {
   votingStruct.claimed = false;
   votingStruct.passed = false;
   votingStruct.currentClaimStep = 1;
+  votingStruct.isProcessed = false;
   proposal.votingRounds.push(votingStruct);
 
   proposal.isActive = true;
@@ -672,7 +753,10 @@ const refreshProposalSpecial = async (res) => {
   await updateSpecialProposal(res._proposalId, {
     $set: proposal,
   });
+
   console.log('updated special proposal');
+
+  return Promise.resolve(proposal);
 };
 
 // TO BE TESTED
@@ -706,7 +790,10 @@ const refreshProposalCommitVoteOnSpecial = async (res) => {
   await updateAddress(res._from, {
     $set: { votes },
   });
+
   console.log('committed vote for special proposal');
+
+  return Promise.resolve(proposal);
 };
 
 // TO BE TESTED
@@ -756,6 +843,8 @@ const refreshProposalRevealVoteOnSpecial = async (res) => {
   });
 
   console.log('reveal vote for special proposal');
+
+  return getSpecialProposal(res._proposalId);
 };
 
 // TO BE TESTED
@@ -766,24 +855,35 @@ const refreshProposalSpecialPartialVotingClaim = async (res) => {
     $set: proposal,
   });
   console.log('refresh special proposal partial voting claim');
+
+  return Promise.resolve(proposal);
 };
 
 // TO BE TESTED
 const refreshProposalSpecialVotingClaim = async (res) => {
   const isClaimed = await getContracts().daoSpecialStorage.isClaimed.call(res._proposalId);
-  if (isClaimed === false) await refreshProposalSpecialPartialVotingClaim(res);
+  if (isClaimed === false) {
+    return refreshProposalSpecialPartialVotingClaim(res);
+  }
 
   // get the current proposal info
   const proposal = await getSpecialProposal(res._proposalId);
+  if (proposal.votingRounds[0].isProcessed === true) return;
+
   const result = await getContracts().daoSpecialStorage.readVotingResult.call(res._proposalId);
   proposal.votingRounds[0].claimed = true;
   proposal.votingRounds[0].passed = result;
+  proposal.votingRounds[0].isProcessed = true;
 
   // update proposal
   await updateSpecialProposal(res._proposalId, {
     $set: proposal,
   });
+
+  await refreshDaoConfigs();
   console.log('updated special proposal after voting claim');
+
+  return Promise.resolve(proposal);
 };
 
 module.exports = {

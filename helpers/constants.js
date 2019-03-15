@@ -18,6 +18,28 @@ const readSpecialProposalIndices = {
   timeVotingStarted: 3,
 };
 
+const daoServerEndpoints = {
+  NEW_PROPOSAL: '/proposals',
+  NEW_USER: '/user',
+  NEW_EVENT: '/dao_event',
+  TRANSACTION_SEEN: '/transactions/seen',
+  TRANSACTION_CONFIRM: '/transactions/confirmed',
+  KYC_UPDATE: '/admin/kyc_approval_update',
+};
+
+const daoServerEventTypes = {
+  NEW_PROPOSAL: 'EVENT_PROJECT_CREATED',
+  PROPOSAL_ENDORSED: 'EVENT_PROJECT_ENDORSED',
+};
+
+const dijixDefaultFields = {
+  TITLE: 'Could not fetch Proposal Details',
+  DESCRIPTION: 'Proposer must edit proposal and re-upload documents',
+  DETAILS: 'The previously uploaded documents could not be stored/fetched on/from IPFS. Kindly edit the proposal to re-upload the necessary documents',
+  MILESTONE_TITLE: 'Could not fetch Proposal Details',
+  MILESTONE_DESCRIPTION: 'Could not fetch Proposal Details',
+};
+
 const daoConfigsIndices = {
   CONFIG_LOCKING_PHASE_DURATION: 0,
   CONFIG_QUARTER_DURATION: 1,
@@ -273,4 +295,7 @@ module.exports = {
   watchedFunctionsList,
   readProposalPRLActions,
   denominators,
+  dijixDefaultFields,
+  daoServerEndpoints,
+  daoServerEventTypes,
 };
