@@ -125,6 +125,10 @@ const serializeProposal = function (proposal) {
   return proposal;
 };
 
+const proposalToType = function (proposal) {
+  return proposal;
+};
+
 const serializeProposalVotingRound = function (proposal, index) {
   if (proposal.votingRounds) {
     const round = proposal.votingRounds[index];
@@ -232,6 +236,7 @@ const deserializeAddress = function (address) {
     address.lockedDgd = ofOne(address.lockedDgd, denominators.DGD);
     address.reputationPoint = ofOne(address.reputationPoint, denominators.REPUTATION_POINT);
     address.quarterPoint = ofOne(address.quarterPoint, denominators.QUARTER_POINT);
+    address.claimableDgx = ofOne(address.claimableDgx, denominators.DGX);
   }
 
   return address;
@@ -289,6 +294,7 @@ module.exports = {
   ofMany,
   ofOne,
   serializeProposal,
+  proposalToType,
   serializeSpecialProposal,
   serializeProposalVotingRound,
   serializeAddress,

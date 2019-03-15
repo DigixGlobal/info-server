@@ -126,6 +126,8 @@ const refreshProposalNew = async (res) => {
       },
     },
   });
+
+  return Promise.resolve(proposal);
 };
 
 // DONE
@@ -172,6 +174,8 @@ const refreshProposalDetails = async (res) => {
     $set: proposal,
   });
   console.log('INSERTED refreshProposalDetails');
+
+  return Promise.resolve(proposal);
 };
 
 // DONE
@@ -184,6 +188,8 @@ const refreshProposalEndorseProposal = async (res) => {
     },
   });
   console.log('INSERTED refreshProposalEndorseProposal');
+
+  return getProposal(res._proposalId);
 };
 
 // DONE
@@ -225,6 +231,8 @@ const refreshProposalFinalizeProposal = async (res) => {
     $set: proposal,
   });
   console.log('INSERTED refreshProposalFinalizeProposal');
+
+  return Promise.resolve(proposal);
 };
 
 // DONE
@@ -287,6 +295,8 @@ const refreshProposalDraftVote = async (res) => {
     },
   }, {});
   console.log('INSERTED refreshProposalDraftVote');
+
+  return getProposal(res._proposalId);
 };
 
 // TO BE TESTED
@@ -297,14 +307,15 @@ const refreshProposalPartialDraftVotingClaim = async (res) => {
     $set: proposal,
   });
   console.log('refresh proposal partial draft voting claim');
+
+  return Promise.resolve(proposal);
 };
 
 // DONE
 const refreshProposalDraftVotingClaim = async (res) => {
   const isClaimed = await getContracts().daoStorage.isDraftClaimed.call(res._proposalId);
   if (isClaimed === false) {
-    await refreshProposalPartialDraftVotingClaim(res);
-    return;
+    return refreshProposalPartialDraftVotingClaim(res);
   }
   const proposal = await getProposal(res._proposalId);
   proposal.draftVoting.claimed = true;
@@ -348,6 +359,8 @@ const refreshProposalDraftVotingClaim = async (res) => {
     $set: proposal,
   }, { upsert: true });
   console.log('INSERTED refreshProposalDraftVotingClaim');
+
+  return Promise.resolve(proposal);
 };
 
 // DONE
@@ -383,6 +396,8 @@ const refreshProposalCommitVote = async (res) => {
     $set: { votes },
   });
   console.log('INSERTED refreshProposalCommitVote');
+
+  return Promise.resolve(proposal);
 };
 
 // DONE
@@ -428,6 +443,11 @@ const refreshProposalRevealVote = async (res) => {
   });
 
   console.log('INSERTED refreshProposalRevealVote');
+
+  return Promise.all([
+    getProposal(res._proposalId),
+    getAddressDetails(res._from),
+  ]);
 };
 
 // TO BE TESTED
@@ -439,6 +459,8 @@ const refreshProposalPartialVotingClaim = async (res) => {
     $set: proposal,
   });
   console.log('refresh proposal partial voting claim');
+
+  return Promise.resolve(proposal);
 };
 
 // DONE
@@ -453,8 +475,7 @@ const refreshProposalVotingClaim = async (res) => {
   // consider this fn call only if event logs were present
   const isClaimed = await getContracts().daoStorage.isClaimed.call(res._proposalId, res._index);
   if (isClaimed === false) {
-    await refreshProposalPartialVotingClaim(res);
-    return;
+    return refreshProposalPartialVotingClaim(res);
   }
 
   // get the current proposal info
@@ -495,6 +516,8 @@ const refreshProposalVotingClaim = async (res) => {
     $set: proposal,
   });
   console.log('INSERTED refreshProposalVotingClaim');
+
+  return Promise.resolve(proposal);
 };
 
 // DONE
@@ -511,6 +534,8 @@ const refreshProposalClaimFunding = async (res) => {
     $set: { claimableFunding: claimableFunding.toString() },
   });
   console.log('INSERTED refreshProposalClaimFunding');
+
+  return Promise.resolve(proposal);
 };
 
 // DONE
@@ -553,6 +578,8 @@ const refreshProposalFinishMilestone = async (res) => {
     $set: proposal,
   });
   console.log('INSERTED refreshProposalFinishMilestone');
+
+  return Promise.resolve(proposal);
 };
 
 // DONE
@@ -568,6 +595,8 @@ const refreshProposalChangeFundings = async (res) => {
     },
   });
   console.log('INSERTED refreshProposalChangeFundings');
+
+  return Promise.resolve(proposal);
 };
 
 // DONE
@@ -579,6 +608,8 @@ const refreshProposalClose = async (res) => {
     },
   });
   console.log('INSERTED refreshProposalClose');
+
+  return getProposal(res._proposalId);
 };
 
 // TO BE TESTED
@@ -610,6 +641,8 @@ const refreshProposalPRLAction = async (res) => {
   await updateProposal(res._proposalId, {
     $set: updateObj,
   });
+
+  return getProposal(res._proposalId);
 };
 
 // TO BE TESTED
@@ -646,6 +679,8 @@ const refreshProposalSpecialNew = async (res) => {
       },
     },
   });
+
+  return Promise.resolve(proposal);
 };
 
 // TO BE TESTED
@@ -677,7 +712,10 @@ const refreshProposalSpecial = async (res) => {
   await updateSpecialProposal(res._proposalId, {
     $set: proposal,
   });
+
   console.log('updated special proposal');
+
+  return Promise.resolve(proposal);
 };
 
 // TO BE TESTED
@@ -711,7 +749,10 @@ const refreshProposalCommitVoteOnSpecial = async (res) => {
   await updateAddress(res._from, {
     $set: { votes },
   });
+
   console.log('committed vote for special proposal');
+
+  return Promise.resolve(proposal);
 };
 
 // TO BE TESTED
@@ -761,6 +802,8 @@ const refreshProposalRevealVoteOnSpecial = async (res) => {
   });
 
   console.log('reveal vote for special proposal');
+
+  return getSpecialProposal(res._proposalId);
 };
 
 // TO BE TESTED
@@ -771,12 +814,16 @@ const refreshProposalSpecialPartialVotingClaim = async (res) => {
     $set: proposal,
   });
   console.log('refresh special proposal partial voting claim');
+
+  return Promise.resolve(proposal);
 };
 
 // TO BE TESTED
 const refreshProposalSpecialVotingClaim = async (res) => {
   const isClaimed = await getContracts().daoSpecialStorage.isClaimed.call(res._proposalId);
-  if (isClaimed === false) await refreshProposalSpecialPartialVotingClaim(res);
+  if (isClaimed === false) {
+    return refreshProposalSpecialPartialVotingClaim(res);
+  }
 
   // get the current proposal info
   const proposal = await getSpecialProposal(res._proposalId);
@@ -791,6 +838,8 @@ const refreshProposalSpecialVotingClaim = async (res) => {
 
   await refreshDaoConfigs();
   console.log('updated special proposal after voting claim');
+
+  return Promise.resolve(proposal);
 };
 
 module.exports = {

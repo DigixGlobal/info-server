@@ -1,3 +1,4 @@
+const http = require('http');
 const express = require('express');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
@@ -13,6 +14,7 @@ const {
   initContracts,
 } = require('./helpers/contracts');
 
+const server = require('./graphql');
 const routes = require('./routes');
 const scripts = require('./scripts');
 
@@ -82,6 +84,14 @@ const init = async () => {
 
 init();
 
-const server = app.listen(process.env.PORT, function () {
-  console.log('Info server running on port.', server.address().port);
+server.applyMiddleware({
+  app,
+  path: '/api',
+});
+
+const httpServer = http.createServer(app);
+server.installSubscriptionHandlers(httpServer);
+
+httpServer.listen(process.env.PORT, () => {
+  console.log('Info server running on port.', process.env.PORT);
 });
