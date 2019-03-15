@@ -14,6 +14,7 @@ const {
   serializeProposalVotingRound,
   getOriginalFundings,
   getUpdatedFundings,
+  getDefaultDijixFields,
 } = require('../helpers/utils');
 
 const {
@@ -25,6 +26,8 @@ const {
   proposalVotingStages,
   readSpecialProposalIndices,
   daoConfigsIndices,
+  daoServerEndpoints,
+  daoServerEventTypes,
 } = require('../helpers/constants');
 
 const {
@@ -106,7 +109,7 @@ const refreshProposalNew = async (res) => {
       dijixObject: ipfsDoc.data ? {
         ...ipfsDoc.data.attestation,
         images: ipfsDoc.data.proofs,
-      } : {},
+      } : getDefaultDijixFields(),
     });
     currentVersion = await getContracts().daoStorage.getNextProposalVersion.call(_proposalId, currentVersion);
   }
@@ -118,9 +121,22 @@ const refreshProposalNew = async (res) => {
   // new proposal, tell dao-server about new proposal
   notifyDaoServer({
     method: 'POST',
-    path: '/proposals',
+    path: daoServerEndpoints.NEW_PROPOSAL,
     body: {
       payload: {
+        proposalId: proposal.proposalId,
+        proposer: proposal.proposer,
+      },
+    },
+  });
+
+  // new proposal, tell dao-server about new proposal
+  notifyDaoServer({
+    method: 'POST',
+    path: daoServerEndpoints.NEW_EVENT,
+    body: {
+      payload: {
+        eventType: daoServerEventTypes.NEW_PROPOSAL,
         proposalId: proposal.proposalId,
         proposer: proposal.proposer,
       },
@@ -164,7 +180,7 @@ const refreshProposalDetails = async (res) => {
       dijixObject: ipfsDoc.data ? {
         ...ipfsDoc.data.attestation,
         images: ipfsDoc.data.proofs,
-      } : {},
+      } : getDefaultDijixFields(),
     });
     currentVersion = await getContracts().daoStorage.getNextProposalVersion.call(res._proposalId, currentVersion);
   }
@@ -180,6 +196,8 @@ const refreshProposalDetails = async (res) => {
 
 // DONE
 const refreshProposalEndorseProposal = async (res) => {
+  const proposal = await getProposal(res._proposalId);
+
   // update the database
   await updateProposal(res._proposalId, {
     $set: {
@@ -188,6 +206,19 @@ const refreshProposalEndorseProposal = async (res) => {
     },
   });
   console.log('INSERTED refreshProposalEndorseProposal');
+
+  // tell dao-server about the endorse event
+  notifyDaoServer({
+    method: 'POST',
+    path: daoServerEndpoints.NEW_EVENT,
+    body: {
+      payload: {
+        eventType: daoServerEventTypes.PROPOSAL_ENDORSED,
+        proposalId: proposal.proposalId,
+        proposer: proposal.proposer,
+      },
+    },
+  });
 
   return getProposal(res._proposalId);
 };
@@ -678,7 +709,7 @@ const refreshProposalSpecialNew = async (res) => {
 
   notifyDaoServer({
     method: 'POST',
-    path: '/proposals',
+    path: daoServerEndpoints.NEW_PROPOSAL,
     body: {
       payload: {
         proposalId: proposal.proposalId,

@@ -28,6 +28,7 @@ const {
 const {
   watchedFunctionsList,
   counters,
+  daoServerEndpoints,
 } = require('../helpers/constants');
 
 const {
@@ -148,7 +149,7 @@ const checkAndNotify = async (transactions, failedTransactions) => {
   if (completedTxns.length > 0 || failedTxns.length > 0) {
     notifyDaoServer({
       method: 'PUT',
-      path: '/transactions/confirmed',
+      path: daoServerEndpoints.TRANSACTION_CONFIRM,
       body: {
         payload: {
           success: completedTxns,

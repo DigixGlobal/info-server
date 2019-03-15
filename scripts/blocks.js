@@ -21,6 +21,7 @@ const {
 
 const {
   counters,
+  daoServerEndpoints,
 } = require('../helpers/constants');
 
 const syncAndProcessToLatestBlock = async () => {
@@ -42,7 +43,7 @@ const updateLatestTxns = async () => {
   if (watchedTxns.length > 0) {
     notifyDaoServer({
       method: 'PUT',
-      path: '/transactions/seen',
+      path: daoServerEndpoints.TRANSACTION_SEEN,
       body: {
         payload: {
           blockNumber: recentBlock.number,

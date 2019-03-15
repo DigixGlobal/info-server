@@ -3,6 +3,7 @@ const crypto = require('crypto');
 
 const {
   denominators,
+  dijixDefaultFields,
 } = require('./constants');
 
 const getServerSignatures = function (req) {
@@ -283,6 +284,20 @@ const getUpdatedFundings = function (changedFundings, finalFundings, finalReward
   return changedFundings;
 };
 
+const getDefaultDijixFields = function () {
+  return {
+    title: dijixDefaultFields.TITLE,
+    description: dijixDefaultFields.DESCRIPTION,
+    details: dijixDefaultFields.DETAILS,
+    milestones: [
+      {
+        title: dijixDefaultFields.MILESTONE_TITLE,
+        description: dijixDefaultFields.MILESTONE_DESCRIPTION,
+      },
+    ],
+  };
+};
+
 module.exports = {
   sumArray,
   sumArrayBN,
@@ -307,4 +322,5 @@ module.exports = {
   getOriginalFundings,
   getUpdatedFundings,
   getServerSignatures,
+  getDefaultDijixFields,
 };
