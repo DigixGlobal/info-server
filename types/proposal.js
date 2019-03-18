@@ -6,6 +6,9 @@ const { denominators } = require('../helpers/constants');
 const typeDef = gql`
   # Voting rounds for proposal voting
   type Milestone {
+    # Index ID
+    id: ID!
+
     # Title of the milestone
     title: String
 
@@ -27,6 +30,9 @@ const typeDef = gql`
 
   # Milestone fundings
   type MilestoneFunding {
+    # Index ID
+    id: ID!
+
     # Milestone changes
     milestones: [MilestoneChange]
 
@@ -82,6 +88,9 @@ const typeDef = gql`
   }
 
   type ProposalDetail {
+    # Index ID
+    id: ID!
+
     # Detail title
     title: String
 
@@ -102,6 +111,9 @@ const typeDef = gql`
   }
 
   type ProposalVersion {
+    # Index ID
+    id: ID!
+
     # The hash of the proposal document
     docIpfsHash: String
 
@@ -301,16 +313,30 @@ const resolvers = {
       return dgd(round.totalVoterStake);
     },
   },
+  ProposalDetail: {
+    milestones(detail) {
+      return detail.milestones.map((milestone, index) => ({
+        id: `${detail.id}/MILESTONE-${index}`,
+        ...milestone,
+      }));
+    },
+  },
   ProposalVersion: {
     milestoneFundings(version) {
       return version.milestoneFundings
         .map(eth);
     },
-    finalReward(round) {
-      return eth(round.finalReward);
+    finalReward(version) {
+      return eth(version.finalReward);
     },
-    totalFunding(round) {
-      return eth(round.totalFunding);
+    totalFunding(version) {
+      return eth(version.totalFunding);
+    },
+    dijixObject(version) {
+      return {
+        id: `${version.id}/DIJIX`,
+        ...version.dijixObject,
+      };
     },
   },
   Proposal: {
@@ -319,6 +345,12 @@ const resolvers = {
     },
     claimableFunding(proposal) {
       return eth(proposal.claimableFunding);
+    },
+    proposalVersions(proposal) {
+      return proposal.proposalVersions.map((version, index) => ({
+        id: `${proposal.proposalId}/VERSION-${index}`,
+        ...version,
+      }));
     },
   },
 
