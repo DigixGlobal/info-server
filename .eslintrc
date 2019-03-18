@@ -24,7 +24,13 @@ rules:
   no-param-reassign: 0
   no-plusplus: 0
   no-shadow: 0
+  react/no-this-in-sfc: 0
+  no-unused-vars:
+  - "error"
+  - argsIgnorePattern: "^_"
+  no-restricted-globals:
+  - 0
+  - "isNaN"
 
 parserOptions:
-  ecmaFeatures:
-    experimentalObjectRestSpread: true
+  ecmaVersion: 2018

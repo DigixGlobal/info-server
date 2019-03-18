@@ -3,6 +3,7 @@ const crypto = require('crypto');
 
 const {
   denominators,
+  dijixDefaultFields,
 } = require('./constants');
 
 const getServerSignatures = function (req) {
@@ -125,6 +126,10 @@ const serializeProposal = function (proposal) {
   return proposal;
 };
 
+const proposalToType = function (proposal) {
+  return proposal;
+};
+
 const serializeProposalVotingRound = function (proposal, index) {
   if (proposal.votingRounds) {
     const round = proposal.votingRounds[index];
@@ -232,6 +237,7 @@ const deserializeAddress = function (address) {
     address.lockedDgd = ofOne(address.lockedDgd, denominators.DGD);
     address.reputationPoint = ofOne(address.reputationPoint, denominators.REPUTATION_POINT);
     address.quarterPoint = ofOne(address.quarterPoint, denominators.QUARTER_POINT);
+    address.claimableDgx = ofOne(address.claimableDgx, denominators.DGX);
   }
 
   return address;
@@ -278,6 +284,20 @@ const getUpdatedFundings = function (changedFundings, finalFundings, finalReward
   return changedFundings;
 };
 
+const getDefaultDijixFields = function () {
+  return {
+    title: dijixDefaultFields.TITLE,
+    description: dijixDefaultFields.DESCRIPTION,
+    details: dijixDefaultFields.DETAILS,
+    milestones: [
+      {
+        title: dijixDefaultFields.MILESTONE_TITLE,
+        description: dijixDefaultFields.MILESTONE_DESCRIPTION,
+      },
+    ],
+  };
+};
+
 module.exports = {
   sumArray,
   sumArrayBN,
@@ -289,6 +309,7 @@ module.exports = {
   ofMany,
   ofOne,
   serializeProposal,
+  proposalToType,
   serializeSpecialProposal,
   serializeProposalVotingRound,
   serializeAddress,
@@ -301,4 +322,5 @@ module.exports = {
   getOriginalFundings,
   getUpdatedFundings,
   getServerSignatures,
+  getDefaultDijixFields,
 };

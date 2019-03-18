@@ -31,6 +31,40 @@ const checkAndInitFreshDb = async () => {
   }
 };
 
+const initToResyncDb = async () => {
+  console.log('in initToResyncDb');
+  await _db.collection(collections.COUNTERS).deleteOne({ name: 'allTransactions' });
+};
+
+const initToProcessOnlyDb = async () => {
+  console.log('in initToProcessOnlyDb');
+  // wipe everything except synced transactions
+  await _emptyCollections([
+    collections.ADDRESSES,
+    collections.DAO_CONFIGS,
+    collections.DAO,
+    collections.KYC_APPROVALS,
+    collections.PENDING_TRANSACTIONS,
+    collections.PROPOSALS,
+    collections.SPECIAL_PROPOSALS,
+  ]);
+
+  // update last_processed counter to 0 (to trigger reprocessing)
+  await _db.collection(collections.COUNTERS).updateOne({
+    name: 'allTransactions',
+  }, {
+    $set: { last_processed: 0 },
+  });
+
+  console.log('cleared DB, except synced transactions. Will now start reprocessing');
+};
+
+const _emptyCollections = async (listOfCollections) => {
+  for (const item of listOfCollections) {
+    await _db.collection(item).deleteMany({});
+  }
+};
+
 const initFreshDb = async () => {
   const nonces = {
     self: 0,
@@ -41,7 +75,6 @@ const initFreshDb = async () => {
     .findOne({ name: 'nonce' });
   if (oldNonce !== null) {
     nonces.self = oldNonce.self;
-    nonces.daoServer = oldNonce.daoServer;
   }
   await _db.dropDatabase();
   await _db.collection(collections.COUNTERS).insertOne({
@@ -61,6 +94,12 @@ const initFreshDb = async () => {
   await _db.createCollection(collections.PENDING_TRANSACTIONS);
   await _db.collection(collections.TRANSACTIONS).createIndex('txhash', { unique: true });
 
+  await _addAdmins();
+
+  console.log('Initialized a fresh database');
+};
+
+const _addAdmins = async () => {
   // add KYC admin and forum admin to the addresses table
   // make sure they return valid json, so that they can be authenticated from DAO server
   const forumAdminAddress = process.env.FORUM_ADMIN_ADDRESS;
@@ -74,7 +113,6 @@ const initFreshDb = async () => {
       isForumAdmin: true,
     },
   ]);
-  console.log('Initialized a fresh database');
 };
 
 module.exports = {
@@ -82,4 +120,6 @@ module.exports = {
   getDB,
   initFreshDb,
   checkAndInitFreshDb,
+  initToResyncDb,
+  initToProcessOnlyDb,
 };
