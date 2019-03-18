@@ -1,5 +1,8 @@
 const { gql } = require('apollo-server-express');
 
+const { ofOne } = require('../helpers/utils');
+const { denominators } = require('../helpers/constants');
+
 const typeDef = gql`
   type Dao {
     # Current quarter number in DigixDAO
@@ -28,13 +31,15 @@ const typeDef = gql`
   }
 `;
 
+const dgd = value => (value === null || value === undefined ? null : ofOne(value, denominators.DGD));
+
 const resolvers = {
   Dao: {
     totalLockedDgds(daoInfo) {
-      return daoInfo.totalLockedDgds;
+      return dgd(daoInfo.totalLockedDgds);
     },
     totalModeratorLockedDgds(daoInfo) {
-      return daoInfo.totalModeratorLockedDgds;
+      return dgd(daoInfo.totalModeratorLockedDgds);
     },
   },
 };
