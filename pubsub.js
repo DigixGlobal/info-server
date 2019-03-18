@@ -27,6 +27,12 @@ const broadcast = {
       { proposalUpdated: proposalObject },
     );
   },
+  daoUpdated(daoInfo) {
+    return pubsub.publish(
+      'daoUpdated',
+      { daoUpdated: daoInfo },
+    );
+  },
 };
 
 module.exports = {

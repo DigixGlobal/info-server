@@ -6,6 +6,7 @@ const {
 
 const {
   updateDao,
+  getDaoInfo,
 } = require('../dbWrapper/dao');
 
 const {
@@ -172,7 +173,10 @@ const refreshAddress = async (res) => {
     },
   });
 
-  return Promise.resolve({ address: user, ...getAddressObject(userInfo) });
+  return Promise.all([
+    getDaoInfo(),
+    { address: user, ...getAddressObject(userInfo) },
+  ]);
 };
 
 module.exports = {
