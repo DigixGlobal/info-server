@@ -5,17 +5,20 @@ const { denominators } = require('../helpers/constants');
 
 const typeDef = gql`
   type Dao {
+    # A flag indicating if the global rewards are available
+    isGlobalRewardsSet: Boolean
+
     # Current quarter number in DigixDAO
     currentQuarter: BigNumber
 
     # Timestamp for start of the current quarter
-    startOfQuarter: BigNumber
+    startOfQuarter: Timestamp
 
     # Timestamp for start of main phase of current quarter
-    startOfMainphase: BigNumber
+    startOfMainphase: Timestamp
 
     # Timestamp for start of the next quarter
-    startOfNextQuarter: BigNumber
+    startOfNextQuarter: Timestamp
 
     # Total number of DGDs locked into DigixDAO by participants
     totalLockedDgds: BigNumber
