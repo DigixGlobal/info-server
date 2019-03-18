@@ -53,7 +53,7 @@ const initToProcessOnlyDb = async () => {
   await _db.collection(collections.COUNTERS).updateOne({
     name: 'allTransactions',
   }, {
-    $set: { last_processed: 0 },
+    $set: { last_processed: 0, last_seen_block: 0, is_syncing: false },
   });
 
   console.log('cleared DB, except synced transactions. Will now start reprocessing');
