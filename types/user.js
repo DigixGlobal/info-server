@@ -35,6 +35,7 @@ const typeDef = gql`
 `;
 
 const dgd = value => (value === null || value === undefined ? null : ofOne(value, denominators.DGD));
+
 const dgx = value => (value === null || value === undefined ? null : ofOne(value, denominators.DGX));
 const reputation = value => (value ? ofOne(value, denominators.REPUTATION_POINT) : null);
 

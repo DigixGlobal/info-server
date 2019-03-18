@@ -13,6 +13,7 @@ const { getProposal, getSpecialProposal } = require('./dbWrapper/proposals');
 const { typeDef: scalarType, resolvers: scalarResolvers } = require('./types/scalar.js');
 const { typeDef: userType, resolvers: userResolvers } = require('./types/user.js');
 const { typeDef: proposalType, resolvers: proposalResolvers } = require('./types/proposal.js');
+const { typeDef: daoType, resolvers: daoResolvers } = require('./types/dao.js');
 
 const queryType = gql`
   type Query {
@@ -41,6 +42,9 @@ const subscriptionType = gql`
 
     # Triggers on any change of the current user.
     userUpdated: User!
+
+    # Triggers on any change in the daoInfo struct
+    daoUpdated: Dao!
   }
 `;
 
@@ -76,6 +80,9 @@ const resolvers = {
     },
     proposalUpdated: {
       subscribe: () => pubsub.asyncIterator('proposalUpdated'),
+    },
+    daoUpdated: {
+      subscribe: () => pubsub.asyncIterator('daoUpdated'),
     },
   },
 };
@@ -118,6 +125,7 @@ module.exports = new ApolloServer({
     scalarType,
     userType,
     proposalType,
+    daoType,
     queryType,
     mutationType,
     subscriptionType,
@@ -126,6 +134,7 @@ module.exports = new ApolloServer({
     ...scalarResolvers,
     ...userResolvers,
     ...proposalResolvers,
+    ...daoResolvers,
     ...resolvers,
   },
   context: ({ req, connection }) => {

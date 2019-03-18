@@ -46,6 +46,14 @@ const broadcastUpdatedUser = tapPromise((user) => {
   }
 });
 
+const broadcastUpdatedDao = tapPromise((daoInfo) => {
+  if (daoInfo) {
+    console.log('BROADCASTING daoUpdated');
+
+    broadcast.daoUpdated(daoInfo);
+  }
+});
+
 const broadcastSubmittedProposal = tapPromise((proposal) => {
   if (proposal) {
     console.log(`BROADCASTING proposalSubmitted for ${proposal.proposalId}`);
@@ -74,9 +82,24 @@ const multiBroadcast = (splitter, broadcasts) => tapPromise((result) => {
 const watchedFunctionsMap = {
   setStartOfFirstQuarter: initDao,
   calculateGlobalRewardsBeforeNewQuarter: initDao,
+<<<<<<< HEAD
   lockDGD: broadcastUpdatedUser(refreshAddress),
   withdrawDGD: broadcastUpdatedUser(refreshAddress),
   confirmContinueParticipation: broadcastUpdatedUser(refreshAddress),
+=======
+  lockDGD: multiBroadcast(
+    ([daoInfo, user]) => [daoInfo, user],
+    [broadcastUpdatedDao, broadcastUpdatedUser],
+  )(refreshAddress),
+  withdrawDGD: multiBroadcast(
+    ([daoInfo, user]) => [daoInfo, user],
+    [broadcastUpdatedDao, broadcastUpdatedUser],
+  )(refreshAddress),
+  confirmContinueParticipation: multiBroadcast(
+    ([daoInfo, user]) => [daoInfo, user],
+    [broadcastUpdatedDao, broadcastUpdatedUser],
+  )(refreshAddress),
+>>>>>>> eed6304513e465a870142e908d41f0c55a46db2e
   redeemBadge: broadcastUpdatedUser(refreshAddress),
   claimRewards: broadcastUpdatedUser(refreshAddress),
   submitPreproposal: broadcastSubmittedProposal(refreshProposalNew),
