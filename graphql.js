@@ -5,6 +5,7 @@ const { ApolloServer, gql } = require('apollo-server-express');
 const { proposalToType } = require('./helpers/utils');
 
 const { getAddressDetails } = require('./dbWrapper/addresses');
+const { getDaoInfo } = require('./dbWrapper/dao');
 
 const { pubsub } = require('./pubsub');
 
@@ -22,6 +23,9 @@ const queryType = gql`
 
     # Get the current user's information.
     fetchCurrentUser: User!
+
+    # Get the current user's information.
+    fetchDao: Dao!
   }
 `;
 
@@ -53,7 +57,7 @@ const filterByCurrentAddress = f => (payload, _variables, context, _operation) =
 
 const resolvers = {
   Query: {
-    fetchProposal: async (obj, args, _context, _info) => {
+    fetchProposal: async (_obj, args, _context, _info) => {
       const { proposalId } = args;
 
       let proposal = await getProposal(proposalId);
@@ -65,6 +69,9 @@ const resolvers = {
     },
     fetchCurrentUser: (_obj, _args, context, _info) => {
       return context.currentUser;
+    },
+    fetchDao: (_obj, _args, _context, _info) => {
+      return getDaoInfo();
     },
   },
   Mutation: {},
