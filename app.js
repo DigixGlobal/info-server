@@ -61,6 +61,13 @@ const initCron = async () => {
   });
 };
 
+const addWatchBlocksCron = async () => {
+  cron.schedule('*/3 * * * * *', async () => {
+    // schedule a script to run every 3 seconds
+    scripts.watchNewBlocks();
+  });
+};
+
 const init = async () => {
   console.log('INFOLOG: init');
   await initDB();
@@ -82,7 +89,7 @@ const init = async () => {
 
   await scripts.syncAndProcessToLatestBlock();
 
-  scripts.watchNewBlocks();
+  addWatchBlocksCron();
 
   scripts.refreshDaoConfigs();
 

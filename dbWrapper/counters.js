@@ -80,12 +80,38 @@ const setLastProcessedBlock = async (block) => {
     });
 };
 
+const setLastSeenBlock = async (block) => {
+  await mongoUtil.getDB()
+    .collection(collections.COUNTERS)
+    .updateOne({
+      name: counters.TRANSACTIONS,
+    }, {
+      $set: {
+        last_seen_block: block,
+      },
+    });
+};
+
+const setIsSyncing = async (is) => {
+  await mongoUtil.getDB()
+    .collection(collections.COUNTERS)
+    .updateOne({
+      name: counters.TRANSACTIONS,
+    }, {
+      $set: {
+        is_syncing: is,
+      },
+    });
+};
+
 module.exports = {
   getCounter,
+  setIsSyncing,
   incrementMaxValue,
   incrementLastProcessed,
   setDaoServerNonce,
   getDaoServerNonce,
   setLastProcessedBlock,
+  setLastSeenBlock,
   incrementAndGetSelfNonce,
 };
