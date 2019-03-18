@@ -15,6 +15,8 @@ module.exports = {
       RATE_LIMIT_PER_WINDOW: 10,
       BLOCK_CONFIRMATIONS: 3,
       START_BLOCK: 10483600,
+      N_BLOCKS_BUCKET: 200,
+      N_BLOCKS_CONCURRENT: 100,
       FORCE_REFRESH_DB: process.env.FORCE_REFRESH_DB,
       RESYNC: process.env.RESYNC,
       REPROCESS_ONLY: process.env.REPROCESS_ONLY,
