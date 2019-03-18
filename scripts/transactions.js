@@ -226,7 +226,7 @@ const updateTransactionsDatabase = async (lastProcessedBlock) => {
 
 const processTransactions = async () => {
   const counter = await getCounter(counters.TRANSACTIONS);
-  console.log(`\tProcessing transactions, last_processed = ${counter.last_processed}, max_value = ${counter.max_value}`);
+  // console.log(`\tProcessing transactions, last_processed = ${counter.last_processed}, max_value = ${counter.max_value}`);
   if (counter.last_processed >= counter.max_value) return;
   const transactions = await getTransactions({}, counter.last_processed);
   if (transactions.length <= 0) return;

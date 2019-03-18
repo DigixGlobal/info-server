@@ -1,5 +1,7 @@
 const {
   getCounter,
+  setLastSeenBlock,
+  setIsSyncing,
 } = require('../dbWrapper/counters');
 
 const {
@@ -24,16 +26,17 @@ const {
   daoServerEndpoints,
 } = require('../helpers/constants');
 
-
-const syncAndProcessToLatestBlock = async () => {
+const syncAndProcessToLatestBlock = async (lastProcessedBlock = null) => {
   console.log('INFOLOG: syncAndProcessToLatestBlock');
-  const lastProcessedBlock = (await getCounter(counters.TRANSACTIONS)).last_processed_block;
+  await setIsSyncing(true);
+  if (lastProcessedBlock === null) lastProcessedBlock = (await getCounter(counters.TRANSACTIONS)).last_processed_block;
   await updateTransactionsDatabase(lastProcessedBlock);
   await processTransactions();
+  await setIsSyncing(false);
 };
 
-const updateLatestTxns = async () => {
-  const recentBlock = await getWeb3().eth.getBlock(getWeb3().eth.blockNumber);
+const updateLatestTxns = async (latestBlockNumber) => {
+  const recentBlock = await getWeb3().eth.getBlock(latestBlockNumber);
   const watchedTxns = [];
   for (const txn of recentBlock.transactions) {
     if (await isExistPendingTransaction(txn)) {
@@ -54,16 +57,20 @@ const updateLatestTxns = async () => {
       },
     });
   }
+  await setLastSeenBlock(latestBlockNumber);
 };
 
 const watchNewBlocks = async () => {
-  const filter = getWeb3().eth.filter('latest');
-  filter.watch(async (err, block) => {
-    console.log('INFOLOG: got a new block from filter("latest"):', block);
-    console.log('\tweb3.eth.blockNumber = ', getWeb3().eth.blockNumber);
-    syncAndProcessToLatestBlock();
-    updateLatestTxns();
-  });
+  const counter = await getCounter(counters.TRANSACTIONS);
+  const lastProcessedBlock = counter.last_processed_block;
+  const lastSeenBlock = counter.last_seen_block;
+  const isSyncing = counter.is_syncing;
+  const latestBlock = getWeb3().eth.blockNumber;
+  if (!isSyncing) syncAndProcessToLatestBlock(lastProcessedBlock);
+  if (latestBlock > lastSeenBlock) {
+    console.log('INFOLOG: got a new block = ', latestBlock);
+    updateLatestTxns(latestBlock);
+  }
 };
 
 module.exports = {

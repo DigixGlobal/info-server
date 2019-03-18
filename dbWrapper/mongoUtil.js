@@ -81,7 +81,9 @@ const initFreshDb = async () => {
     name: 'allTransactions',
     max_value: 0,
     last_processed: 0,
+    last_seen_block: 0,
     last_processed_block: 0,
+    is_syncing: false,
   });
   await _db.createCollection(collections.KYC_APPROVALS);
   await _db.collection(collections.COUNTERS).insertOne({ name: 'nonce', daoServer: nonces.daoServer, self: nonces.self });
