@@ -1,4 +1,8 @@
 const {
+  indexRange,
+} = require('@digix/helpers/lib/helpers');
+
+const {
   getCounter,
   setLastSeenBlock,
   setIsSyncing,
@@ -35,27 +39,29 @@ const syncAndProcessToLatestBlock = async (lastProcessedBlock = null) => {
   await setIsSyncing(false);
 };
 
-const updateLatestTxns = async (latestBlockNumber) => {
-  const recentBlock = await getWeb3().eth.getBlock(latestBlockNumber);
-  const watchedTxns = [];
-  for (const txn of recentBlock.transactions) {
-    if (await isExistPendingTransaction(txn)) {
-      watchedTxns.push({
-        txhash: txn,
+const _updateLatestTxns = async (lastSeenBlock, latestBlockNumber) => {
+  for (const blockNumber of indexRange(lastSeenBlock + 1, latestBlockNumber + 1)) {
+    const block = await getWeb3().eth.getBlock(blockNumber);
+    const watchedTxns = [];
+    for (const txn of block.transactions) {
+      if (await isExistPendingTransaction(txn)) {
+        watchedTxns.push({
+          txhash: txn,
+        });
+      }
+    }
+    if (watchedTxns.length > 0) {
+      notifyDaoServer({
+        method: 'PUT',
+        path: daoServerEndpoints.TRANSACTION_SEEN,
+        body: {
+          payload: {
+            blockNumber: block.number,
+            transactions: watchedTxns,
+          },
+        },
       });
     }
-  }
-  if (watchedTxns.length > 0) {
-    notifyDaoServer({
-      method: 'PUT',
-      path: daoServerEndpoints.TRANSACTION_SEEN,
-      body: {
-        payload: {
-          blockNumber: recentBlock.number,
-          transactions: watchedTxns,
-        },
-      },
-    });
   }
   await setLastSeenBlock(latestBlockNumber);
 };
@@ -68,8 +74,8 @@ const watchNewBlocks = async () => {
   const latestBlock = getWeb3().eth.blockNumber;
   if (!isSyncing) syncAndProcessToLatestBlock(lastProcessedBlock);
   if (latestBlock > lastSeenBlock) {
-    console.log('INFOLOG: got a new block = ', latestBlock);
-    updateLatestTxns(latestBlock);
+    console.log('INFOLOG: [seen] new blocks = [', lastSeenBlock + 1, ', ', latestBlock, ']');
+    _updateLatestTxns(lastSeenBlock, latestBlock);
   }
 };
 

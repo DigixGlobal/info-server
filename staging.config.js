@@ -22,6 +22,11 @@ module.exports = {
       WEB3_HTTP_PROVIDER: 'https://kovan.infura.io',
       IPFS_ENDPOINT: 'https://ipfs-api.digix.global',
       HTTP_ENDPOINT: 'https://ipfs.digix.global/ipfs',
+      IPFS_TIMEOUT: 30000,
+      CRON_PROCESS_KYC_FREQUENCY: 5,
+      CRON_WATCH_BLOCKS_FREQUENCY: 5,
+      KYC_ADMIN_PASSWORD: 'digixdao-kovan',
+      FORUM_ADMIN_ADDRESS: '0x369d674039d64519af688f4c6f9608552207bdab',
     },
   }],
 };
