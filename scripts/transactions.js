@@ -217,6 +217,7 @@ const updateTransactionsDatabase = async (lastProcessedBlock) => {
       const block = blocksMap.get(blockNumber);
       await filterAndInsertTxns(web3, block.transactions);
       await setLastProcessedBlock(blockNumber);
+      console.log('INFOLOG: [processed] block = ', blockNumber);
       if (block.number % parseInt(process.env.SYNC_REPORT_FREQUENCY, 10) === 0) {
         console.log(`\tSynced transactions to block ${block.number}/${endBlock}`);
       }
