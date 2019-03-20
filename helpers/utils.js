@@ -166,6 +166,7 @@ const serializeAddress = function (address) {
     address.lockedDgd = new BigNumber(address.lockedDgd);
     address.reputationPoint = new BigNumber(address.reputationPoint);
     address.quarterPoint = new BigNumber(address.quarterPoint);
+    address.moderatorQuarterPoint = new BigNumber(address.moderatorQuarterPoint);
   }
 
   return address;
@@ -237,6 +238,7 @@ const deserializeAddress = function (address) {
     address.lockedDgd = ofOne(address.lockedDgd, denominators.DGD);
     address.reputationPoint = ofOne(address.reputationPoint, denominators.REPUTATION_POINT);
     address.quarterPoint = ofOne(address.quarterPoint, denominators.QUARTER_POINT);
+    address.moderatorQuarterPoint = ofOne(address.moderatorQuarterPoint, denominators.QUARTER_POINT);
     address.claimableDgx = ofOne(address.claimableDgx, denominators.DGX);
   }
 
