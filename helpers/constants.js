@@ -30,6 +30,11 @@ const daoServerEndpoints = {
 const daoServerEventTypes = {
   NEW_PROPOSAL: 'EVENT_PROJECT_CREATED',
   PROPOSAL_ENDORSED: 'EVENT_PROJECT_ENDORSED',
+  PRL_ACTION: {
+    1: 'EVENT_PROJECT_PRL_STOPPED',
+    2: 'EVENT_PROJECT_PRL_PAUSED',
+    3: 'EVENT_PROJECT_PRL_UNPAUSED',
+  },
 };
 
 const dijixDefaultFields = {
