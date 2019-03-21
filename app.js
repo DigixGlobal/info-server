@@ -18,6 +18,10 @@ const server = require('./graphql');
 const routes = require('./routes');
 const scripts = require('./scripts');
 
+const {
+  setLastSeenBlock,
+} = require('./dbWrapper/counters');
+
 const app = express();
 
 web3Util.initWeb3(process.env.WEB3_HTTP_PROVIDER);
@@ -44,11 +48,13 @@ const initDB = async () => {
 };
 
 const initIpfs = async () => {
-  await dijixUtil.init(process.env.IPFS_ENDPOINT, process.env.HTTP_ENDPOINT);
+  const ipfsTimeout = parseInt(process.env.IPFS_TIMEOUT, 10);
+  await dijixUtil.init(process.env.IPFS_ENDPOINT, process.env.HTTP_ENDPOINT, ipfsTimeout);
 };
 
 const initCron = async () => {
-  cron.schedule('* * * * *', async () => {
+  const cronFrequency = process.env.CRON_PROCESS_KYC_FREQUENCY;
+  cron.schedule(`*/${cronFrequency} * * * *`, async () => {
     // schedule a script to run every min
     console.log('INFOLOG: running the 1min cron job');
 
@@ -58,6 +64,14 @@ const initCron = async () => {
     // So, only need to refreshDao when a new quarter begins
     scripts.refreshDao();
     scripts.processPendingKycs();
+  });
+};
+
+const addWatchBlocksCron = async () => {
+  const watchBlocksFrequency = process.env.CRON_WATCH_BLOCKS_FREQUENCY;
+  cron.schedule(`*/${watchBlocksFrequency} * * * * *`, async () => {
+    // schedule a script to run every 3 seconds
+    scripts.watchNewBlocks();
   });
 };
 
@@ -82,7 +96,10 @@ const init = async () => {
 
   await scripts.syncAndProcessToLatestBlock();
 
-  scripts.watchNewBlocks();
+  // set the last seen block (at start)
+  await setLastSeenBlock(web3.eth.blockNumber);
+
+  addWatchBlocksCron();
 
   scripts.refreshDaoConfigs();
 
