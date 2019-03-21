@@ -6,6 +6,7 @@ const {
   getCounter,
   setLastSeenBlock,
   setIsSyncing,
+  setIsUpdatingLatestTxns,
 } = require('../dbWrapper/counters');
 
 const {
@@ -40,6 +41,7 @@ const syncAndProcessToLatestBlock = async (lastProcessedBlock = null) => {
 };
 
 const _updateLatestTxns = async (lastSeenBlock, latestBlockNumber) => {
+  await setIsUpdatingLatestTxns(true);
   for (const blockNumber of indexRange(lastSeenBlock + 1, latestBlockNumber + 1)) {
     const block = await getWeb3().eth.getBlock(blockNumber);
     const watchedTxns = [];
@@ -64,6 +66,7 @@ const _updateLatestTxns = async (lastSeenBlock, latestBlockNumber) => {
     }
   }
   await setLastSeenBlock(latestBlockNumber);
+  await setIsUpdatingLatestTxns(false);
 };
 
 const watchNewBlocks = async () => {
@@ -71,11 +74,12 @@ const watchNewBlocks = async () => {
   const lastProcessedBlock = counter.last_processed_block;
   const lastSeenBlock = counter.last_seen_block;
   const isSyncing = counter.is_syncing;
+  const isUpdatingLatestTxns = counter.is_updating_latest_txns;
   const latestBlock = getWeb3().eth.blockNumber;
   if (!isSyncing) syncAndProcessToLatestBlock(lastProcessedBlock);
   if (latestBlock > lastSeenBlock) {
     console.log('INFOLOG: [seen] new blocks = [', lastSeenBlock + 1, ', ', latestBlock, ']');
-    _updateLatestTxns(lastSeenBlock, latestBlock);
+    if (!isUpdatingLatestTxns) _updateLatestTxns(lastSeenBlock, latestBlock);
   }
 };
 
