@@ -80,15 +80,18 @@ const getFromEventLog = function (res, argName) {
 
 const ofMany = function (array, denominator) {
   return array.map((a) => {
+    if (a === null || a === undefined) return a;
     return ((new BigNumber(a)).div(new BigNumber(denominator))).toString();
   });
 };
 
 const ofOne = function (value, denominator) {
+  if (value === null || value === undefined) return value;
   return ((new BigNumber(value)).div(new BigNumber(denominator))).toString();
 };
 
 const serializeProposal = function (proposal) {
+  if (proposal === null) return proposal;
   // resolve proposal version
   for (const version of proposal.proposalVersions) {
     version.milestoneFundings = stringArrayToBN(version.milestoneFundings);
@@ -131,6 +134,7 @@ const proposalToType = function (proposal) {
 };
 
 const serializeProposalVotingRound = function (proposal, index) {
+  if (proposal === null) return proposal;
   if (proposal.votingRounds) {
     const round = proposal.votingRounds[index];
     if (round) {
@@ -145,6 +149,7 @@ const serializeProposalVotingRound = function (proposal, index) {
 };
 
 const serializeSpecialProposal = function (proposal) {
+  if (proposal === null) return proposal;
   if (proposal.votingRounds && proposal.votingRounds.length > 0) {
     proposal.votingRounds[0].totalCommitCount = new BigNumber(proposal.votingRounds[0].totalCommitCount);
     proposal.votingRounds[0].totalVoterStake = new BigNumber(proposal.votingRounds[0].totalVoterStake);
@@ -246,6 +251,7 @@ const deserializeAddress = function (address) {
 };
 
 const deserializeDaoInfo = function (daoInfo) {
+  if (daoInfo === null) return daoInfo;
   daoInfo.totalLockedDgds = ofOne(daoInfo.totalLockedDgds, denominators.DGD);
   daoInfo.totalModeratorLockedDgds = ofOne(daoInfo.totalModeratorLockedDgds, denominators.DGD);
 
@@ -253,6 +259,7 @@ const deserializeDaoInfo = function (daoInfo) {
 };
 
 const deserializeDaoConfigs = function (daoConfigs) {
+  if (daoConfigs === null) return daoConfigs;
   daoConfigs.CONFIG_MINIMUM_DGD_FOR_MODERATOR = ofOne(daoConfigs.CONFIG_MINIMUM_DGD_FOR_MODERATOR, denominators.DGD);
   daoConfigs.CONFIG_PREPROPOSAL_COLLATERAL = ofOne(daoConfigs.CONFIG_PREPROPOSAL_COLLATERAL, denominators.ETH);
   daoConfigs.CONFIG_MINIMUM_LOCKED_DGD = ofOne(daoConfigs.CONFIG_MINIMUM_LOCKED_DGD, denominators.DGD);

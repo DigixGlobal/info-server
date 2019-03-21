@@ -23,6 +23,7 @@ const {
 } = require('./dbWrapper/counters');
 
 const app = express();
+let waitingCron;
 
 web3Util.initWeb3(process.env.WEB3_HTTP_PROVIDER);
 
@@ -53,6 +54,8 @@ const initIpfs = async () => {
 };
 
 const initCron = async () => {
+  waitingCron.stop();
+  scripts.refreshDao();
   const cronFrequency = process.env.CRON_PROCESS_KYC_FREQUENCY;
   cron.schedule(`*/${cronFrequency} * * * *`, async () => {
     // schedule a script to run every min
@@ -72,6 +75,18 @@ const addWatchBlocksCron = async () => {
   cron.schedule(`*/${watchBlocksFrequency} * * * * *`, async () => {
     // schedule a script to run every 3 seconds
     scripts.watchNewBlocks();
+  });
+};
+
+const waitForDaoToStart = async () => {
+  waitingCron = cron.schedule('*/2 * * * * *', async () => {
+    // schedule a script to run every min
+    console.log('INFOLOG: waiting for digixdao to start');
+
+    if (await scripts.isDaoStarted()) {
+      initCron();
+      addWatchBlocksCron();
+    }
   });
 };
 
@@ -99,11 +114,7 @@ const init = async () => {
   // set the last seen block (at start)
   await setLastSeenBlock(web3.eth.blockNumber);
 
-  addWatchBlocksCron();
-
-  scripts.refreshDaoConfigs();
-
-  initCron();
+  waitForDaoToStart();
 };
 
 init();

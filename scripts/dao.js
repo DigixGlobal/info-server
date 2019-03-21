@@ -1,4 +1,8 @@
 const {
+  getCurrentTimestamp,
+} = require('@digix/helpers/lib/helpers');
+
+const {
   updateDao,
   updateDaoConfigs,
 } = require('../dbWrapper/dao');
@@ -69,8 +73,31 @@ const refreshDao = async () => {
   });
 };
 
+const isDaoStarted = async () => {
+  const startOfFirstQuarter = await getContracts().daoUpgradeStorage.startOfFirstQuarter.call();
+  if (
+    startOfFirstQuarter.toNumber() === 0
+    || startOfFirstQuarter.toNumber() > getCurrentTimestamp()
+  ) {
+    return false;
+  }
+  return true;
+};
+
+const initDaoBeforeStart = async () => {
+  const startOfFirstQuarter = await getContracts().daoUpgradeStorage.startOfFirstQuarter.call();
+  await updateDao({
+    $set: {
+      currentQuarter: 0,
+      startOfNextQuarter: startOfFirstQuarter.toNumber(),
+    },
+  }, { upsert: true });
+};
+
 module.exports = {
   initDao,
   refreshDao,
   refreshDaoConfigs,
+  isDaoStarted,
+  initDaoBeforeStart,
 };
