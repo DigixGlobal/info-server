@@ -14,7 +14,7 @@ module.exports = {
       HTTP_ENDPOINT: 'http://localhost:9001/ipfs',
       IPFS_TIMEOUT: 30000,
       CRON_PROCESS_KYC_FREQUENCY: 5,
-      CRON_WATCH_BLOCKS_FREQUENCY: 5,
+      CRON_WATCH_BLOCKS_FREQUENCY: 1,
       WEB3_HTTP_PROVIDER: 'http://localhost:8545',
       DAO_SERVER_URL: 'http://localhost:3005',
       SERVER_SECRET: 'this-is-a-secret-between-dao-and-info-server',
