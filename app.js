@@ -53,18 +53,18 @@ const initIpfs = async () => {
   await dijixUtil.init(process.env.IPFS_ENDPOINT, process.env.HTTP_ENDPOINT, ipfsTimeout);
 };
 
-const initCron = async () => {
+const addProcessKycCron = async () => {
+  // kill the cron that was waiting for it to start
   waitingCron.stop();
+
+  // refresh DAO, now that the DigixDAO has started
   scripts.refreshDao();
+
   const cronFrequency = process.env.CRON_PROCESS_KYC_FREQUENCY;
   cron.schedule(`*/${cronFrequency} * * * *`, async () => {
-    // schedule a script to run every min
-    console.log('INFOLOG: running the 1min cron job');
+    console.log('INFOLOG: [processKycCron]');
 
-    // TODO: remove this part
-    // don't need to refresh dao every minute
-    // the values stay the same in the same quarter
-    // So, only need to refreshDao when a new quarter begins
+    // refresh DAO info and process pending KYC applications
     scripts.refreshDao();
     scripts.processPendingKycs();
   });
@@ -73,7 +73,9 @@ const initCron = async () => {
 const addWatchBlocksCron = async () => {
   const watchBlocksFrequency = process.env.CRON_WATCH_BLOCKS_FREQUENCY;
   cron.schedule(`*/${watchBlocksFrequency} * * * * *`, async () => {
-    // schedule a script to run every 3 seconds
+    console.log('INFOLOG: [watchBlocksCron]');
+
+    // watch for new blocks
     scripts.watchNewBlocks();
   });
 };
@@ -84,8 +86,7 @@ const waitForDaoToStart = async () => {
     console.log('INFOLOG: waiting for digixdao to start');
 
     if (await scripts.isDaoStarted()) {
-      initCron();
-      addWatchBlocksCron();
+      addProcessKycCron();
     }
   });
 };
@@ -113,6 +114,9 @@ const init = async () => {
 
   // set the last seen block (at start)
   await setLastSeenBlock(web3.eth.blockNumber);
+
+  // cron to watch for new blocks
+  addWatchBlocksCron();
 
   waitForDaoToStart();
 };
