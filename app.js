@@ -59,6 +59,7 @@ const addProcessKycCron = async () => {
 
   // refresh DAO, now that the DigixDAO has started
   scripts.refreshDao();
+  scripts.refreshDaoConfigs();
 
   const cronFrequency = process.env.CRON_PROCESS_KYC_FREQUENCY;
   cron.schedule(`*/${cronFrequency} * * * *`, async () => {
