@@ -35,7 +35,6 @@ const typeDef = gql`
 `;
 
 const dgd = value => (value === null || value === undefined ? null : ofOne(value, denominators.DGD));
-
 const dgx = value => (value === null || value === undefined ? null : ofOne(value, denominators.DGX));
 const reputation = value => (value ? ofOne(value, denominators.REPUTATION_POINT) : null);
 
@@ -43,6 +42,9 @@ const resolvers = {
   User: {
     id(user) {
       return user.address;
+    },
+    claimableDgx(user) {
+      return dgx(user.claimableDgx);
     },
     lockedDgdStake(user) {
       return dgd(user.lockedDgdStake);
