@@ -53,7 +53,12 @@ const initToProcessOnlyDb = async () => {
   await _db.collection(collections.COUNTERS).updateOne({
     name: 'allTransactions',
   }, {
-    $set: { last_processed: 0, last_seen_block: 0, is_syncing: false },
+    $set: {
+      last_processed: 0,
+      last_seen_block: 0,
+      is_syncing: false,
+      is_updating_latest_txns: false,
+    },
   });
 
   console.log('cleared DB, except synced transactions. Will now start reprocessing');
@@ -84,6 +89,7 @@ const initFreshDb = async () => {
     last_seen_block: 0,
     last_processed_block: 0,
     is_syncing: false,
+    is_updating_latest_txns: false,
   });
   await _db.createCollection(collections.KYC_APPROVALS);
   await _db.collection(collections.COUNTERS).insertOne({ name: 'nonce', daoServer: nonces.daoServer, self: nonces.self });

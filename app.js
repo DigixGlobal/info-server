@@ -18,6 +18,10 @@ const server = require('./graphql');
 const routes = require('./routes');
 const scripts = require('./scripts');
 
+const {
+  setLastSeenBlock,
+} = require('./dbWrapper/counters');
+
 const app = express();
 
 web3Util.initWeb3(process.env.WEB3_HTTP_PROVIDER);
@@ -91,6 +95,9 @@ const init = async () => {
   await initContracts(web3, networkId);
 
   await scripts.syncAndProcessToLatestBlock();
+
+  // set the last seen block (at start)
+  await setLastSeenBlock(web3.eth.blockNumber);
 
   addWatchBlocksCron();
 
