@@ -8,8 +8,11 @@ const {
 } = require('./transactions');
 
 const {
+  isDaoStarted,
   refreshDao,
+  initDaoBeforeStart,
   refreshDaoConfigs,
+  refreshDaoTemp,
 } = require('./dao');
 
 const {
@@ -23,4 +26,7 @@ module.exports = {
   refreshDao,
   refreshDaoConfigs,
   processPendingKycs,
+  isDaoStarted,
+  initDaoBeforeStart,
+  refreshDaoTemp,
 };
