@@ -23,7 +23,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@digix/dao-contracts": "^0.0.7",
+    "@digix/dao-contracts": "0.1.0",
     "@digix/dijix": "0.0.16",
     "@digix/helpers": "^1.0.1",
     "@digix/lite-dgx-contract": "1.0.1",

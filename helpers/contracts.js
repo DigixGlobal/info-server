@@ -1,7 +1,7 @@
 const ContractResolver = require('@digix/dao-contracts/build/contracts/ContractResolver.json');
 const Dao = require('@digix/dao-contracts/build/contracts/Dao.json');
 const DaoCalculatorService = require('@digix/dao-contracts/build/contracts/DaoCalculatorService.json');
-const MockDaoConfigsStorage = require('@digix/dao-contracts/build/contracts/MockDaoConfigsStorage.json');
+const DaoConfigsStorage = require('@digix/dao-contracts/build/contracts/DaoConfigsStorage.json');
 const DaoFundingManager = require('@digix/dao-contracts/build/contracts/DaoFundingManager.json');
 const DaoIdentity = require('@digix/dao-contracts/build/contracts/DaoIdentity.json');
 const DaoIdentityStorage = require('@digix/dao-contracts/build/contracts/DaoIdentityStorage.json');
@@ -16,7 +16,6 @@ const DaoStakeLocking = require('@digix/dao-contracts/build/contracts/DaoStakeLo
 const DaoStakeStorage = require('@digix/dao-contracts/build/contracts/DaoStakeStorage.json');
 const DaoStorage = require('@digix/dao-contracts/build/contracts/DaoStorage.json');
 
-// Replace with DaoUpgradeStorage in mainnet deployment
 const DaoUpgradeStorage = require('@digix/dao-contracts/build/contracts/DaoUpgradeStorage.json');
 
 const DaoVoting = require('@digix/dao-contracts/build/contracts/DaoVoting.json');
@@ -32,7 +31,7 @@ const contracts = {
   contractResolver: ContractResolver,
   dao: Dao,
   daoCalculatorService: DaoCalculatorService,
-  daoConfigsStorage: MockDaoConfigsStorage,
+  daoConfigsStorage: DaoConfigsStorage,
   daoFundingManager: DaoFundingManager,
   daoIdentity: DaoIdentity,
   daoIdentityStorage: DaoIdentityStorage,

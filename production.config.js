@@ -21,9 +21,12 @@ module.exports = {
       RESYNC: process.env.RESYNC,
       REPROCESS_ONLY: process.env.REPROCESS_ONLY,
       SYNC_REPORT_FREQUENCY: 10,
-      WEB3_HTTP_PROVIDER: 'https://kovan.digixdev.com',
+      WEB3_HTTP_PROVIDER: 'https://mainnet.infura.io/v3/d356a5affcea4eec8e0cdde7e52570ba',
       IPFS_ENDPOINT: 'https://ipfs-api.digix.global',
       HTTP_ENDPOINT: 'https://ipfs.digix.global/ipfs',
+      IPFS_TIMEOUT: 60000,
+      CRON_PROCESS_KYC_FREQUENCY: 5, // in minutes
+      CRON_WATCH_BLOCKS_FREQUENCY: 15, // in seconds
       KYC_ADMIN_PASSWORD: process.env.KYC_ADMIN_PASSWORD,
       KYC_KEYSTORE_PATH: process.env.KYC_KEYSTORE_PATH,
       FORUM_ADMIN_ADDRESS: '0x369d674039d64519af688f4c6f9608552207bdab',
