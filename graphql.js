@@ -1,5 +1,5 @@
 const ethJsUtil = require('ethereumjs-util');
-const { withFilter } = require('apollo-server');
+const { withFilter, AuthenticationError } = require('apollo-server');
 const { ApolloServer, gql } = require('apollo-server-express');
 
 const { proposalToType } = require('./helpers/utils');
@@ -121,9 +121,10 @@ const signatureAuthorization = (params) => {
           currentUser: userInfo,
         }));
     }
-    throw new Error('Invalid address or signature');
+
+    throw new AuthenticationError('Invalid address or signature');
   } else {
-    throw new Error('Missing address or signature');
+    throw new AuthenticationError('Missing address or signature');
   }
 };
 
