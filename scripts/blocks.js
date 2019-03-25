@@ -42,30 +42,34 @@ const syncAndProcessToLatestBlock = async (lastProcessedBlock = null) => {
 
 const _updateLatestTxns = async (lastSeenBlock, latestBlockNumber) => {
   await setIsUpdatingLatestTxns(true);
-  for (const blockNumber of indexRange(lastSeenBlock + 1, latestBlockNumber + 1)) {
-    const block = await getWeb3().eth.getBlock(blockNumber);
-    const watchedTxns = [];
-    for (const txn of block.transactions) {
-      if (await isExistPendingTransaction(txn)) {
-        watchedTxns.push({
-          txhash: txn,
+  try {
+    for (const blockNumber of indexRange(lastSeenBlock + 1, latestBlockNumber + 1)) {
+      const block = await getWeb3().eth.getBlock(blockNumber);
+      const watchedTxns = [];
+      for (const txn of block.transactions) {
+        if (await isExistPendingTransaction(txn)) {
+          watchedTxns.push({
+            txhash: txn,
+          });
+        }
+      }
+      if (watchedTxns.length > 0) {
+        notifyDaoServer({
+          method: 'PUT',
+          path: daoServerEndpoints.TRANSACTION_SEEN,
+          body: {
+            payload: {
+              blockNumber: block.number,
+              transactions: watchedTxns,
+            },
+          },
         });
       }
+      await setLastSeenBlock(blockNumber);
     }
-    if (watchedTxns.length > 0) {
-      notifyDaoServer({
-        method: 'PUT',
-        path: daoServerEndpoints.TRANSACTION_SEEN,
-        body: {
-          payload: {
-            blockNumber: block.number,
-            transactions: watchedTxns,
-          },
-        },
-      });
-    }
+  } catch (e) {
+    console.log('[ERROR] = ', e);
   }
-  await setLastSeenBlock(latestBlockNumber);
   await setIsUpdatingLatestTxns(false);
 };
 
