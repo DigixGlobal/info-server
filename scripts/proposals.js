@@ -682,6 +682,20 @@ const refreshProposalPRLAction = async (res) => {
     $set: updateObj,
   });
 
+  const proposal = await getProposal(res._proposalId);
+  // prl action on proposal, tell dao-server
+  notifyDaoServer({
+    method: 'POST',
+    path: daoServerEndpoints.NEW_EVENT,
+    body: {
+      payload: {
+        eventType: daoServerEventTypes.PRL_ACTION[actionId],
+        proposalId: proposal.proposalId,
+        proposer: proposal.proposer,
+      },
+    },
+  });
+
   return getProposal(res._proposalId);
 };
 
