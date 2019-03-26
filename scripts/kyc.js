@@ -47,8 +47,8 @@ const _txnObject = (entry, kycAdmin, nonce) => {
   return {
     from: kycAdmin,
     to: getContracts().daoIdentity.address,
-    gas: 300000,
-    gasPrice: 40 * (10 ** 9),
+    gas: 100000,
+    gasPrice: 10 * (10 ** 9),
     data: _getCallData(entry),
     nonce,
   };
