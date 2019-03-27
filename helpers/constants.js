@@ -191,6 +191,9 @@ const watchedFunctionNames = {
   COMMIT_VOTE_SPECIAL: 'commitVoteOnSpecialProposal',
   REVEAL_VOTE_SPECIAL: 'revealVoteOnSpecialProposal',
   SPECIAL_PROPOSAL_CLAIM: 'claimSpecialProposalVotingResult',
+  // approve transactions
+  APPROVE_DGD: 'approve',
+  APPROVE_DGD_BADGE: 'approve',
 };
 
 const watchedFunctionsList = [
@@ -222,6 +225,9 @@ const watchedFunctionsList = [
   watchedFunctionNames.COMMIT_VOTE_SPECIAL,
   watchedFunctionNames.REVEAL_VOTE_SPECIAL,
   watchedFunctionNames.SPECIAL_PROPOSAL_CLAIM,
+  // approve transactions
+  watchedFunctionNames.APPROVE_DGD,
+  watchedFunctionNames.APPROVE_DGD_BADGE,
 ];
 
 const daoConfigsKeys = {
