@@ -30,6 +30,8 @@ module.exports = {
       SYNC_REPORT_FREQUENCY: 10,
       KYC_ADMIN_PASSWORD: 'digixdao',
       FORUM_ADMIN_ADDRESS: '0x52a9d38687a0c2d5e1645f91733ffab3bbd29b06',
+      DGD_CONTRACT: '0x36376d6e66f20a2f5377a91a5e6ce37b53dda0d8',
+      DGD_BADGE_CONTRACT: '0xb26c6b7a4db0acf7d7e3ba5f8ca26386684f97ed',
     },
   }],
 };

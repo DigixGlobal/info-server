@@ -24,6 +24,9 @@ const DaoVotingClaims = require('@digix/dao-contracts/build/contracts/DaoVotingC
 const DaoWhitelisting = require('@digix/dao-contracts/build/contracts/DaoWhitelisting.json');
 const DaoInformation = require('@digix/dao-contracts/build/contracts/DaoInformation.json');
 const DaoWhitelistingStorage = require('@digix/dao-contracts/build/contracts/DaoWhitelistingStorage.json');
+
+const ERC20 = require('@digix/dao-contracts/build/contracts/ERC20.json');
+
 const abiDecoder = require('abi-decoder');
 
 const _contracts = {};
@@ -64,6 +67,8 @@ const initContracts = async (web3, networkId) => {
     _contracts.fromAddress[contractAddress] = _contracts[k];
     _contracts.decoder.addABI(contract.abi);
   }
+  _contracts.dgd = web3.eth.contract(ERC20.abi).at(process.env.DGD_CONTRACT);
+  _contracts.dgdBadge = web3.eth.contract(ERC20.abi).at(process.env.DGD_BADGE_CONTRACT);
 };
 
 const getContracts = () => {
