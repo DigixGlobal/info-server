@@ -330,7 +330,10 @@ const refreshProposalDraftVote = async (res) => {
   }, {});
   console.log('INSERTED refreshProposalDraftVote');
 
-  return getProposal(res._proposalId);
+  return Promise.all([
+    getProposal(res._proposalId),
+    getAddressDetails(res._from),
+  ]);
 };
 
 // TO BE TESTED
