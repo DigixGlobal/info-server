@@ -315,7 +315,7 @@ const resolvers = {
   },
   ProposalDetail: {
     milestones(detail) {
-      return detail.milestones.map((milestone, index) => ({
+      return (detail.milestones || []).map((milestone, index) => ({
         id: `${detail.id}/MILESTONE-${index}`,
         ...milestone,
       }));
@@ -347,7 +347,7 @@ const resolvers = {
       return eth(proposal.claimableFunding);
     },
     proposalVersions(proposal) {
-      return proposal.proposalVersions.map((version, index) => ({
+      return (proposal.proposalVersions || []).map((version, index) => ({
         id: `${proposal.proposalId}/VERSION-${index}`,
         ...version,
       }));

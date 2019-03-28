@@ -30,6 +30,7 @@ const {
 
 const {
   initDao,
+  initDaoBeforeStart,
 } = require('./dao');
 
 const tapPromise = t => f => (...args) => f(...args).then((result) => {
@@ -80,7 +81,7 @@ const multiBroadcast = (splitter, broadcasts) => tapPromise((result) => {
 });
 
 const watchedFunctionsMap = {
-  setStartOfFirstQuarter: initDao,
+  setStartOfFirstQuarter: initDaoBeforeStart,
   calculateGlobalRewardsBeforeNewQuarter: initDao,
 
   lockDGD: multiBroadcast(
@@ -107,7 +108,10 @@ const watchedFunctionsMap = {
   modifyProposal: broadcastUpdatedProposal(refreshProposalDetails),
   endorseProposal: broadcastUpdatedProposal(refreshProposalEndorseProposal),
   finalizeProposal: broadcastUpdatedProposal(refreshProposalFinalizeProposal),
-  voteOnDraft: broadcastUpdatedProposal(refreshProposalDraftVote),
+  voteOnDraft: multiBroadcast(
+    ([proposal, user]) => [proposal, user],
+    [broadcastUpdatedProposal, broadcastUpdatedUser],
+  )(refreshProposalDraftVote),
   claimDraftVotingResult: broadcastUpdatedProposal(refreshProposalDraftVotingClaim),
   commitVoteOnProposal: broadcastUpdatedProposal(refreshProposalCommitVote),
   revealVoteOnProposal: multiBroadcast(

@@ -46,6 +46,7 @@ const getAddressObject = (userInfo) => {
     reputationPoint: userInfo[8].toString(),
     quarterPoint: userInfo[9].toString(),
     claimableDgx: userInfo[10].toString(),
+    moderatorQuarterPoint: userInfo[11].toString(),
   };
 };
 

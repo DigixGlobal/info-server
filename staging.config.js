@@ -24,8 +24,13 @@ module.exports = {
       WEB3_HTTP_PROVIDER: 'https://kovan.digixdev.com',
       IPFS_ENDPOINT: 'https://ipfs-api.digix.global',
       HTTP_ENDPOINT: 'https://ipfs.digix.global/ipfs',
+      IPFS_TIMEOUT: 30000,
+      CRON_PROCESS_KYC_FREQUENCY: 5,
+      CRON_WATCH_BLOCKS_FREQUENCY: 5,
       KYC_ADMIN_PASSWORD: 'digixdao-kovan',
       FORUM_ADMIN_ADDRESS: '0x369d674039d64519af688f4c6f9608552207bdab',
+      DGD_CONTRACT: '0x3bbba4b50468ead87cfc90a31c2768b7bf4d26e1',
+      DGD_BADGE_CONTRACT: '0x1ed8364eaabf655882dca0c01b19519f8acaed0b',
     },
   }],
 };

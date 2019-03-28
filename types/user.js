@@ -26,6 +26,9 @@ const typeDef = gql`
     # User's current quarterly points
     quarterPoint: BigNumber
 
+    # User's current moderator quarter points
+    moderatorQuarterPoint: BigNumber
+
     # A flag to indicate if the current user is a moderator
     isModerator: Boolean
 
@@ -37,6 +40,7 @@ const typeDef = gql`
 const dgd = value => (value === null || value === undefined ? null : ofOne(value, denominators.DGD));
 const dgx = value => (value === null || value === undefined ? null : ofOne(value, denominators.DGX));
 const reputation = value => (value ? ofOne(value, denominators.REPUTATION_POINT) : null);
+const quarterPoint = value => (value ? ofOne(value, denominators.QUARTER_POINT) : null);
 
 const resolvers = {
   User: {
@@ -56,7 +60,10 @@ const resolvers = {
       return reputation(user.reputationPoint);
     },
     quarterPoint(user) {
-      return reputation(user.quarterPoint);
+      return quarterPoint(user.quarterPoint);
+    },
+    moderatorQuarterPoint(user) {
+      return quarterPoint(user.moderatorQuarterPoint);
     },
   },
 };

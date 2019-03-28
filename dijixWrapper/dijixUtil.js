@@ -5,13 +5,13 @@ const DijixAttestation = require('dijix-attestation').default;
 
 let _dijix;
 
-const init = (ipfsEndpoint, httpEndpoint) => {
+const init = (ipfsEndpoint, httpEndpoint, timeout) => {
   _dijix = new Dijix({
     ipfsEndpoint,
     httpEndpoint,
     cache: true,
     concurrency: 10,
-    requestTimeout: 30000,
+    requestTimeout: timeout,
     types: [
       new DijixImage(),
       new DijixPDF(),
