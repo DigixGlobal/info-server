@@ -3,6 +3,8 @@ module.exports = {
     name: 'info-server:staging',
     script: './app.js',
     watch: false,
+    out_file: './out.log',
+    error_file: './error.log',
     env: {
       PORT: '3002',
       DB_URL: 'mongodb://localhost:27017/digixdao',
@@ -19,7 +21,7 @@ module.exports = {
       RESYNC: process.env.RESYNC,
       REPROCESS_ONLY: process.env.REPROCESS_ONLY,
       SYNC_REPORT_FREQUENCY: 10,
-      WEB3_HTTP_PROVIDER: 'https://kovan.infura.io',
+      WEB3_HTTP_PROVIDER: 'https://kovan.digixdev.com',
       IPFS_ENDPOINT: 'https://ipfs-api.digix.global',
       HTTP_ENDPOINT: 'https://ipfs.digix.global/ipfs',
       IPFS_TIMEOUT: 30000,

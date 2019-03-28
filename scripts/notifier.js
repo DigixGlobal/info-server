@@ -26,13 +26,20 @@ const notifyDaoServer = async (notification) => {
     url: notification.path,
     method: notification.method,
     body: JSON.stringify(notification.body),
-    strictSSL: false,
+    strictSSL: true,
     headers: {
       'ACCESS-SIGN': signature,
       'ACCESS-NONCE': nonce,
       'content-type': 'application/json',
     },
   };
+
+  console.log('');
+  console.log('*** REQUESTING DAO-SERVER ***');
+  console.log('signature = ', signature);
+  console.log('message   = ', message);
+  console.log('options   = ', options);
+  console.log('');
 
   request(options, async function (err) {
     if (err) console.log(err);

@@ -83,6 +83,7 @@ const multiBroadcast = (splitter, broadcasts) => tapPromise((result) => {
 const watchedFunctionsMap = {
   setStartOfFirstQuarter: initDaoBeforeStart,
   calculateGlobalRewardsBeforeNewQuarter: initDao,
+
   lockDGD: multiBroadcast(
     ([daoInfo, user]) => [daoInfo, user],
     [broadcastUpdatedDao, broadcastUpdatedUser],
