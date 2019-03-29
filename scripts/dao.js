@@ -85,6 +85,8 @@ const refreshDaoTemp = async () => {
       isGlobalRewardsSet: true,
       nModerators: 0,
       nParticipants: 0,
+      totalLockedDgds: 0,
+      totalModeratorLockedDgds: 0,
     },
   });
 };
@@ -98,6 +100,11 @@ const isDaoStarted = async () => {
     return false;
   }
   return true;
+};
+
+const getStartOfFirstQuarter = async () => {
+  const startOfFirstQuarter = await getContracts().daoUpgradeStorage.startOfFirstQuarter.call();
+  return startOfFirstQuarter;
 };
 
 const initDaoBeforeStart = async () => {
@@ -117,4 +124,5 @@ module.exports = {
   refreshDaoConfigs,
   isDaoStarted,
   initDaoBeforeStart,
+  getStartOfFirstQuarter,
 };

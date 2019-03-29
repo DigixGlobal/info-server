@@ -30,6 +30,11 @@ const daoServerEndpoints = {
 const daoServerEventTypes = {
   NEW_PROPOSAL: 'EVENT_PROJECT_CREATED',
   PROPOSAL_ENDORSED: 'EVENT_PROJECT_ENDORSED',
+  PRL_ACTION: {
+    1: 'EVENT_PROJECT_PRL_STOPPED',
+    2: 'EVENT_PROJECT_PRL_PAUSED',
+    3: 'EVENT_PROJECT_PRL_UNPAUSED',
+  },
 };
 
 const dijixDefaultFields = {
@@ -186,6 +191,9 @@ const watchedFunctionNames = {
   COMMIT_VOTE_SPECIAL: 'commitVoteOnSpecialProposal',
   REVEAL_VOTE_SPECIAL: 'revealVoteOnSpecialProposal',
   SPECIAL_PROPOSAL_CLAIM: 'claimSpecialProposalVotingResult',
+  // approve transactions
+  APPROVE_DGD: 'approve',
+  APPROVE_DGD_BADGE: 'approve',
 };
 
 const watchedFunctionsList = [
@@ -217,6 +225,9 @@ const watchedFunctionsList = [
   watchedFunctionNames.COMMIT_VOTE_SPECIAL,
   watchedFunctionNames.REVEAL_VOTE_SPECIAL,
   watchedFunctionNames.SPECIAL_PROPOSAL_CLAIM,
+  // approve transactions
+  watchedFunctionNames.APPROVE_DGD,
+  watchedFunctionNames.APPROVE_DGD_BADGE,
 ];
 
 const daoConfigsKeys = {

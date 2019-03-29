@@ -6,6 +6,10 @@ const cors = require('cors');
 const cron = require('node-cron');
 const rateLimit = require('express-rate-limit');
 
+const {
+  timeIsRecent,
+} = require('@digix/helpers/lib/helpers');
+
 const mongoUtil = require('./dbWrapper/mongoUtil');
 const dijixUtil = require('./dijixWrapper/dijixUtil');
 const web3Util = require('./web3Wrapper/web3Util');
@@ -58,7 +62,12 @@ const addProcessKycCron = async () => {
   waitingCron.stop();
 
   // refresh DAO, now that the DigixDAO has started
-  scripts.refreshDaoTemp();
+  const startOfFirstQuarter = await scripts.getStartOfFirstQuarter();
+  if (timeIsRecent(startOfFirstQuarter)) {
+    await scripts.refreshDaoTemp();
+  } else {
+    await scripts.initDao();
+  }
   scripts.refreshDaoConfigs();
 
   const cronFrequency = process.env.CRON_PROCESS_KYC_FREQUENCY;

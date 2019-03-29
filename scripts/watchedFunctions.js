@@ -108,7 +108,10 @@ const watchedFunctionsMap = {
   modifyProposal: broadcastUpdatedProposal(refreshProposalDetails),
   endorseProposal: broadcastUpdatedProposal(refreshProposalEndorseProposal),
   finalizeProposal: broadcastUpdatedProposal(refreshProposalFinalizeProposal),
-  voteOnDraft: broadcastUpdatedProposal(refreshProposalDraftVote),
+  voteOnDraft: multiBroadcast(
+    ([proposal, user]) => [proposal, user],
+    [broadcastUpdatedProposal, broadcastUpdatedUser],
+  )(refreshProposalDraftVote),
   claimDraftVotingResult: broadcastUpdatedProposal(refreshProposalDraftVotingClaim),
   commitVoteOnProposal: broadcastUpdatedProposal(refreshProposalCommitVote),
   revealVoteOnProposal: multiBroadcast(

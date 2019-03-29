@@ -13,6 +13,8 @@ const {
   initDaoBeforeStart,
   refreshDaoConfigs,
   refreshDaoTemp,
+  getStartOfFirstQuarter,
+  initDao,
 } = require('./dao');
 
 const {
@@ -29,4 +31,6 @@ module.exports = {
   isDaoStarted,
   initDaoBeforeStart,
   refreshDaoTemp,
+  getStartOfFirstQuarter,
+  initDao,
 };
