@@ -12,6 +12,7 @@ const {
   refreshDao,
   initDaoBeforeStart,
   refreshDaoConfigs,
+  refreshDaoTemp,
 } = require('./dao');
 
 const {
@@ -27,4 +28,5 @@ module.exports = {
   processPendingKycs,
   isDaoStarted,
   initDaoBeforeStart,
+  refreshDaoTemp,
 };
