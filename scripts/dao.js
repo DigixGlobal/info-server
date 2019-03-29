@@ -104,7 +104,7 @@ const isDaoStarted = async () => {
 
 const getStartOfFirstQuarter = async () => {
   const startOfFirstQuarter = await getContracts().daoUpgradeStorage.startOfFirstQuarter.call();
-  return startOfFirstQuarter.toNumber();
+  return startOfFirstQuarter;
 };
 
 const initDaoBeforeStart = async () => {
