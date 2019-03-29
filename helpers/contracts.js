@@ -57,6 +57,11 @@ const contracts = {
 const initContracts = async (web3, networkId) => {
   _contracts.fromAddress = {};
   _contracts.decoder = abiDecoder;
+
+  // add dgd and badge contracts
+  contracts.dgd = web3.eth.contract(ERC20.abi).at(process.env.DGD_CONTRACT);
+  contracts.dgdBadge = web3.eth.contract(ERC20.abi).at(process.env.DGD_BADGE_CONTRACT);
+
   for (const k in contracts) {
     const contract = contracts[k];
     const contractAddress = contract.networks[networkId].address;
@@ -64,8 +69,6 @@ const initContracts = async (web3, networkId) => {
     _contracts.fromAddress[contractAddress] = _contracts[k];
     _contracts.decoder.addABI(contract.abi);
   }
-  _contracts.dgd = web3.eth.contract(ERC20.abi).at(process.env.DGD_CONTRACT);
-  _contracts.dgdBadge = web3.eth.contract(ERC20.abi).at(process.env.DGD_BADGE_CONTRACT);
 };
 
 const getContracts = () => {
