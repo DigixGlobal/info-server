@@ -16,6 +16,7 @@ const {
   getUpdatedFundings,
   getDefaultDijixFields,
   bNArrayToString,
+  getAdditionalDocs,
 } = require('../helpers/utils');
 
 const {
@@ -51,6 +52,7 @@ const {
 
 const {
   fetchProposalVersion,
+  fetchMultiple,
 } = require('../dijixWrapper/proposals');
 
 const {
@@ -168,16 +170,12 @@ const refreshProposalDetails = async (res) => {
     console.log('version id : ', v);
     const proposalVersion = await getContracts().daoStorage.readProposalVersion.call(res._proposalId, currentVersion);
     const ipfsDoc = await fetchProposalVersion('Qm'.concat(decodeHash(proposalVersion[readProposalVersionIndices.docIpfsHash]).slice(2)));
-    let proposalDocs = [];
-    if (proposalVersion === proposal.finalVersionIpfsDoc) {
-      proposalDocs = await getContracts().daoStorage.readProposalDocs.call(res._proposalId);
-    }
     proposal.proposalVersions.push({
       docIpfsHash: proposalVersion[readProposalVersionIndices.docIpfsHash],
       created: proposalVersion[readProposalVersionIndices.created].toNumber(),
       milestoneFundings: (currentVersion === latestVersion) ? res._milestonesFundings : bNArrayToString(proposalVersion[readProposalVersionIndices.milestoneFundings]),
       finalReward: (currentVersion === latestVersion) ? res._finalReward.toString() : proposalVersion[readProposalVersionIndices.finalReward].toString(),
-      moreDocs: proposalDocs,
+      moreDocs: [],
       totalFunding: (new BigNumber(res._finalReward)).plus(sumArrayString(res._milestonesFundings)).toString(),
       dijixObject: ipfsDoc.data ? {
         ...ipfsDoc.data.attestation,
@@ -194,6 +192,25 @@ const refreshProposalDetails = async (res) => {
   console.log('INSERTED refreshProposalDetails');
 
   return Promise.resolve(proposal);
+};
+
+// TO BE TESTED
+const refreshProposalAddMoreDocs = async (res) => {
+  const proposal = await getProposal(res._proposalId);
+
+  const v = proposal.proposalVersions.length - 1;
+  let proposalMoreDocs = await getContracts().daoStorage.readProposalDocs.call(res._proposalId);
+  proposalMoreDocs = proposalMoreDocs.map((item) => {
+    return 'Qm'.concat(decodeHash(item).slice(2));
+  });
+
+  proposal.proposalVersions[v].moreDocs = getAdditionalDocs(await fetchMultiple(proposalMoreDocs));
+
+  await updateProposal(res._proposalId, {
+    $set: {
+      proposalVersions: proposal.proposalVersions,
+    },
+  });
 };
 
 // DONE
@@ -908,6 +925,7 @@ module.exports = {
   refreshProposalDetails,
   refreshProposalEndorseProposal,
   refreshProposalFinalizeProposal,
+  refreshProposalAddMoreDocs,
   refreshProposalDraftVote,
   refreshProposalDraftVotingClaim,
   refreshProposalCommitVote,

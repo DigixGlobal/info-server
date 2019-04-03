@@ -307,6 +307,24 @@ const getDefaultDijixFields = function () {
   };
 };
 
+const _getAdditionalDocObj = function (doc) {
+  if (doc === null || doc === undefined) return doc;
+  const doc2 = {
+    ...doc.data.attestation,
+    docs: doc.data.proofs,
+    created: Math.floor(doc.created / 1000),
+  };
+  return doc2;
+};
+
+const getAdditionalDocs = function (docs) {
+  const additionalDocs = [];
+  for (const doc of docs) {
+    additionalDocs.push(_getAdditionalDocObj(doc));
+  }
+  return additionalDocs;
+};
+
 module.exports = {
   sumArray,
   sumArrayBN,
@@ -332,4 +350,5 @@ module.exports = {
   getUpdatedFundings,
   getServerSignatures,
   getDefaultDijixFields,
+  getAdditionalDocs,
 };
