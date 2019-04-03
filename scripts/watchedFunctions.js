@@ -5,6 +5,7 @@ const {
   refreshProposalDetails,
   refreshProposalEndorseProposal,
   refreshProposalFinalizeProposal,
+  refreshProposalAddMoreDocs,
   refreshProposalDraftVote,
   refreshProposalDraftVotingClaim,
   refreshProposalCommitVote,
@@ -108,6 +109,7 @@ const watchedFunctionsMap = {
   modifyProposal: broadcastUpdatedProposal(refreshProposalDetails),
   endorseProposal: broadcastUpdatedProposal(refreshProposalEndorseProposal),
   finalizeProposal: broadcastUpdatedProposal(refreshProposalFinalizeProposal),
+  addProposalDoc: broadcastUpdatedProposal(refreshProposalAddMoreDocs),
   voteOnDraft: multiBroadcast(
     ([proposal, user]) => [proposal, user],
     [broadcastUpdatedProposal, broadcastUpdatedUser],
