@@ -292,6 +292,36 @@ const daoConfigsKeys = {
   CONFIG_PREPROPOSAL_COLLATERAL: 'config_preproposal_collateral',
 };
 
+const gasLimits = {
+  // participation
+  LOCK_DGD: 1000000,
+  UNLOCK_DGD: 1000000,
+  CONFIRM_CONTINUE_PARTICIPATION: 1000000,
+  CLAIM_REWARDS: 400000,
+  // voting
+  MODERATOR_VOTE: 300000,
+  COMMIT_VOTE: 150000,
+  REVEAL_VOTE: 300000,
+  COMMIT_VOTE_SPECIAL: 200000,
+  REVEAL_VOTE_SPECIAL: 250000,
+  // claim voting
+  CLAIM_DRAFT_VOTING: 8000000,
+  CLAIM_VOTING: 8000000,
+  CLAIM_SPECIAL_VOTING: 8000000,
+  // proposal
+  CREATE_PROPOSAL: 1000000,
+  ENDORSE_PROPOSAL: 400000,
+  EDIT_PROPOSAL: 1000000,
+  FINALIZE_PROPOSAL: 400000,
+  CLAIM_FUNDING: 400000,
+  FINISH_MILESTONE: 400000,
+  ADD_PROPOSAL_DOC: 300000,
+  CHANGE_FUNDINGS: 500000,
+  ABORT_PROPOSAL: 400000,
+  // default value
+  DEFAULT_GAS: 2000000,
+};
+
 module.exports = {
   readProposalIndices,
   readSpecialProposalIndices,
@@ -309,4 +339,5 @@ module.exports = {
   dijixDefaultFields,
   daoServerEndpoints,
   daoServerEventTypes,
+  gasLimits,
 };

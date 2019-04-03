@@ -4,6 +4,7 @@ const crypto = require('crypto');
 const {
   denominators,
   dijixDefaultFields,
+  gasLimits,
 } = require('./constants');
 
 const getServerSignatures = function (req) {
@@ -307,6 +308,40 @@ const getDefaultDijixFields = function () {
   };
 };
 
+const getTxConfigs = function () {
+  return {
+    gas: {
+      // participation
+      LOCK_DGD: gasLimits.LOCK_DGD,
+      UNLOCK_DGD: gasLimits.UNLOCK_DGD,
+      CONFIRM_CONTINUE_PARTICIPATION: gasLimits.CONFIRM_CONTINUE_PARTICIPATION,
+      CLAIM_REWARDS: gasLimits.CLAIM_REWARDS,
+      // voting
+      MODERATOR_VOTE: gasLimits.MODERATOR_VOTE,
+      COMMIT_VOTE: gasLimits.COMMIT_VOTE,
+      REVEAL_VOTE: gasLimits.REVEAL_VOTE,
+      COMMIT_VOTE_SPECIAL: gasLimits.COMMIT_VOTE_SPECIAL,
+      REVEAL_VOTE_SPECIAL: gasLimits.REVEAL_VOTE_SPECIAL,
+      // claim voting
+      CLAIM_DRAFT_VOTING: gasLimits.CLAIM_DRAFT_VOTING,
+      CLAIM_VOTING: gasLimits.CLAIM_VOTING,
+      CLAIM_SPECIAL_VOTING: gasLimits.CLAIM_SPECIAL_VOTING,
+      // proposal
+      CREATE_PROPOSAL: gasLimits.CREATE_PROPOSAL,
+      ENDORSE_PROPOSAL: gasLimits.ENDORSE_PROPOSAL,
+      EDIT_PROPOSAL: gasLimits.EDIT_PROPOSAL,
+      FINALIZE_PROPOSAL: gasLimits.FINALIZE_PROPOSAL,
+      CLAIM_FUNDING: gasLimits.CLAIM_FUNDING,
+      FINISH_MILESTONE: gasLimits.FINISH_MILESTONE,
+      ADD_PROPOSAL_DOC: gasLimits.ADD_PROPOSAL_DOC,
+      CHANGE_FUNDINGS: gasLimits.CHANGE_FUNDINGS,
+      ABORT_PROPOSAL: gasLimits.ABORT_PROPOSAL,
+      // default value
+      DEFAULT: gasLimits.DEFAULT_GAS,
+    },
+  };
+};
+
 module.exports = {
   sumArray,
   sumArrayBN,
@@ -332,4 +367,5 @@ module.exports = {
   getUpdatedFundings,
   getServerSignatures,
   getDefaultDijixFields,
+  getTxConfigs,
 };
