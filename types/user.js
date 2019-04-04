@@ -21,7 +21,7 @@ const typeDef = gql`
     lockedDgd: BigNumber
 
     # User's current reputation points
-    reputationPoint: BigNumber!
+    reputationPoint: BigNumber
 
     # User's current quarterly points
     quarterPoint: BigNumber
