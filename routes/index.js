@@ -23,10 +23,12 @@ const {
   deserializeDaoConfigs,
   deserializeAddress,
   readConfig,
+  ofOne,
 } = require('../helpers/utils');
 
 const {
   counters,
+  denominators,
 } = require('../helpers/constants');
 
 const router = express.Router();
@@ -66,8 +68,8 @@ router.get('/points', async (req, res) => {
   const filteredDetails = {};
   details.forEach(function (d) {
     filteredDetails[d.address] = {
-      reputation: d.reputationPoint,
-      quarterPoints: d.quarterPoint,
+      reputation: ofOne(d.reputationPoint, denominators.REPUTATION_POINT),
+      quarterPoints: ofOne(d.quarterPoint, denominators.QUARTER_POINT),
     };
   });
   return res.json({ result: filteredDetails });
