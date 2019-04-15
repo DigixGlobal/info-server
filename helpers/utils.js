@@ -310,8 +310,7 @@ const getDefaultDijixFields = function () {
 const _getAdditionalDocObj = function (doc) {
   if (doc === null || doc === undefined) return doc;
   const doc2 = {
-    ...doc.data.attestation,
-    docs: doc.data.proofs,
+    ...doc.data.attestation.moreDocs,
     created: Math.floor(doc.created / 1000),
   };
   return doc2;

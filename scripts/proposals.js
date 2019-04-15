@@ -211,6 +211,8 @@ const refreshProposalAddMoreDocs = async (res) => {
       proposalVersions: proposal.proposalVersions,
     },
   });
+
+  return Promise.resolve(proposal);
 };
 
 // DONE
