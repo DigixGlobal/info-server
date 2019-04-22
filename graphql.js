@@ -68,6 +68,10 @@ const resolvers = {
       return proposal ? proposalToType(proposal) : null;
     },
     fetchCurrentUser: (_obj, _args, context, _info) => {
+      if (!context.currentUser) {
+        throw new Error('Not Authenticated');
+      }
+
       return context.currentUser;
     },
     fetchDao: (_obj, _args, _context, _info) => {
@@ -78,15 +82,33 @@ const resolvers = {
   Subscription: {
     userUpdated: {
       subscribe: withFilter(
-        () => pubsub.asyncIterator('userUpdated'),
+        (_obj, _args, context, _info) => {
+          if (!context.currentUser) {
+            throw new Error('Not Authenticated');
+          }
+
+          return pubsub.asyncIterator('userUpdated');
+        },
         filterByCurrentAddress(payload => payload.userUpdated.address),
       ),
     },
     proposalSubmitted: {
-      subscribe: () => pubsub.asyncIterator('proposalSubmitted'),
+      subscribe: (_obj, _args, context, _info) => {
+        if (!context.currentUser) {
+          throw new Error('Not Authenticated');
+        }
+
+        return pubsub.asyncIterator('proposalSubmitted');
+      },
     },
     proposalUpdated: {
-      subscribe: () => pubsub.asyncIterator('proposalUpdated'),
+      subscribe: (_obj, _args, context, _info) => {
+        if (!context.currentUser) {
+          throw new Error('Not Authenticated');
+        }
+
+        return pubsub.asyncIterator('proposalUpdated');
+      },
     },
     daoUpdated: {
       subscribe: () => pubsub.asyncIterator('daoUpdated'),
@@ -124,7 +146,7 @@ const signatureAuthorization = (params) => {
 
     throw new AuthenticationError('Invalid address or signature');
   } else {
-    throw new AuthenticationError('Missing address or signature');
+    return {};
   }
 };
 
