@@ -115,9 +115,9 @@ const readProposalVersionIndices = {
 };
 
 const readProposalPRLActions = {
-  1: 'stopped',
-  2: 'paused',
-  3: 'ok',
+  1: true,
+  2: true,
+  3: false,
 };
 
 const proposalStages = {
@@ -174,6 +174,7 @@ const watchedFunctionNames = {
   ENDORSE_PROPOSAL: 'endorseProposal',
   MODIFY_PROPOSAL: 'modifyProposal',
   FINALIZE_PROPOSAL: 'finalizeProposal',
+  ADD_PROPOSAL_DOC: 'addProposalDoc',
   DRAFT_VOTE: 'voteOnDraft',
   CLAIM_DRAFT_VOTING: 'claimDraftVotingResult',
   COMMIT_VOTE: 'commitVoteOnProposal',
@@ -208,6 +209,7 @@ const watchedFunctionsList = [
   watchedFunctionNames.ENDORSE_PROPOSAL,
   watchedFunctionNames.MODIFY_PROPOSAL,
   watchedFunctionNames.FINALIZE_PROPOSAL,
+  watchedFunctionNames.ADD_PROPOSAL_DOC,
   watchedFunctionNames.DRAFT_VOTE,
   watchedFunctionNames.CLAIM_DRAFT_VOTING,
   watchedFunctionNames.COMMIT_VOTE,
