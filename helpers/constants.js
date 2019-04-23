@@ -115,9 +115,9 @@ const readProposalVersionIndices = {
 };
 
 const readProposalPRLActions = {
-  1: 'stopped',
-  2: 'paused',
-  3: 'ok',
+  1: true,
+  2: true,
+  3: false,
 };
 
 const proposalStages = {
