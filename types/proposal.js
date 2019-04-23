@@ -28,6 +28,14 @@ const typeDef = gql`
     updated: BigNumber
   }
 
+  type ProposalDoc {
+    # IPFS hashes for doc
+    docs: [String]
+
+    # Date the document is created
+    created: Timestamp
+  }
+
   # Milestone fundings
   type MilestoneFunding {
     # Index ID
@@ -126,8 +134,8 @@ const typeDef = gql`
     # Expected reward on the completion of the proposal
     finalReward: BigNumber
 
-    # More docs(?)
-    moreDocs: [String]
+    # More docs associated with the proposal
+    moreDocs: [ProposalDoc]
 
     # Version total funding
     totalFunding: BigNumber
