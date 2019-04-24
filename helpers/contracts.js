@@ -15,7 +15,10 @@ const DaoSpecialVotingClaims = require('@digix/dao-contracts/build/contracts/Dao
 const DaoStakeLocking = require('@digix/dao-contracts/build/contracts/DaoStakeLocking.json');
 const DaoStakeStorage = require('@digix/dao-contracts/build/contracts/DaoStakeStorage.json');
 const DaoStorage = require('@digix/dao-contracts/build/contracts/DaoStorage.json');
+
+// Replace with DaoUpgradeStorage in mainnet deployment
 const DaoUpgradeStorage = require('@digix/dao-contracts/build/contracts/DaoUpgradeStorage.json');
+
 const DaoVoting = require('@digix/dao-contracts/build/contracts/DaoVoting.json');
 const DaoVotingClaims = require('@digix/dao-contracts/build/contracts/DaoVotingClaims.json');
 const DaoWhitelisting = require('@digix/dao-contracts/build/contracts/DaoWhitelisting.json');
