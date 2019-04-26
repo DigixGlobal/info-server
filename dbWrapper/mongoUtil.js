@@ -6,6 +6,10 @@ const {
   collections,
 } = require('../helpers/constants');
 
+const {
+  getAddressesDetails,
+} = require('./addresses');
+
 const keystore = require('../keystore/kyc-admin.json');
 
 let _db;
@@ -38,6 +42,11 @@ const initToResyncDb = async () => {
 
 const initToProcessOnlyDb = async () => {
   console.log('in initToProcessOnlyDb');
+
+  // read who the current forum admin/kyc admins are
+  const kycAdmins = await getAddressesDetails({ isKycOfficer: true });
+  const forumAdmins = await getAddressesDetails({ isForumAdmin: true });
+
   // wipe everything except synced transactions
   await _emptyCollections([
     collections.ADDRESSES,
@@ -60,6 +69,20 @@ const initToProcessOnlyDb = async () => {
       is_updating_latest_txns: false,
     },
   });
+
+  const kycAdminsInsertions = kycAdmins.map((item) => {
+    return {
+      address: item.address,
+      isKycOfficer: true,
+    };
+  });
+  const forumAdminsInsertions = forumAdmins.map((item) => {
+    return {
+      address: item.address,
+      isForumAdmin: true,
+    };
+  });
+  await _db.collection(collections.ADDRESSES).insertMany(kycAdminsInsertions.concat(forumAdminsInsertions));
 
   console.log('cleared DB, except synced transactions. Will now start reprocessing');
 };
