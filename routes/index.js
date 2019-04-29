@@ -24,6 +24,7 @@ const {
   deserializeAddress,
   readConfig,
   ofOne,
+  getTxConfigs,
 } = require('../helpers/utils');
 
 const {
@@ -48,6 +49,12 @@ router.get('/daoConfigs', async (req, res) => {
   const daoConfigs = deserializeDaoConfigs(await getDaoConfigs());
   return res.json({
     result: daoConfigs,
+  });
+});
+
+router.get('/txConfigs', (req, res) => {
+  return res.json({
+    result: getTxConfigs(),
   });
 });
 

@@ -880,7 +880,10 @@ const refreshProposalRevealVoteOnSpecial = async (res) => {
 
   console.log('reveal vote for special proposal');
 
-  return getSpecialProposal(res._proposalId);
+  return Promise.all([
+    getSpecialProposal(res._proposalId),
+    getAddressDetails(res._from),
+  ]);
 };
 
 // TO BE TESTED
