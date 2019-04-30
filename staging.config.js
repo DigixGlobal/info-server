@@ -21,7 +21,7 @@ module.exports = {
       RESYNC: process.env.RESYNC,
       REPROCESS_ONLY: process.env.REPROCESS_ONLY,
       SYNC_REPORT_FREQUENCY: 10,
-      WEB3_HTTP_PROVIDER: 'https://kovan.digixdev.com',
+      WEB3_HTTP_PROVIDER: 'https://kovan.infura.io/v3/0bc82d401f644369afdbed5b5590fe28',
       IPFS_ENDPOINT: 'https://ipfs-api.digix.global',
       HTTP_ENDPOINT: 'https://ipfs.digix.global/ipfs',
       IPFS_TIMEOUT: 60000,
