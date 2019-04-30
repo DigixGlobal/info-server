@@ -131,7 +131,10 @@ const watchedFunctionsMap = {
   createSpecialProposal: broadcastUpdatedProposal(refreshProposalSpecialNew),
   startSpecialProposalVoting: broadcastUpdatedProposal(refreshProposalSpecial),
   commitVoteOnSpecialProposal: broadcastUpdatedProposal(refreshProposalCommitVoteOnSpecial),
-  revealVoteOnSpecialProposal: broadcastUpdatedProposal(refreshProposalRevealVoteOnSpecial),
+  revealVoteOnSpecialProposal: multiBroadcast(
+    ([proposal, user]) => [proposal, user],
+    [broadcastUpdatedProposal, broadcastUpdatedUser],
+  )(refreshProposalRevealVoteOnSpecial),
   claimSpecialProposalVotingResult: broadcastUpdatedProposal(refreshProposalSpecialVotingClaim),
 };
 
