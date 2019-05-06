@@ -115,25 +115,26 @@ const readProposalVersionIndices = {
 };
 
 const readProposalPRLActions = {
-  1: true,
-  2: true,
-  3: false,
+  1: 'STOPPED',
+  2: 'PAUSED',
+  3: 'ACTIVE',
+  NEW: 'ACTIVE',
 };
 
 const proposalStages = {
-  IDEA: 'idea',
-  DRAFT: 'draft',
-  PROPOSAL: 'proposal',
-  ONGOING: 'ongoing',
-  REVIEW: 'review',
-  ARCHIVED: 'archived',
+  IDEA: 'IDEA',
+  DRAFT: 'DRAFT',
+  PROPOSAL: 'PROPOSAL',
+  ONGOING: 'ONGOING',
+  REVIEW: 'REVIEW',
+  ARCHIVED: 'ARCHIVED',
 };
 
 const proposalVotingStages = {
-  DRAFT: 'draftVoting',
-  COMMIT: 'commit',
-  REVEAL: 'reveal',
-  NONE: 'none',
+  DRAFT: 'DRAFT',
+  COMMIT: 'COMMIT',
+  REVEAL: 'REVEAL',
+  NONE: 'NONE',
 };
 
 const collections = {

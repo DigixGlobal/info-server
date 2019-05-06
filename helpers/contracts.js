@@ -1,7 +1,6 @@
 const ContractResolver = require('@digix/dao-contracts/build/contracts/ContractResolver.json');
 const Dao = require('@digix/dao-contracts/build/contracts/Dao.json');
 const DaoCalculatorService = require('@digix/dao-contracts/build/contracts/DaoCalculatorService.json');
-const DaoConfigsStorage = require('@digix/dao-contracts/build/contracts/DaoConfigsStorage.json');
 const DaoFundingManager = require('@digix/dao-contracts/build/contracts/DaoFundingManager.json');
 const DaoIdentity = require('@digix/dao-contracts/build/contracts/DaoIdentity.json');
 const DaoIdentityStorage = require('@digix/dao-contracts/build/contracts/DaoIdentityStorage.json');
@@ -17,7 +16,9 @@ const DaoStakeStorage = require('@digix/dao-contracts/build/contracts/DaoStakeSt
 const DaoStorage = require('@digix/dao-contracts/build/contracts/DaoStorage.json');
 
 // Replace with DaoUpgradeStorage in mainnet deployment
+// Replace with DaoConfigsStorage in mainnet deployment
 const DaoUpgradeStorage = require('@digix/dao-contracts/build/contracts/MockDaoUpgradeStorage.json');
+const DaoConfigsStorage = require('@digix/dao-contracts/build/contracts/MockDaoConfigsStorage.json');
 
 const DaoVoting = require('@digix/dao-contracts/build/contracts/DaoVoting.json');
 const DaoVotingClaims = require('@digix/dao-contracts/build/contracts/DaoVotingClaims.json');
@@ -63,6 +64,7 @@ const initContracts = async (web3, networkId) => {
 
   for (const k in contracts) {
     const contract = contracts[k];
+    console.log('constract name = ', contract.contractName);
     const contractAddress = contract.networks[networkId].address;
     _contracts[k] = web3.eth.contract(contract.abi).at(contractAddress);
     _contracts.fromAddress[contractAddress] = _contracts[k];

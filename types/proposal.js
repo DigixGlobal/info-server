@@ -4,6 +4,28 @@ const { ofOne } = require('../helpers/utils');
 const { denominators } = require('../helpers/constants');
 
 const typeDef = gql`
+  enum ProposalPrlEnum {
+    STOPPED
+    PAUSED
+    ACTIVE
+  }
+
+  enum ProposalStageEnum {
+    IDEA
+    DRAFT
+    PROPOSAL
+    ONGOING
+    REVIEW
+    ARCHIVED
+  }
+
+  enum ProposalVotingStageEnum {
+    DRAFT
+    COMMIT
+    REVEAL
+    NONE
+  }
+
   # Voting rounds for proposal voting
   type Milestone {
     # Index ID
@@ -233,7 +255,7 @@ const typeDef = gql`
     endorser: EthAddress
 
     # The current stage of the proposal
-    stage: String
+    stage: ProposalStageEnum
 
     # A flag to indicate the proposal is by the Digix
     isDigix: Boolean
@@ -281,13 +303,13 @@ const typeDef = gql`
     finalVersionIpfsDoc: String
 
     # See 'Proposal.isPrl'
-    prl: Boolean
+    prl: ProposalPrlEnum
 
     # Proposal's claimable funding
     claimableFunding: BigNumber
 
     # Current voting stage
-    votingStage: String
+    votingStage: ProposalVotingStageEnum
 
     # For special proposals, the title of the proposal
     title: String

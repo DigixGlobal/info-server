@@ -89,7 +89,7 @@ const refreshProposalNew = async (res) => {
   proposal.stage = proposalStages.IDEA;
   proposal.timeCreated = proposalDetails[readProposalIndices.timeCreated].toNumber();
   proposal.finalVersionIpfsDoc = proposalDetails[readProposalIndices.finalVersionIpfsDoc];
-  proposal.prl = proposalDetails[readProposalIndices.prl];
+  proposal.prl = readProposalPRLActions.NEW;
   proposal.isDigix = proposalDetails[readProposalIndices.isDigix];
   proposal.claimableFunding = 0;
   proposal.currentMilestone = -1;
