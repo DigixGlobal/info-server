@@ -41,6 +41,15 @@ const typeDef = gql`
     CLAIM_FUNDING
   }
 
+  # Proposal actionable status for a proposal
+  type ProposalActionableObject {
+    # Proposal ID
+    proposalId: String
+
+    # Action that can be done by the current user
+    actionableStatus: String
+  }
+
   # Voting rounds for proposal voting
   type Milestone {
     # Index ID
