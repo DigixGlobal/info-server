@@ -64,7 +64,6 @@ const initContracts = async (web3, networkId) => {
 
   for (const k in contracts) {
     const contract = contracts[k];
-    console.log('constract name = ', contract.contractName);
     const contractAddress = contract.networks[networkId].address;
     _contracts[k] = web3.eth.contract(contract.abi).at(contractAddress);
     _contracts.fromAddress[contractAddress] = _contracts[k];
