@@ -137,6 +137,16 @@ const proposalVotingStages = {
   NONE: 'NONE',
 };
 
+const actionableStatus = {
+  NONE: 'NONE',
+  AWAITING_ENDORSEMENT: 'AWAITING_ENDORSEMENT',
+  MODERATOR_VOTING: 'MODERATOR_VOTING_ACTIVE',
+  COMMIT_PHASE: 'COMMIT_PHASE_ACTIVE',
+  REVEAL_PHASE: 'REVEAL_PHASE_ACTIVE',
+  CLAIM_FUNDING: 'CLAIM_FUNDING',
+  CLAIM_VOTING: 'CLAIM_VOTING',
+};
+
 const collections = {
   COUNTERS: 'counters',
   TRANSACTIONS: 'allTransactions',
@@ -343,4 +353,5 @@ module.exports = {
   daoServerEndpoints,
   daoServerEventTypes,
   gasLimits,
+  actionableStatus,
 };

@@ -2,9 +2,16 @@ const BigNumber = require('bignumber.js');
 const crypto = require('crypto');
 
 const {
+  getCurrentTimestamp,
+} = require('@digix/helpers/lib/helpers');
+
+const {
   denominators,
   dijixDefaultFields,
   gasLimits,
+  actionableStatus,
+  proposalStages,
+  proposalVotingStages,
 } = require('./constants');
 
 const getServerSignatures = function (req) {
@@ -359,6 +366,66 @@ const getTxConfigs = function () {
   };
 };
 
+const getCurrentActionableStatus = function (proposal, user) {
+  if (!proposal || !user) return actionableStatus.NONE;
+
+  const currentTime = getCurrentTimestamp();
+  if (
+    proposal.stage === proposalStages.IDEA
+    && user.isModerator
+  ) {
+    return actionableStatus.AWAITING_ENDORSEMENT;
+  }
+  if (
+    proposal.stage === proposalStages.DRAFT
+    && currentTime > proposal.draftVoting.startTime
+    && currentTime < proposal.draftVoting.votingDeadline
+    && user.isModerator
+  ) {
+    return actionableStatus.MODERATOR_VOTING;
+  }
+  if (
+    proposal.votingStage === proposalVotingStages.DRAFT
+    && currentTime > proposal.draftVoting.votingDeadline
+    && user.address === proposal.proposer
+  ) {
+    return actionableStatus.CLAIM_VOTING;
+  }
+  if (
+    proposal.votingStage === proposalVotingStages.COMMIT
+    && currentTime > proposal.votingRounds[proposal.currentVotingRound].startTime
+    && currentTime < proposal.votingRounds[proposal.currentVotingRound].commitDeadline
+    && (user.isModerator || user.isParticipant)
+  ) {
+    return actionableStatus.COMMIT_PHASE;
+  }
+  if (
+    proposal.votingStage === proposalVotingStages.COMMIT
+    && currentTime > proposal.votingRounds[proposal.currentVotingRound].commitDeadline
+    && currentTime < proposal.votingRounds[proposal.currentVotingRound].revealDeadline
+    && (user.isModerator || user.isParticipant)
+  ) {
+    return actionableStatus.REVEAL_PHASE;
+  }
+  if (
+    proposal.votingStage === proposalVotingStages.COMMIT
+    && currentTime > proposal.votingRounds[proposal.currentVotingRound].revealDeadline
+    && user.address === proposal.proposer
+  ) {
+    return actionableStatus.CLAIM_VOTING;
+  }
+  if (
+    proposal.stage === proposalStages.ONGOING
+    && proposal.claimableFunding !== null
+    && proposal.claimableFunding !== undefined
+    && proposal.claimableFunding !== '0'
+    && user.address === proposal.proposer
+  ) {
+    return actionableStatus.CLAIM_FUNDING;
+  }
+  return actionableStatus.NONE;
+};
+
 module.exports = {
   sumArray,
   sumArrayBN,
@@ -386,4 +453,5 @@ module.exports = {
   getDefaultDijixFields,
   getAdditionalDocs,
   getTxConfigs,
+  getCurrentActionableStatus,
 };

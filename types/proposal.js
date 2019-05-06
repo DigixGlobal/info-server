@@ -1,7 +1,13 @@
 const { gql } = require('apollo-server-express');
 
-const { ofOne } = require('../helpers/utils');
-const { denominators } = require('../helpers/constants');
+const {
+  ofOne,
+  getCurrentActionableStatus,
+} = require('../helpers/utils');
+
+const {
+  denominators,
+} = require('../helpers/constants');
 
 const typeDef = gql`
   enum ProposalPrlEnum {
@@ -24,6 +30,15 @@ const typeDef = gql`
     COMMIT
     REVEAL
     NONE
+  }
+
+  enum ProposalActionableStatusEnum {
+    NONE
+    AWAITING_ENDORSEMENT
+    MODERATOR_VOTING
+    COMMIT_PHASE
+    REVEAL_PHASE
+    CLAIM_FUNDING
   }
 
   # Voting rounds for proposal voting
@@ -322,6 +337,9 @@ const typeDef = gql`
 
     # Special proposal config changes
     uintConfigs: UintConfig
+
+    # Any actionable status
+    actionableStatus: ProposalActionableStatusEnum
   }
 `;
 
@@ -375,6 +393,10 @@ const resolvers = {
     },
     claimableFunding(proposal) {
       return eth(proposal.claimableFunding);
+    },
+    actionableStatus(proposal, user) {
+      const status = getCurrentActionableStatus(proposal, user);
+      return status.replace('_', ' ');
     },
     proposalVersions(proposal) {
       return (proposal.proposalVersions || []).map((version, index) => ({
