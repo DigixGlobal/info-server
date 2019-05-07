@@ -7,6 +7,7 @@ const {
 
 const {
   denominators,
+  actionableStatus,
 } = require('../helpers/constants');
 
 const typeDef = gql`
@@ -30,15 +31,6 @@ const typeDef = gql`
     COMMIT
     REVEAL
     NONE
-  }
-
-  enum ProposalActionableStatusEnum {
-    NONE
-    AWAITING_ENDORSEMENT
-    MODERATOR_VOTING
-    COMMIT_PHASE
-    REVEAL_PHASE
-    CLAIM_FUNDING
   }
 
   # Proposal actionable status for a proposal
@@ -348,7 +340,7 @@ const typeDef = gql`
     uintConfigs: UintConfig
 
     # Any actionable status
-    actionableStatus: ProposalActionableStatusEnum
+    actionableStatus: String
   }
 `;
 
@@ -403,9 +395,14 @@ const resolvers = {
     claimableFunding(proposal) {
       return eth(proposal.claimableFunding);
     },
-    actionableStatus(proposal, user) {
-      const status = getCurrentActionableStatus(proposal, user);
-      return status.replace('_', ' ');
+    actionableStatus(proposal, _args, context, _info) {
+      let status;
+      if (context.currentUser) {
+        status = getCurrentActionableStatus(proposal, context.currentUser);
+      } else {
+        status = actionableStatus.NONE;
+      }
+      return status.split('_').join(' ');
     },
     proposalVersions(proposal) {
       return (proposal.proposalVersions || []).map((version, index) => ({

@@ -2,7 +2,7 @@ const ethJsUtil = require('ethereumjs-util');
 const { withFilter, AuthenticationError } = require('apollo-server');
 const { ApolloServer, gql } = require('apollo-server-express');
 
-const { proposalToType, getCurrentActionableStatus } = require('./helpers/utils');
+const { proposalToType } = require('./helpers/utils');
 
 const { getAddressDetails } = require('./dbWrapper/addresses');
 const { getDaoInfo } = require('./dbWrapper/dao');
@@ -12,8 +12,11 @@ const { pubsub } = require('./pubsub');
 const {
   getProposal,
   getSpecialProposal,
+  getSpecialProposals,
   getProposals,
 } = require('./dbWrapper/proposals');
+
+const { proposalStages } = require('./helpers/constants');
 
 const { typeDef: scalarType, resolvers: scalarResolvers } = require('./types/scalar.js');
 const { typeDef: userType, resolvers: userResolvers } = require('./types/user.js');
@@ -31,8 +34,8 @@ const queryType = gql`
     # Get the current user's information.
     fetchDao: Dao!
 
-    # Get actionable statuses for proposals with proposalIds
-    getActionableStatus(proposalIds: [String!]): [ProposalActionableObject]
+    # Find proposals in specific stage
+    fetchProposals(stage: String!): [Proposal]
   }
 `;
 
@@ -84,25 +87,19 @@ const resolvers = {
     fetchDao: (_obj, _args, _context, _info) => {
       return getDaoInfo();
     },
-    getActionableStatus: async (_obj, args, context, _info) => {
-      if (!context.currentUser) {
-        throw new Error('Not Authenticated');
+    fetchProposals: async (_obj, args, _context, _info) => {
+      const { stage } = args;
+      const filter = (stage === 'all') ? {} : { stage: stage.toUpperCase() };
+      const proposals = await getProposals(filter);
+      let specialProposals = [];
+      if (
+        stage === proposalStages.PROPOSAL
+        || stage === 'all'
+      ) {
+        specialProposals = await getSpecialProposals();
       }
 
-      const { proposalIds } = args;
-      const proposals = await getProposals({
-        proposalId: {
-          $in: proposalIds,
-        },
-      });
-
-      return proposals.map((proposal) => {
-        const status = getCurrentActionableStatus(proposal, context.currentUser);
-        return {
-          proposalId: proposal.proposalId,
-          actionableStatus: status.replace('_', ' '),
-        };
-      });
+      return specialProposals.concat(proposals);
     },
   },
   Mutation: {},

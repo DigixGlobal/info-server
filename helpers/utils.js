@@ -377,7 +377,7 @@ const getCurrentActionableStatus = function (proposal, user) {
     return actionableStatus.AWAITING_ENDORSEMENT;
   }
   if (
-    proposal.stage === proposalStages.DRAFT
+    proposal.votingStage === proposalVotingStages.DRAFT
     && currentTime > proposal.draftVoting.startTime
     && currentTime < proposal.draftVoting.votingDeadline
     && user.isModerator
@@ -422,6 +422,22 @@ const getCurrentActionableStatus = function (proposal, user) {
     && user.address === proposal.proposer
   ) {
     return actionableStatus.CLAIM_FUNDING;
+  }
+  if (
+    proposal.isActive
+    && currentTime > proposal.votingRounds[0].startTime
+    && currentTime < proposal.votingRounds[0].commitDeadline
+    && (user.isModerator || user.isParticipant)
+  ) {
+    return actionableStatus.COMMIT_PHASE;
+  }
+  if (
+    proposal.isActive
+    && currentTime > proposal.votingRounds[0].commitDeadline
+    && currentTime < proposal.votingRounds[0].revealDeadline
+    && (user.isModerator || user.isParticipant)
+  ) {
+    return actionableStatus.REVEAL_PHASE;
   }
   return actionableStatus.NONE;
 };

@@ -45,7 +45,7 @@ router.get('/details/:id', async (req, res) => {
 });
 
 router.get('/:stage', async (req, res) => {
-  const filter = (req.params.stage === 'all') ? {} : { stage: req.params.stage };
+  const filter = (req.params.stage === 'all') ? {} : { stage: req.params.stage.toUpperCase() };
   const proposals = await getProposals(filter);
   let specialProposals = [];
   if (
