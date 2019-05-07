@@ -733,6 +733,7 @@ const refreshProposalSpecialNew = async (res) => {
   proposal.timeCreated = readProposal[readSpecialProposalIndices.timeCreated].toNumber();
   proposal.isActive = false;
   proposal.isSpecial = true;
+  proposal.prl = readProposalPRLActions.NEW;
   proposal.stage = proposalStages.PROPOSAL;
   proposal.uintConfigs = {};
   proposal.addressConfigs = {};
