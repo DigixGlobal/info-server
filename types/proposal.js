@@ -396,6 +396,9 @@ const resolvers = {
       return eth(proposal.claimableFunding);
     },
     actionableStatus(proposal, _args, context, _info) {
+      if (proposal.actionableStatus && proposal.actionableStatus !== undefined) {
+        return proposal.actionableStatus.split('_').join(' ');
+      }
       let status;
       if (context.currentUser) {
         status = getCurrentActionableStatus(proposal, context.currentUser);

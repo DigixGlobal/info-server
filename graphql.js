@@ -2,7 +2,8 @@ const ethJsUtil = require('ethereumjs-util');
 const { withFilter, AuthenticationError } = require('apollo-server');
 const { ApolloServer, gql } = require('apollo-server-express');
 
-const { proposalToType } = require('./helpers/utils');
+const { actionableStatus } = require('./helpers/constants');
+const { proposalToType, getCurrentActionableStatus } = require('./helpers/utils');
 
 const { getAddressDetails } = require('./dbWrapper/addresses');
 const { getDaoInfo } = require('./dbWrapper/dao');
@@ -35,7 +36,7 @@ const queryType = gql`
     fetchDao: Dao!
 
     # Find proposals in specific stage
-    fetchProposals(stage: String!): [Proposal]
+    fetchProposals(stage: String!, onlyActionable: Boolean): [Proposal]
   }
 `;
 
@@ -87,8 +88,8 @@ const resolvers = {
     fetchDao: (_obj, _args, _context, _info) => {
       return getDaoInfo();
     },
-    fetchProposals: async (_obj, args, _context, _info) => {
-      const { stage } = args;
+    fetchProposals: async (_obj, args, context, _info) => {
+      const { stage, onlyActionable } = args;
       const filter = (stage === 'all') ? {} : { stage: stage.toUpperCase() };
       const proposals = await getProposals(filter);
       let specialProposals = [];
@@ -99,6 +100,12 @@ const resolvers = {
         specialProposals = await getSpecialProposals();
       }
 
+      if (onlyActionable) {
+        return specialProposals.concat(proposals).map(proposal => ({
+          ...proposal,
+          actionableStatus: getCurrentActionableStatus(proposal, context.currentUser),
+        })).filter(proposal => proposal.actionableStatus !== actionableStatus.NONE);
+      }
       return specialProposals.concat(proposals);
     },
   },
