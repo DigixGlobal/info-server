@@ -159,7 +159,7 @@ const refreshProposalDetails = async (res) => {
   proposal.endorser = proposalDetails[readProposalIndices.endorser];
   proposal.timeCreated = proposalDetails[readProposalIndices.timeCreated].toNumber();
   proposal.finalVersionIpfsDoc = proposalDetails[readProposalIndices.finalVersionIpfsDoc];
-  proposal.prl = proposalDetails[readProposalIndices.prl];
+  proposal.prl = proposalDetails[readProposalIndices.prl] ? readProposalPRLActions.NEW : readProposalPRLActions.PAUSED;
   proposal.isDigix = proposalDetails[readProposalIndices.isDigix];
 
   const nVersions = proposalDetails[readProposalIndices.nVersions];

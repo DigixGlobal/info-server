@@ -119,6 +119,7 @@ const readProposalPRLActions = {
   2: 'PAUSED',
   3: 'ACTIVE',
   NEW: 'ACTIVE',
+  PAUSED: 'PAUSED',
 };
 
 const proposalStages = {

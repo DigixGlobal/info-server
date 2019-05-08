@@ -396,15 +396,10 @@ const resolvers = {
       return eth(proposal.claimableFunding);
     },
     actionableStatus(proposal, _args, context, _info) {
-      if (proposal.actionableStatus && proposal.actionableStatus !== undefined) {
-        return proposal.actionableStatus.split('_').join(' ');
+      if (!context.currentUser) {
+        return actionableStatus.NONE;
       }
-      let status;
-      if (context.currentUser) {
-        status = getCurrentActionableStatus(proposal, context.currentUser);
-      } else {
-        status = actionableStatus.NONE;
-      }
+      const status = proposal.actionableStatus || getCurrentActionableStatus(proposal, context.currentUser);
       return status.split('_').join(' ');
     },
     proposalVersions(proposal) {

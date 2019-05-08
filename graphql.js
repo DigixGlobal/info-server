@@ -92,21 +92,13 @@ const resolvers = {
       const { stage, onlyActionable } = args;
       const filter = (stage === 'all') ? {} : { stage: stage.toUpperCase() };
       const proposals = await getProposals(filter);
-      let specialProposals = [];
-      if (
-        stage === proposalStages.PROPOSAL
-        || stage === 'all'
-      ) {
-        specialProposals = await getSpecialProposals();
-      }
+      const specialProposals = (stage === proposalStages.PROPOSAL || stage === 'all') ? await getSpecialProposals() : [];
 
-      if (onlyActionable) {
-        return specialProposals.concat(proposals).map(proposal => ({
-          ...proposal,
-          actionableStatus: getCurrentActionableStatus(proposal, context.currentUser),
-        })).filter(proposal => proposal.actionableStatus !== actionableStatus.NONE);
-      }
-      return specialProposals.concat(proposals);
+      const allProposals = specialProposals.concat(proposals).map(proposal => ({
+        ...proposal,
+        actionableStatus: getCurrentActionableStatus(proposal, context.currentUser),
+      }));
+      return onlyActionable ? allProposals.filter(proposal => proposal.actionableStatus !== actionableStatus.NONE) : allProposals;
     },
   },
   Mutation: {},
