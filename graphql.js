@@ -92,7 +92,7 @@ const resolvers = {
       const { stage, onlyActionable } = args;
       const filter = (stage === 'all') ? {} : { stage: stage.toUpperCase() };
       const proposals = await getProposals(filter);
-      const specialProposals = (stage === proposalStages.PROPOSAL || stage === 'all') ? await getSpecialProposals() : [];
+      const specialProposals = (stage.toUpperCase() === proposalStages.PROPOSAL || stage === 'all') ? await getSpecialProposals() : [];
 
       const allProposals = specialProposals.concat(proposals).map(proposal => ({
         ...proposal,
