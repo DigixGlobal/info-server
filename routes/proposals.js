@@ -34,7 +34,7 @@ router.get('/count', async (req, res) => {
     if (!result[proposal.stage]) result[proposal.stage] = 0;
     result[proposal.stage] += 1;
   }
-  result[proposalStages.PROPOSAL] += specialProposalsCount;
+  result[proposalStages.PROPOSAL] = result[proposalStages.PROPOSAL] ? result[proposalStages.PROPOSAL] + specialProposalsCount : specialProposalsCount;
   return res.json({ result });
 });
 
