@@ -49,7 +49,7 @@ router.get('/:stage', async (req, res) => {
   const proposals = await getProposals(filter);
   let specialProposals = [];
   if (
-    req.params.stage === proposalStages.PROPOSAL
+    req.params.stage.toUpperCase() === proposalStages.PROPOSAL
     || req.params.stage === 'all'
   ) {
     specialProposals = await getSpecialProposals();
