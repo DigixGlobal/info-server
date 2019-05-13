@@ -28,6 +28,7 @@ module.exports = {
       RESYNC: process.env.RESYNC,
       REPROCESS_ONLY: process.env.REPROCESS_ONLY,
       SYNC_REPORT_FREQUENCY: 10,
+      KYC_ADMIN_KEYSTORE_PATH: '../keystore/kyc-admin.json',
       KYC_ADMIN_PASSWORD: 'digixdao',
       FORUM_ADMIN_ADDRESS: '0x52a9d38687a0c2d5e1645f91733ffab3bbd29b06',
       DGD_CONTRACT: '0x36376d6e66f20a2f5377a91a5e6ce37b53dda0d8',
