@@ -6,7 +6,7 @@ const {
   collections,
 } = require('../helpers/constants');
 
-const keystore = require('../keystore/kyc-admin.json');
+const keystore = require(process.env.KYC_ADMIN_KEYSTORE_PATH);
 
 let _db;
 

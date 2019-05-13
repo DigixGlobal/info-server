@@ -28,7 +28,7 @@ const {
   notifyDaoServer,
 } = require('./notifier');
 
-const keystore = require('../keystore/kyc-admin.json');
+const keystore = require(process.env.KYC_ADMIN_KEYSTORE_PATH);
 
 const _getCallData = (entry) => {
   return getContracts()
