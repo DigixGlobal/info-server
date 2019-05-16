@@ -1,9 +1,105 @@
 const { gql } = require('apollo-server-express');
 
-const { ofOne } = require('../helpers/utils');
-const { denominators } = require('../helpers/constants');
+const {
+  ofOne,
+  getCurrentActionableStatus,
+} = require('../helpers/utils');
+
+const {
+  denominators,
+  actionableStatus,
+} = require('../helpers/constants');
 
 const typeDef = gql`
+  enum ProposalPrlEnum {
+    # If PRL stops proposal
+    STOPPED
+
+    # If PRL pauses proposal
+    PAUSED
+
+    # If no action has been taken
+    # the proposal is active
+    ACTIVE
+  }
+
+  enum ProposalStageEnum {
+    # Idea phase
+    IDEA
+
+    # Draft phase
+    DRAFT
+
+    # Proposal phase
+    PROPOSAL
+
+    # Ongoing phase
+    ONGOING
+
+    # Review phase
+    REVIEW
+
+    # Archived phase
+    # After a proposal is completed all rounds
+    # Or if it failed voting in any round
+    # Or the proposer closed the proposal
+    # Or the founder closed the proposal after deadline
+    ARCHIVED
+  }
+
+  enum ProposalVotingStageEnum {
+    # Draft Voting stage
+    DRAFT
+
+    # Commit voting stage
+    COMMIT
+
+    # Reveal voting stage
+    REVEAL
+
+    # No voting stage going on
+    NONE
+  }
+
+  enum ActionableStatusEnum {
+    # No actionable status
+    # Or there is no user context
+    NONE
+
+    # Proposal awaits endorsement
+    # is displayed to the moderators
+    AWAITING_ENDORSEMENT
+
+    # Proposal is in moderator voting phase
+    # is displayed to the moderators
+    MODERATOR_VOTING
+
+    # Proposal is in commit voting phase
+    # is displayed to every participant
+    COMMIT_PHASE
+
+    # Proposal is in reveal vote phase
+    # is displayed to every participant
+    REVEAL_PHASE
+
+    # Funds can be claimed for this proposal
+    # is displayed only to the proposer of this proposal
+    CLAIM_FUNDING
+
+    # Voting result can be claimed for this proposal
+    # is displayed only to the proposer of this proposal
+    CLAIM_VOTING
+  }
+
+  # Proposal actionable status for a proposal
+  type ProposalActionableObject {
+    # Proposal ID
+    proposalId: String
+
+    # Action that can be done by the current user
+    actionableStatus: String
+  }
+
   # Voting rounds for proposal voting
   type Milestone {
     # Index ID
@@ -233,7 +329,7 @@ const typeDef = gql`
     endorser: EthAddress
 
     # The current stage of the proposal
-    stage: String
+    stage: ProposalStageEnum
 
     # A flag to indicate the proposal is by the Digix
     isDigix: Boolean
@@ -281,13 +377,13 @@ const typeDef = gql`
     finalVersionIpfsDoc: String
 
     # See 'Proposal.isPrl'
-    prl: Boolean
+    prl: ProposalPrlEnum
 
     # Proposal's claimable funding
     claimableFunding: BigNumber
 
     # Current voting stage
-    votingStage: String
+    votingStage: ProposalVotingStageEnum
 
     # For special proposals, the title of the proposal
     title: String
@@ -300,6 +396,9 @@ const typeDef = gql`
 
     # Special proposal config changes
     uintConfigs: UintConfig
+
+    # Any actionable status
+    actionableStatus: ActionableStatusEnum
   }
 `;
 
@@ -354,6 +453,12 @@ const resolvers = {
     claimableFunding(proposal) {
       return eth(proposal.claimableFunding);
     },
+    actionableStatus(proposal, _args, context, _info) {
+      if (!context.currentUser) {
+        return actionableStatus.NONE;
+      }
+      return (proposal.actionableStatus || getCurrentActionableStatus(proposal, context.currentUser));
+    },
     proposalVersions(proposal) {
       return (proposal.proposalVersions || []).map((version, index) => ({
         id: `${proposal.proposalId}/VERSION-${index}`,
@@ -361,7 +466,6 @@ const resolvers = {
       }));
     },
   },
-
 };
 
 module.exports = { resolvers, typeDef };

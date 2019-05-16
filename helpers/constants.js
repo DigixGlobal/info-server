@@ -115,25 +115,37 @@ const readProposalVersionIndices = {
 };
 
 const readProposalPRLActions = {
-  1: true,
-  2: true,
-  3: false,
+  1: 'STOPPED',
+  2: 'PAUSED',
+  3: 'ACTIVE',
+  NEW: 'ACTIVE',
+  PAUSED: 'PAUSED',
 };
 
 const proposalStages = {
-  IDEA: 'idea',
-  DRAFT: 'draft',
-  PROPOSAL: 'proposal',
-  ONGOING: 'ongoing',
-  REVIEW: 'review',
-  ARCHIVED: 'archived',
+  IDEA: 'IDEA',
+  DRAFT: 'DRAFT',
+  PROPOSAL: 'PROPOSAL',
+  ONGOING: 'ONGOING',
+  REVIEW: 'REVIEW',
+  ARCHIVED: 'ARCHIVED',
 };
 
 const proposalVotingStages = {
-  DRAFT: 'draftVoting',
-  COMMIT: 'commit',
-  REVEAL: 'reveal',
-  NONE: 'none',
+  DRAFT: 'DRAFT',
+  COMMIT: 'COMMIT',
+  REVEAL: 'REVEAL',
+  NONE: 'NONE',
+};
+
+const actionableStatus = {
+  NONE: 'NONE',
+  AWAITING_ENDORSEMENT: 'AWAITING_ENDORSEMENT',
+  MODERATOR_VOTING: 'MODERATOR_VOTING',
+  COMMIT_PHASE: 'COMMIT_PHASE',
+  REVEAL_PHASE: 'REVEAL_PHASE',
+  CLAIM_FUNDING: 'CLAIM_FUNDING',
+  CLAIM_VOTING: 'CLAIM_VOTING',
 };
 
 const collections = {
@@ -342,4 +354,11 @@ module.exports = {
   daoServerEndpoints,
   daoServerEventTypes,
   gasLimits,
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+  actionableStatus,
+=======
+>>>>>>> staging
+>>>>>>> develop
 };
