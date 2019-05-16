@@ -9,9 +9,12 @@ const {
   denominators,
   dijixDefaultFields,
   gasLimits,
+<<<<<<< HEAD
   actionableStatus,
   proposalStages,
   proposalVotingStages,
+=======
+>>>>>>> staging
 } = require('./constants');
 
 const getServerSignatures = function (req) {
@@ -469,5 +472,8 @@ module.exports = {
   getDefaultDijixFields,
   getAdditionalDocs,
   getTxConfigs,
+<<<<<<< HEAD
   getCurrentActionableStatus,
+=======
+>>>>>>> staging
 };
