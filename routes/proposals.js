@@ -34,7 +34,7 @@ router.get('/count', async (req, res) => {
     if (!result[proposal.stage]) result[proposal.stage] = 0;
     result[proposal.stage] += 1;
   }
-  result[proposalStages.PROPOSAL] += specialProposalsCount;
+  result[proposalStages.PROPOSAL] = result[proposalStages.PROPOSAL] ? result[proposalStages.PROPOSAL] + specialProposalsCount : specialProposalsCount;
   return res.json({ result });
 });
 
@@ -45,11 +45,11 @@ router.get('/details/:id', async (req, res) => {
 });
 
 router.get('/:stage', async (req, res) => {
-  const filter = (req.params.stage === 'all') ? {} : { stage: req.params.stage };
+  const filter = (req.params.stage === 'all') ? {} : { stage: req.params.stage.toUpperCase() };
   const proposals = await getProposals(filter);
   let specialProposals = [];
   if (
-    req.params.stage === proposalStages.PROPOSAL
+    req.params.stage.toUpperCase() === proposalStages.PROPOSAL
     || req.params.stage === 'all'
   ) {
     specialProposals = await getSpecialProposals();
