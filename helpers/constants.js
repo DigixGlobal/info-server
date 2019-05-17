@@ -354,11 +354,5 @@ module.exports = {
   daoServerEndpoints,
   daoServerEventTypes,
   gasLimits,
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
   actionableStatus,
-=======
->>>>>>> staging
->>>>>>> develop
 };
