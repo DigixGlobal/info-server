@@ -28,6 +28,10 @@ const {
 } = require('../helpers/utils');
 
 const {
+  fetchMany,
+} = require('../cacheWrapper/cacheUtil');
+
+const {
   counters,
   denominators,
 } = require('../helpers/constants');
@@ -43,6 +47,11 @@ router.use('/kyc', kycRoutes);
 router.get('/daoInfo', async (req, res) => {
   const info = deserializeDaoInfo(await getDaoInfo());
   return res.json({ result: info });
+});
+
+router.get('/priceInfo', async (req, res) => {
+  const priceInfo = fetchMany(['ethusd']);
+  return res.json({ result: priceInfo });
 });
 
 router.get('/daoConfigs', async (req, res) => {

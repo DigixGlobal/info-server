@@ -16,6 +16,10 @@ const {
   daoConfigsIndices,
 } = require('../helpers/constants');
 
+const {
+  getWeb3,
+} = require('../web3Wrapper/web3Util');
+
 const initDao = async () => {
   const daoInfo = await getContracts().daoInformation.readDaoInfo.call();
   const totalLockedDgds = await getContracts()
@@ -26,6 +30,7 @@ const initDao = async () => {
     .daoStakeStorage
     .totalModeratorLockedDGDStake
     .call();
+  const fundsInDao = await getWeb3().eth.getBalance(getContracts().daoFundingManager.address);
   // don't need to wait for this to be completed
 
   await updateDao({
@@ -39,6 +44,7 @@ const initDao = async () => {
       isGlobalRewardsSet: daoInfo[5],
       nModerators: daoInfo[6].toNumber(),
       nParticipants: daoInfo[7].toNumber(),
+      remainingFunds: fundsInDao.toNumber(),
     },
   }, { upsert: true });
 };
@@ -60,6 +66,7 @@ const refreshDaoConfigs = async () => {
 // which is already handled in the `addresses.js`
 const refreshDao = async () => {
   const daoInfo = await getContracts().daoInformation.readDaoInfo.call();
+  const fundsInDao = await getWeb3().eth.getBalance(getContracts().daoFundingManager.address);
   // don't need to wait for this to be completed
   await updateDao({
     $set: {
@@ -70,6 +77,7 @@ const refreshDao = async () => {
       isGlobalRewardsSet: daoInfo[5],
       nModerators: daoInfo[6].toNumber(),
       nParticipants: daoInfo[7].toNumber(),
+      remainingFunds: fundsInDao.toNumber(),
     },
   });
 };
@@ -87,6 +95,7 @@ const refreshDaoTemp = async () => {
       nParticipants: 0,
       totalLockedDgds: 0,
       totalModeratorLockedDgds: 0,
+      remainingFunds: 0,
     },
   });
 };
