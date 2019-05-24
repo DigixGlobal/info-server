@@ -262,6 +262,7 @@ const deserializeDaoInfo = function (daoInfo) {
   if (daoInfo === null) return daoInfo;
   daoInfo.totalLockedDgds = ofOne(daoInfo.totalLockedDgds, denominators.DGD);
   daoInfo.totalModeratorLockedDgds = ofOne(daoInfo.totalModeratorLockedDgds, denominators.DGD);
+  daoInfo.remainingFunds = ofOne(daoInfo.remainingFunds, denominators.ETH);
 
   return daoInfo;
 };

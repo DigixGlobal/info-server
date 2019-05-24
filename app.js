@@ -13,6 +13,7 @@ const {
 const mongoUtil = require('./dbWrapper/mongoUtil');
 const dijixUtil = require('./dijixWrapper/dijixUtil');
 const web3Util = require('./web3Wrapper/web3Util');
+const cacheUtil = require('./cacheWrapper/cacheUtil');
 
 const {
   initContracts,
@@ -105,6 +106,7 @@ const init = async () => {
   console.log('INFOLOG: init');
   await initDB();
   await initIpfs();
+  cacheUtil.init();
 
   app.use('/', routes);
 
