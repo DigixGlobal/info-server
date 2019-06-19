@@ -27,9 +27,14 @@ const {
 } = require('./notifier');
 
 const {
+  updatePrices,
+} = require('./prices');
+
+const {
   counters,
   daoServerEndpoints,
 } = require('../helpers/constants');
+
 
 const syncAndProcessToLatestBlock = async (lastProcessedBlock = null) => {
   console.log('INFOLOG: syncAndProcessToLatestBlock');
@@ -84,6 +89,7 @@ const watchNewBlocks = async () => {
   if (latestBlock > lastSeenBlock) {
     console.log('INFOLOG: [seen] new blocks = [', lastSeenBlock + 1, ', ', latestBlock, ']');
     if (!isUpdatingLatestTxns) _updateLatestTxns(lastSeenBlock, latestBlock);
+    updatePrices();
   }
 };
 
