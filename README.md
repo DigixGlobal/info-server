@@ -39,6 +39,8 @@ $ sudo service mongod start
 
 ### DigixDAO Architecture
 
+![DigixDAO Architecture](docs/digixdao-architecture.png)
+
 ### Contributing
 Refer [CONTRIBUTING.md](./CONTRIBUTING.md) for the process for submitting pull requests to us.
 
