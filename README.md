@@ -22,9 +22,20 @@ $ npm install
 $ sudo service mongod start
 ```
 * Run info-server
-```
-$ npm run dev:force
-```
+
+  Info-server can be started with multiple configurations, that are included in the `development.config.js` file. A few `npm` scripts have been added in the `package.json` file, also listed below:
+  * Forcefully drop database and restart info-server with a fresh instance. This also starts watching blocks from the `START_BLOCK` config value.
+  ```
+  $ npm run dev:force
+  ```
+  * Re-sync all transactions from the blockchain, and then process them. This does not drop the database.
+  ```
+  $ npm run dev:resync
+  ```
+  * Only re-process the transactions that already exist in the database. You may want to choose this option if you have modified certain logic in the `scripts/` directory, but do not want to re-sync all transactions from the blockchain
+  ```
+  $ npm run dev:reprocess
+  ```
 
 ### Repository Structure
 * `dbWrapper/`
