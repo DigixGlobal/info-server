@@ -1,189 +1,50 @@
-### Outline of server structure: [link](OUTLINE.md)
+# Info Server
+Info-server is a NodeJS server responsible for maintaining an off-chain replica of the DigixDAO storage contracts. Essentially, it watches for newly mined Ethereum blocks and updates its own database.
 
-### SETUP INSTRUCTIONS
-Please refer [HERE](https://gist.github.com/roynalnaruto/52f2be795f256ed7b0f156666108f8fc). The Info-server runs together with [DigixDAO contracts](https://github.com/DigixGlobal/dao-contracts/tree/dev-info-server) and [Dao-server](https://github.com/DigixGlobal/dao-server/tree/dev)
+### Setup
+##### Prerequisites
+* [MongoDB](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/#install-mongodb-community-edition-using-deb-packages)
+* [Ganache](https://github.com/trufflesuite/ganache-cli) (Ethereum RPC client for development/testing)
+* [DigixDAO Contracts](https://github.com/DigixGlobal/dao-contracts)
 
-### Setup:
-* Install MongoDB: https://docs.mongodb.com/manual/administration/install-on-linux/
-* Make sure `mongod` is running:
+##### Run info-server
+* Get the source
 ```
-sudo service mongod start
+$ git clone https://github.com/DigixGlobal/info-server.git
+$ git checkout develop
 ```
-* Install pm2:
+* Install dependencies
 ```
-npm install pm2@latest -g
+$ npm install
 ```
-* Install node dependencies:
+* Run MongoDB
 ```
-npm i
+$ sudo service mongod start
 ```
-* [Development] start the server in development:
-```
-npm run dev
-```
-  * The local server is at `localhost:3001`. Test going to http://localhost:3001/daoInfo
-* [Staging] start the staging server (on port 3002)
-```
-npm run staging
-```
+* Run info-server
 
-##### Details
-Note that the `dev` can be replaced by `staging` for the staging environment
-* Forcefully drop database and restart Info-server
-```
-$ npm run dev:force
-```
-* Re-sync all transactions from the blockchain, and then process them
-```
-$ npm run dev:resync
-```
-* Don't re-sync transactions, only process transactions all over again
-```
-$ npm run dev:reprocess
-```
+  Info-server can be started with multiple configurations, that are included in the `development.config.js` file. A few `npm` scripts have been added in the `package.json` file, also listed below:
+  * Forcefully drop database and restart info-server with a fresh instance. This also starts watching blocks from the `START_BLOCK` config value.
+  ```
+  $ npm run dev:force
+  ```
+  * Re-sync all transactions from the blockchain, and then process them. This does not drop the database.
+  ```
+  $ npm run dev:resync
+  ```
+  * Only re-process the transactions that already exist in the database. You may want to choose this option if you have modified certain logic in the `scripts/` directory, but do not want to re-sync all transactions from the blockchain
+  ```
+  $ npm run dev:reprocess
+  ```
 
-### Endpoints
-##### Dao details
-* `/daoInfo`
-```
-{
-    result: {
-      "currentQuarter": 1,
-      "startOfQuarter": <timestamp>, // in seconds
-      "startOfMainphase": <timestamp>,
-      "startOfNextQuarter": <timestamp>,
-      "totalLockedDgds": 1234e9, // = 1234 DGD
-      "totalModeratorLockedDgds": 234e9 // 234 DGD
-    }
-}
-```
-##### Address details
-* `/address/:address`
-```
-{
-    result: {
-      "address": "0x6ed6e4bc5341d8d53bca4ee5df6f0e1970f49918",
-      "isUser": true, // whether this address is a user. In ther words, whether this address has locked DGDs at least once
-      "lockedDgdStake": 123e9, // 123 DGDStake
-      "lockedDgd": 200e9, // locked 200 DGD
-      "reputationPoint": 12e9, // 12 Reputation Points
-      "quarterPoint": 8e9, // 8 Quarter Points
-      "isParticipant": true,
-      "isModerator": true,
-      "lastParticipatedQuarter": 1
-    }
-}
-```
+### DigixDAO Architecture
 
+![DigixDAO Architecture](docs/digixdao-architecture.png)
 
-##### Proposals
-* Get count of proposals in different stages: `/proposals/count`
-```
-{
-  "result": {
-    "idea": 2,
-    "draft": 1,
-    "proposal": 2,
-    "ongoing": 1,
-    "review": 1,
-    "archived": 1
-  }
-}
-```
-* Get proposal details: `/proposals/details/:id`
-```
-{
-    result: {
-      "proposalId": "0xwef23fwef",
-      "stage": "idea",
-      "proposer": "0x1234we..",
-      "endorser": "0x231423..",
-      "isDigix": false,
-      "timeCreated": <timestamp>,
-      "finalVersionIpfsDoc": "Qm23f..",
-      "proposalVersions": [
-        {
-          "docIpfsHash": "Qm..",
-          "created": <timestamp>,
-          "milestoneFundings": [1e18, 2e18],
-          finalReward: [1e18],
-          moreDocs: ["Qm..", "Qm..",..],
-          totalFunding: 4e18
-        },
-        ...
-      ]
-      "draftVoting": {
-        "startTime": <timestamp>,
-        "votingDeadline": <timestamp>,
-        "totalVoterStake": 123e9, // 123 DGD,
-        "totalVoterCount": 12
-        "currentResult": 0.61, // 61%
-        "quorum": 140e9, // 140 DGD
-        "quota": 0.60, // 60%
-        "claimed": false,
-        "passed": false,
-        "funded": false,
-      },
-      "votingRounds": [
-        { // voting round 0
-          "startTime": <timestamp>,
-          "commitDeadline": <timestamp>,
-          "revealDeadline": <timestamp>,
-          "totalVoterStake": 123e9, // 123 DGD,
-          "totalVoterCount": 12
-          "currentResult": 0.61, // 61%
-          "quorum": 140e9, // 140 DGD
-          "quota": 0.60, // 60%
-          "claimed": false,
-          "passed": false,
-          "funded": false,
-        },
-        ....
-      ]
-      "currentMilestone": 1,
-      "currentMilestoneStart": <timestamp>,
-      "currentVotingRound": -1, // -1 = draftVoting, 0 = first Voting
-      "votingStage": "draftVoting", // draftVoting/commit/reveal/none
-      "claimableFunding": 1e18, // 1 ETH
-      "prl": "ok", // ok/paused/stopped
-    }
-}
-```
+### Contributing
+Refer [CONTRIBUTING.md](./CONTRIBUTING.md) for the process for submitting pull requests to us.
 
-* List proposals in a certain stage: `/proposals/:stage`  :stage = idea/draft/...
-```
-{
-    result: [
-      {
-        "proposalId": "0xwef23fwef",
-        "proposer": "0x1234we..",
-        ....
-      },
-      {
-        "proposalId": "0xwef23fwef",
-        "proposer": "0x1234we..",
-        ....
-      },
-      ...
-    ]
-}
-```
+### [License](./LICENSE.md)
+Copyright DIGIXGLOBAL PRIVATE LIMITED.
 
-* List all proposals: `/proposals/all`
-```
-{
-    result: [
-      {
-        "proposalId": "0xwef23fwef",
-        "proposer": "0x1234we..",
-        ....
-      },
-      {
-        "proposalId": "0xwef23fwef",
-        "proposer": "0x1234we..",
-        ....
-      },
-      ...
-    ]
-}
-```
+The code in this repository is licensed under the [BSD-3 Clause](https://opensource.org/licenses/BSD-3-Clause) BSD-3-clause, 2017.
