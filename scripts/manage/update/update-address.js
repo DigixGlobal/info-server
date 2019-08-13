@@ -38,7 +38,7 @@ const updateAddress = async () => {
   const networkId = await web3.version.network;
   await initContracts(web3, networkId);
 
-  const address = process.env.USER_ADDRESS;
+  const address = process.env.USER_ADDRESS.toLowerCase();
 
   const addressDetails = await mongoClient
     .collection(collections.ADDRESSES)
@@ -53,6 +53,7 @@ const updateAddress = async () => {
           ...getAddressObject(userInfo),
         },
       }, { upsert: true });
+    console.log('updated address info to : ', userInfo);
   }
 
   console.log('done');
