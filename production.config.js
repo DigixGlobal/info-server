@@ -21,7 +21,7 @@ module.exports = {
       RESYNC: process.env.RESYNC,
       REPROCESS_ONLY: process.env.REPROCESS_ONLY,
       SYNC_REPORT_FREQUENCY: 10,
-      WEB3_HTTP_PROVIDER: 'https://mainnet.infura.io/v3/d356a5affcea4eec8e0cdde7e52570ba',
+      WEB3_HTTP_PROVIDER: 'https://mainnet.digix.global',
       IPFS_ENDPOINT: 'https://ipfs-api.digix.global',
       HTTP_ENDPOINT: 'https://ipfs.digix.global/ipfs',
       IPFS_TIMEOUT: 60000,
