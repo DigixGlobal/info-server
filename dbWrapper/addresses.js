@@ -16,6 +16,12 @@ const updateAddress = async (address, update, moreOptions = {}) => {
     .updateOne({ address }, update, moreOptions);
 };
 
+const updateAddresses = async (filter, update, moreOptions = {}) => {
+  await mongoUtil.getDB()
+    .collection(collections.ADDRESSES)
+    .updateMany(filter, update, moreOptions);
+};
+
 const getAddressDetails = async (address) => {
   const addressDetails = await mongoUtil.getDB()
     .collection(collections.ADDRESSES)
@@ -46,6 +52,7 @@ const getAllAddresses = async (filter) => {
 
 module.exports = {
   updateAddress,
+  updateAddresses,
   insertAddress,
   getAddressDetails,
   getAllAddresses,

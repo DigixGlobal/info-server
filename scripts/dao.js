@@ -9,6 +9,10 @@ const {
 } = require('../dbWrapper/dao');
 
 const {
+  updateAddresses,
+} = require('../dbWrapper/addresses');
+
+const {
   getContracts,
 } = require('../helpers/contracts');
 
@@ -32,6 +36,43 @@ const initDao = async () => {
     .call();
   const fundsInDao = await getWeb3().eth.getBalance(getContracts().daoFundingManager.address);
   // don't need to wait for this to be completed
+
+  await updateDao({
+    $set: {
+      currentQuarter: daoInfo[0].toNumber(),
+      startOfQuarter: daoInfo[1].toNumber(),
+      startOfMainphase: daoInfo[2].toNumber(),
+      startOfNextQuarter: daoInfo[3].toNumber(),
+      totalLockedDgds: totalLockedDgds.toNumber(),
+      totalModeratorLockedDgds: totalModeratorLockedDgds.toNumber(),
+      isGlobalRewardsSet: daoInfo[5],
+      nModerators: daoInfo[6].toNumber(),
+      nParticipants: daoInfo[7].toNumber(),
+      remainingFunds: fundsInDao.toNumber(),
+    },
+  }, { upsert: true });
+};
+
+const initDaoAtNewQuarter = async () => {
+  const daoInfo = await getContracts().daoInformation.readDaoInfo.call();
+  const totalLockedDgds = await getContracts()
+    .daoStakeStorage
+    .totalLockedDGDStake
+    .call();
+  const totalModeratorLockedDgds = await getContracts()
+    .daoStakeStorage
+    .totalModeratorLockedDGDStake
+    .call();
+  const fundsInDao = await getWeb3().eth.getBalance(getContracts().daoFundingManager.address);
+  // don't need to wait for this to be completed
+
+  // set everybody to be not participants and not moderators
+  await updateAddresses({ isParticipant: true }, {
+    $set: {
+      isParticipant: false,
+      isModerator: false,
+    },
+  });
 
   await updateDao({
     $set: {
@@ -133,5 +174,6 @@ module.exports = {
   refreshDaoConfigs,
   isDaoStarted,
   initDaoBeforeStart,
+  initDaoAtNewQuarter,
   getStartOfFirstQuarter,
 };
