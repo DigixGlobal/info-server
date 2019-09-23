@@ -30,8 +30,8 @@ const {
 } = require('./addresses');
 
 const {
-  initDao,
   initDaoBeforeStart,
+  initDaoAtNewQuarter,
 } = require('./dao');
 
 const tapPromise = t => f => (...args) => f(...args).then((result) => {
@@ -83,7 +83,7 @@ const multiBroadcast = (splitter, broadcasts) => tapPromise((result) => {
 
 const watchedFunctionsMap = {
   setStartOfFirstQuarter: initDaoBeforeStart,
-  calculateGlobalRewardsBeforeNewQuarter: initDao,
+  calculateGlobalRewardsBeforeNewQuarter: initDaoAtNewQuarter,
 
   lockDGD: multiBroadcast(
     ([daoInfo, user]) => [daoInfo, user],
