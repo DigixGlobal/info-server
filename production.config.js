@@ -10,6 +10,7 @@ module.exports = {
       DB_URL: 'mongodb://localhost:27017/digixdao',
       DIGIXDAO_DB_NAME: 'digixdao',
       DAO_SERVER_URL: 'https://daoapi.digix.global',
+      PRICEFEED_SERVER: 'https://datafeed.digix.global',
       SERVER_SECRET: process.env.SERVER_SECRET,
       RATE_LIMIT_WINDOW_MS: 60 * 1000,
       RATE_LIMIT_PER_WINDOW: 10,
