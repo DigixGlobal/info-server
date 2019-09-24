@@ -53,6 +53,7 @@
     "mongodb": "^3.1.8",
     "morgan": "^1.9.0",
     "node-cron": "^2.0.1",
+    "node-cache": "^4.2.0",
     "nodemon": "^1.18.4",
     "pm2": "^3.2.2",
     "postmark": "^1.6.1",

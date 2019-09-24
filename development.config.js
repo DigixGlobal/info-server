@@ -17,6 +17,7 @@ module.exports = {
       CRON_WATCH_BLOCKS_FREQUENCY: 5,
       WEB3_HTTP_PROVIDER: 'http://localhost:8545',
       DAO_SERVER_URL: 'http://localhost:3005',
+      PRICEFEED_SERVER: 'https://datafeed.digix.global',
       SERVER_SECRET: 'this-is-a-secret-between-dao-and-info-server',
       RATE_LIMIT_WINDOW_MS: 60 * 1000,
       RATE_LIMIT_PER_WINDOW: 10,
