@@ -75,7 +75,7 @@ const getSpecialProposals = async () => {
   const proposals = [];
   const cursor = mongoUtil.getDB()
     .collection(collections.SPECIAL_PROPOSALS)
-    .find({ isActive: true });
+    .find({});
   for (let proposal = await cursor.next(); proposal != null; proposal = await cursor.next()) {
     if (proposal && proposal._id) delete proposal._id;
     proposals.push(proposal);
