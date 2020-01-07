@@ -95,7 +95,7 @@ const ofMany = function (array, denominator) {
 
 const ofOne = function (value, denominator) {
   if (value === null || value === undefined) return value;
-  return ((new BigNumber(value)).div(new BigNumber(denominator))).toString();
+  return ((new BigNumber(value.toString())).div(new BigNumber(denominator))).toString();
 };
 
 const serializeProposal = function (proposal) {
