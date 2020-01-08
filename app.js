@@ -22,6 +22,8 @@ const {
 const server = require('./graphql');
 const routes = require('./routes');
 const scripts = require('./scripts');
+const cloudflare = require('cloudflare-express');
+
 
 const {
   setLastSeenBlock,
@@ -32,10 +34,12 @@ let waitingCron;
 
 web3Util.initWeb3(process.env.WEB3_HTTP_PROVIDER);
 
+app.use(cloudflare.restore({update_on_start:true}));
 app.use(cors());
 app.use(morgan('combined'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.set('trust proxy', 'loopback')
 app.set('json spaces', 4);
 
 const initDB = async () => {
