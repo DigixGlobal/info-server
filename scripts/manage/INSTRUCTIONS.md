@@ -15,3 +15,7 @@ $ FORUM_ADMIN_ADDRESS=<> node scripts/manage/add/add-forum-admin.js
 ```
 $ FORUM_ADMIN_ADDRESS=<> node scripts/manage/remove/remove-forum-admin.js
 ```
+* Update Special Proposal quorum
+```
+$ WEB3_HTTP_PROVIDER=https://mainnet.digix.global PROPOSAL_ID=<proposal-id> node scripts/manage/update/update-special-proposal.js
+```
