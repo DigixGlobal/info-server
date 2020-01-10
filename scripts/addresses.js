@@ -1,3 +1,5 @@
+const BigNumber = require('bignumber.js');
+
 const {
   getAddressDetails,
   updateAddress,
@@ -115,6 +117,13 @@ const _updateProposalVoteWeightages = async function (addressDetails, userInfo) 
       }
       proposal.votingRounds[votingRoundIndex].totalVoterStake = proposal.votingRounds[votingRoundIndex].totalVoterStake.minus(addressDetails.lockedDgdStake).plus(userInfo[6]).toString();
       proposal.votingRounds[votingRoundIndex].totalVoterCount = proposal.votingRounds[votingRoundIndex].totalVoterCount.toString();
+
+      // update quorum
+      proposal.votingRounds[votingRoundIndex].quorum = (await getContracts().daoCalculatorService.minimumVotingQuorum.call(
+        p.proposalId,
+        new BigNumber(votingRoundIndex),
+      )).toString();
+
       await updateProposal(p.proposalId, {
         $set: proposal,
       });
