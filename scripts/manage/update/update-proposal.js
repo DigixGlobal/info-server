@@ -1,4 +1,5 @@
 // will only update the voting times and deadlines
+// and quorum of current voting round
 const Web3 = require('web3');
 
 const BigNumber = require('bignumber.js');
@@ -35,17 +36,23 @@ const updateProposal = async () => {
   console.log('[old] commit deadline = ', proposal.votingRounds[0].commitDeadline);
   console.log('[old] reveal deadline = ', proposal.votingRounds[0].revealDeadline);
 
+  console.log('proposal current voting round = ', proposal.currentVotingRound);
+  console.log('[old] quorum = ', proposal.votingRounds[proposal.currentVotingRound].quorum);
+
   const votingStartTime = (await getContracts().daoStorage.readProposalVotingTime.call(proposalId, new BigNumber(0))).toNumber();
   const commitPhaseDuration = (await getContracts().daoConfigsStorage.uintConfigs.call(daoConfigsKeys.CONFIG_VOTING_COMMIT_PHASE)).toNumber();
   const votingPhaseDuration = (await getContracts().daoConfigsStorage.uintConfigs.call(daoConfigsKeys.CONFIG_VOTING_PHASE_TOTAL)).toNumber();
+  const quorum = (await getContracts().daoCalculatorService.minimumVotingQuorum.call(proposalId, new BigNumber(proposal.currentVotingRound))).toString();
 
   proposal.votingRounds[0].startTime = votingStartTime;
   proposal.votingRounds[0].commitDeadline = votingStartTime + commitPhaseDuration;
   proposal.votingRounds[0].revealDeadline = votingStartTime + votingPhaseDuration;
+  proposal.votingRounds[proposal.currentVotingRound].quorum = quorum;
 
   console.log('[new] voting start = ', proposal.votingRounds[0].startTime);
   console.log('[new] commit deadline = ', proposal.votingRounds[0].commitDeadline);
   console.log('[new] reveal deadline = ', proposal.votingRounds[0].revealDeadline);
+  console.log('[new] quorum = ', proposal.votingRounds[proposal.currentVotingRound].quorum);
 
   await mongoClient
     .collection(collections.PROPOSALS)
