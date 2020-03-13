@@ -5,3 +5,4 @@ db/
 !db/.gitkeep
 keystore/*
 production.env
+.node-xmlhttprequest-*
