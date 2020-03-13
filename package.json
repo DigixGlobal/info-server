@@ -35,6 +35,7 @@
     "apollo-server": "^2.4.8",
     "apollo-server-express": "^2.4.8",
     "awaiting": "^3.0.0",
+    "bignumber.js": "^9.0.0",
     "body-parser": "^1.18.2",
     "cloudflare-express": "^1.0.1",
     "cors": "^2.8.4",
