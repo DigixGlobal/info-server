@@ -47,7 +47,7 @@
     "graphql": "^14.1.1",
     "graphql-tools": "^4.0.4",
     "mongodb": "^3.1.8",
-    "morgan": "^1.9.0",
+    "morgan": "^1.10.1",
     "node-cron": "^2.0.1",
     "node-cache": "^4.2.0",
     "nodemon": "^1.18.4",
